@@ -7,28 +7,6 @@
     android:padding="10dp"
     tools:context=".MainActivity">
 
-
-
-    <Button
-        android:id="@+id/button_showInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show Info"
-        app:layout_constraintBottom_toTopOf="@+id/btn_select_file"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn_select_file"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select a Statement"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_fileChooser"
         android:name="com.aston.spendingtracker.FileSelectorFragment"
@@ -38,6 +16,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/fragment_file_selector" />
+
+    <Button
+        android:id="@+id/button_showInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/strip_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_fileChooser" />
+
+    <!--
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
+        app:layout_constraintTop_toBottomOf="@+id/button_showInfo">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/linearLayout">
+
+            <TextView
+                android:id="@+id/stripped_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="UnStripped Text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_showInfo" />
+
+        </LinearLayout>
+
+    </ScrollView>
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/button_showInfo"
+        android:id="@+id/recyclerview">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 
 

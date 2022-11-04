@@ -46,6 +46,7 @@ public class FileSelectorFragment extends Fragment {
 
     private static final String LOG_TAG = "AndroidExample";
 
+    private Uri uripath;
 
     public FileSelectorFragment() {
         // Required empty public constructor
@@ -101,15 +102,18 @@ public class FileSelectorFragment extends Fragment {
     }
 
     private void askPermissionAndBrowseFile()  {
+        Log.d(getClass().toString(), "askPermissionAndBrowseFile------------------------------------");
+
         // With Android Level >= 23, you have to ask the user
         // for permission to access External Storage.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // Level 23
-
+            Log.d(getClass().toString(), "android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M------------------------------------");
             // Check if we have Call permission
             int permisson = ActivityCompat.checkSelfPermission(this.getContext(),
                     Manifest.permission.READ_EXTERNAL_STORAGE);
 
             if (permisson != PackageManager.PERMISSION_GRANTED) {
+                Log.d(getClass().toString(), "don't have permission so prompt the user------------------------------------");
                 // If don't have permission so prompt the user.
                 this.requestPermissions(
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -118,6 +122,7 @@ public class FileSelectorFragment extends Fragment {
                 return;
             }
         }
+
         this.doBrowseFile();
     }
 
@@ -177,6 +182,8 @@ public class FileSelectorFragment extends Fragment {
                         String filePath = null;
                         try {
                             filePath = FileUtils.getPath(this.getContext(),fileUri);
+                            uripath = fileUri;
+
                             //File file = new File(fileUri.getPath());
                         } catch (Exception e) {
                             Log.e(LOG_TAG,"Error: " + e);
@@ -193,6 +200,11 @@ public class FileSelectorFragment extends Fragment {
 
     public String getPath()  {
         return this.editTextPath.getText().toString();
+    }
+
+    public Uri getPathURI()  {
+
+        return uripath;
     }
 
 }
