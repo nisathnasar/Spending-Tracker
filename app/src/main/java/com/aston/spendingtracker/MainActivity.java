@@ -1,36 +1,26 @@
 package com.aston.spendingtracker;
 
-import static androidx.core.content.PackageManagerCompat.LOG_TAG;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileUtils;
 import android.os.ParcelFileDescriptor;
-import android.provider.DocumentsContract;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
-import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
 
 import java.io.File;
@@ -38,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,35 +46,35 @@ public class MainActivity extends AppCompatActivity {
     private File root;
     private AssetManager assetManager;
     private TextView tv;
-    //private LinearLayout linearLayout;
+    private LinearLayout linearLayout;
 
     private final LinkedList<String> mWordList = new LinkedList<>();
 
     private RecyclerView mRecyclerView;
     private WordListAdapter mAdapter;
 
+    PyObject pyobj;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //linearLayout = findViewById(R.id.linearLayout);
+        linearLayout = findViewById(R.id.linearLayout);
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
 
         this.buttonShowInfo = this.findViewById(R.id.button_showInfo);
 
-        this.buttonShowInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    showInfo();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+        this.buttonShowInfo.setOnClickListener(v -> {
+            try {
+                stripText();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         });
 
@@ -95,6 +84,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Get a handle to the RecyclerView.
         mRecyclerView = findViewById(R.id.recyclerview);
+
+
+        if(!Python.isStarted()){
+            Python.start(new AndroidPlatform(this));
+        }
+
+//        Python py = Python.getInstance();
+//        pyobj = py.getModule("listoftransactions");
 
     }
 
@@ -117,55 +114,17 @@ public class MainActivity extends AppCompatActivity {
         //tv = (TextView) findViewById(R.id.stripped_tv);
     }
 
-    private void showInfo() throws IOException, URISyntaxException {
+    private void stripText() throws IOException, URISyntaxException {
         String path = this.fragment.getPath();
         Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
 
         PDFBoxResourceLoader.init(getApplicationContext());
 
-
-        //stripText();
-
         activateSequence();
     }
 
-    /**
-     * Strips the text from a PDF and displays the text on screen
-     */
-    public void stripText() {
-        String parsedText = null;
-        PDDocument document = null;
 
-        try {
-            document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
-            //document = PDDocument.load(f);
-        } catch(IOException e) {
-            Log.e("PdfBox-Android-Sample", "Exception thrown while loading document to strip", e);
-        }
-
-        try {
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            pdfStripper.setStartPage(0);
-            pdfStripper.setEndPage(1);
-            parsedText = "Parsed text: " + pdfStripper.getText(document);
-        }
-        catch (IOException e)
-        {
-            Log.e("PdfBox-Android-Sample", "Exception thrown while stripping text", e);
-        } finally {
-            try {
-                if (document != null) document.close();
-            }
-            catch (IOException e)
-            {
-                Log.e("PdfBox-Android-Sample", "Exception thrown while closing document", e);
-            }
-        }
-        tv.setText(parsedText);
-    }
-
-
-    public void activateSequence() throws IOException, URISyntaxException {
+    public void activateSequence() throws IOException {
         PDFtoCSV pdftocsv = new PDFtoCSV();
         //int numOfPagesToExtractFrom = numOfPagesToExtract;
         int numOfPagesToExtractFrom = 1;
@@ -181,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
         PDDocument document = PDDocument.load(fileStream);
 
         //PDDocument document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
+
+
+        PyObject obj = pyobj.callAttr("extract_text");
+        addTextView(obj.toString());
+
+
 
         Splitter splitter = new Splitter();
         List<PDDocument> splitPages = splitter.split(document);
@@ -223,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Page 2
-
         if(numOfPagesToExtractFrom>1){
             String text2 = stripper.getText(splitPages.get(1));
             String[] lines2 = text2.split("\\r?\\n");
@@ -325,13 +289,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*
+
     private void addTextView(String text){
         TextView valueTV = new TextView(this);
         valueTV.setText(text);
         valueTV.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        //linearLayout.addView(valueTV);
-    }*/
+        linearLayout.addView(valueTV);
+    }
 
 
 

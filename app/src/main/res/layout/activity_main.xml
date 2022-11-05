@@ -26,40 +26,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fragment_fileChooser" />
 
-    <!--
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/scrollView"
-        app:layout_constraintTop_toBottomOf="@+id/button_showInfo">
+        app:layout_constraintTop_toBottomOf="@+id/button_showInfo"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/linearLayout">
-
-            <TextView
-                android:id="@+id/stripped_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="UnStripped Text"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_showInfo" />
+            android:id="@+id/linearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/button_showInfo"
+            >
 
         </LinearLayout>
 
     </ScrollView>
-    -->
+
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/button_showInfo"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView"
         android:id="@+id/recyclerview">
 
     </androidx.recyclerview.widget.RecyclerView>
+
 
 
 
