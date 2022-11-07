@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private WordListAdapter mAdapter;
 
-    PyObject pyobj;
+//    PyObject pyobj;
 
 
     @Override
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        linearLayout = findViewById(R.id.linearLayout);
+        //linearLayout = findViewById(R.id.linearLayout);
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
@@ -142,8 +142,8 @@ public class MainActivity extends AppCompatActivity {
         //PDDocument document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
 
 
-        PyObject obj = pyobj.callAttr("extract_text");
-        addTextView(obj.toString());
+//        PyObject obj = pyobj.callAttr("extract_text");
+//        addTextView(obj.toString());
 
 
 
