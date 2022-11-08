@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
+import com.aston.spendingtracker.RegisterUser;
 import com.aston.spendingtracker.ui.login.LoginViewModel;
 import com.aston.spendingtracker.ui.login.LoginViewModelFactory;
 import com.aston.spendingtracker.databinding.ActivityLoginBinding;
@@ -64,6 +65,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private BeginSignInRequest signUpRequest;
 
+    private Button registerButton;
+
 
 
     @Override
@@ -71,6 +74,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = new Intent(this, MainActivity.class);
+
+        Intent registerIntent = new Intent(this, RegisterUser.class);
+
+
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -247,6 +254,16 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        final Button registerButton = binding.register;
+        //registerButton = findViewById(R.id.register);
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(registerIntent);
+            }
+        });
+
 
     }
 
@@ -331,5 +348,7 @@ public class LoginActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
 
 }
