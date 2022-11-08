@@ -60,6 +60,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:21.0.2'
 
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
+    implementation 'com.google.firebase:firebase-database:20.1.0'
 
     def fragment_version = "1.5.4"
 

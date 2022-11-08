@@ -1,23 +1,32 @@
 package com.aston.spendingtracker;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aston.spendingtracker.ui.login.LoginActivity;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.google.firebase.auth.FirebaseAuth;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
@@ -61,7 +70,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //linearLayout = findViewById(R.id.linearLayout);
+
+        if(FirebaseAuth.getInstance().getCurrentUser() == null){
+            signOut();
+        }
+
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
@@ -77,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+
 
         for(int i = 0; i < 20; i++){
             mWordList.addLast("Word " + i);
@@ -213,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
             for(String str : rows2){
                 fw.write(str+"\n");
                 //addTextView(str + "\n");
+                listTransaction.addLast(str+"\n");
             }
         }
 
@@ -298,6 +313,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        if(FirebaseAuth.getInstance().getCurrentUser() == null){
+            signOut();
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Disable back button
+    }
+
+    public void signOut(){
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_logout:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                signOut();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menufile, menu);
+        return true;
+    }
 
 }
