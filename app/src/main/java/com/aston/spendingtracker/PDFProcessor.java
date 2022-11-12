@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
@@ -22,16 +23,21 @@ public class PDFProcessor {
 
     private static final String TAG = "PDFProcessor";
 
-    public List<Integer> rowNumToJoin;
+    public List<Integer> rowIndexListToMergeWith;
     public boolean paymentOut;
     public String date = "";
     private FileDescriptor fileDescriptor;
     private LinkedList<String> listTransaction;
+    private Transaction transaction;
+    private String transactionDate, transactionPaymentType, transactionPaymentDetails, transactionPaidOut, transactionPaidIn, transactionBalance;
+    private HSBCRegex hsbcRegex;
 
     public PDFProcessor(Context context, Uri pathURI) throws IOException {
 
-        int numOfPagesToExtractFrom = 2;
+        int numOfPagesToExtractFrom = 1;
         listTransaction = new LinkedList<>();
+        hsbcRegex = new HSBCRegex();
+        PDFBoxResourceLoader.init(context);
         ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(pathURI, "r");
         this.fileDescriptor = parcelFileDescriptor.getFileDescriptor();
         InputStream fileStream = new FileInputStream(this.fileDescriptor);
@@ -55,27 +61,25 @@ public class PDFProcessor {
         Splitter splitter = new Splitter();
         List<PDDocument> splitPages = splitter.split(document);
         PDFTextStripper stripper = new PDFTextStripper();
-        String text = stripper.getText(splitPages.get(0));
-        String[] lines = text.split("\\r?\\n");
+        String text = stripper.getText(splitPages.get(0)); // reads all of the page
+        String[] lines = text.split("\\r?\\n"); // each line is broken into array
 
-        List<String> rows = synthesiseList(lines);
+        List<String> rows = stringArrayToArrayList(lines); //change string array to arraylist
 
-        // Remove the first non transaction lines: removes the first 30 lines by traversing in reverse
-        for (int i = 30; i > 1; i--) {
-            rows.remove(rows.remove(rows.size() - 1));
+        // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
+        for (int i = 29; i > 0; i--) {
+            rows.remove(rows.size() - 1);
         }
 
-        // Remove the last non transaction lines
-        for (int i = 2; i > -1; i--) {
+        // Remove the first non transaction lines
+        for (int i = 3; i >= 0; i--) {
             rows.remove(i);
         }
 
         rows = processLines(rows);
 
-        //write to file
         for (String str : rows) {
-            //fw.write(str+"\n");
-            //addTextView(str+"\n");
+            //fw.write(str+"\n"); //write to file
             listTransaction.addLast(str + "\n");
         }
 
@@ -83,7 +87,7 @@ public class PDFProcessor {
         if (numOfPagesToExtractFrom > 1) {
             String text2 = stripper.getText(splitPages.get(1));
             String[] lines2 = text2.split("\\r?\\n");
-            List<String> rows2 = synthesiseList(lines2);
+            List<String> rows2 = stringArrayToArrayList(lines2);
 
             /*
              * Remove the last irrelevant lines: removes the first 16 lines by traversing in reverse
@@ -94,7 +98,7 @@ public class PDFProcessor {
             /*
              * Remove the first useless lines
              */
-            for (int i = 1; i > -1; i--) {
+            for (int i = 1; i >= 0; i--) {
                 rows2.remove(i);
             }
 
@@ -114,7 +118,7 @@ public class PDFProcessor {
         if (numOfPagesToExtractFrom > 2) {
             String text3 = stripper.getText(splitPages.get(2));
             String[] lines3 = text3.split("\\r?\\n");
-            List<String> rows3 = synthesiseList(lines3);
+            List<String> rows3 = stringArrayToArrayList(lines3);
 
             /*
              * Remove the last irrelevant lines: removes the first 16 lines by traversing in reverse
@@ -148,15 +152,9 @@ public class PDFProcessor {
         return listTransaction;
     }
 
-    public List<String> synthesiseList(String[] strArr) {
+    public List<String> stringArrayToArrayList(String[] strArr) {
         List<String> result = new ArrayList<>();
         Collections.addAll(result, strArr);
-
-        /*
-        for(String str : strArr){
-            result.add(str);
-        }*/
-
         System.out.println("synthesised list: " + result);
         return result;
     }
@@ -168,25 +166,6 @@ public class PDFProcessor {
         }
     }
 
-    public boolean startsWithDate(String str) {
-        return str.matches("^[0-9]{2}\\s[a-zA-Z]{3}\\s[0-9]{2}\\s[()a-zA-Z0-9_-].*$");
-    }
-
-    public boolean startsWithFormattedDate(String str) {
-        return str.matches("^[0-9]{2}-[a-zA-Z]{3}-[0-9]{2}\\s[()a-zA-Z0-9_-].*$");
-    }
-
-    public boolean endsWithMoneyValue(String str) {
-        return str.matches("[,()a-zA-Z0-9_-].*\\s[0-9]{1}[0-9]*\\.[0-9]{2}$");
-    }
-
-    public boolean endsWith1MoneyValue(String str) {
-        return str.matches("[,()a-zA-Z0-9_-].*\\s[0-9]{1}[0-9]*\\.[0-9]{2}$") && !str.matches("[,()a-zA-Z0-9_-].*\\s[0-9]{1}[0-9]*\\.[0-9]{2}\\s[0-9]{1}[0-9]*\\.[0-9]{2}$");
-    }
-
-    public boolean endsWith2MoneyValues(String str) {
-        return str.matches("[,()a-zA-Z0-9_-].*\\s[0-9]{1}[0-9]*\\.[0-9]{2}\\s[0-9]{1}[0-9]*\\.[0-9]{2}$");
-    }
 
     /**
      * //System.out.println("10 aug 22 whatever d563 rfr".matches("^[0-9]{2}\\s[a-zA-Z]{3}\\s[0-9]{2}\\s[a-zA-Z0-9_-].*$"));
@@ -196,84 +175,76 @@ public class PDFProcessor {
      */
     public List<String> processLines(List<String> rows) {
 
-        rowNumToJoin = new ArrayList<>();
+        rowIndexListToMergeWith = new ArrayList<>();
 
         for (int i = 0; i < rows.size(); i++) {
 
+            rows.set(i, rows.get(i).replaceAll(",", "")); //removes the commas in money values
+            rows.set(i, rows.get(i).trim()); //removes space on both ends
 
-            rows.set(i, rows.get(i).replaceAll(",", ""));
-            rows.set(i, rows.get(i).replaceAll(" +", " "));
-            rows.set(i, rows.get(i).trim());
+            if (hsbcRegex.startsWithDate(rows.get(i))) { //if row starts with a date
 
-            if (startsWithDate(rows.get(i))) {
-
-                String[] words = rows.get(i).split(" ");
-                StringBuilder reformattedLine = new StringBuilder(words[0] + "-" + words[1] + "-" + words[2] + " ");
-                date = reformattedLine.toString().trim();
-
+                String[] words = rows.get(i).split(" "); //one word could be '29 Dec 20 ))) GOLDENS'
+                StringBuilder reformattedLine = new StringBuilder(words[0] + "-" + words[1] + "-" + words[2] + " "); //add dashes between dates
+                //date = reformattedLine.toString().trim();
 
                 for (int j = 3; j < words.length; j++) {
                     if (j != words.length - 1) {
-                        reformattedLine.append(words[j]).append(" ");
+                        reformattedLine.append(words[j]).append(" "); //after each word, add space
                     } else {
-                        reformattedLine.append(words[j]);
+                        reformattedLine.append(words[j]); //add no space after ending word
                     }
                 }
+
+                //bef: 29 Dec 20 ))) GOLDENS
                 rows.set(i, reformattedLine.toString());
+                //aft: 29-Dec-20 ))) GOLDENS
                 rows.set(i, rows.get(i).trim());
-                //System.out.println(i + ". starts with date:    " +rows.get(i));
 
-                if (!endsWithMoneyValue(rows.get(i))) {
-                    rowNumToJoin.add(i);
+
+                if (!hsbcRegex.endsWithMoneyValue(rows.get(i))) {  //if the row doesn't end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'this+next'
+                    rowIndexListToMergeWith.add(i);
                 }
-
-            } else if (endsWithMoneyValue(rows.get(i))) {
-                //System.out.println(i + ". ends with money: " + rows.get(i));
-            } else {
-                //System.out.println( i + ". regex fail:      " + rows.get(i));
-                rowNumToJoin.add(i);
-
+            }
+            else if (hsbcRegex.endsWithMoneyValue(rows.get(i))) { //if doesn't start with date nor ends with money value, ignore, it will be merged with a prev line: 'prev+this'
+//                System.out.println(i + ". ends with money: " + rows.get(i));
+            }
+            else { //if the row doesn't start with a date nor end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'date+this+next'
+//                System.out.println( i + ". regex fail:      " + rows.get(i));
+                rowIndexListToMergeWith.add(i);
             }
         }
-        /*
-        for(int i=0; i<rowNumToJoin.size(); i++){
-            System.out.println(rowNumToJoin.get(i));
-        }*/
 
-        /*
-          join together broken lines
-         */
+        //join together broken lines
+        for (int i = rowIndexListToMergeWith.size(); i > 0; i--) { //iterate from last row
+            int rowNumber = rowIndexListToMergeWith.get(i - 1); //get last index from array
+            if (rowNumber + 1 < rows.size()) { //if not on last index of rows
 
-        for (int i = rowNumToJoin.size(); i > 0; i--) {
-            int rowNumber = rowNumToJoin.get(i - 1);
-            if (rowNumber + 1 < rows.size()) {
-                rows.set(rowNumber, rows.get(rowNumber) + " " + rows.get(rowNumber + 1));
-                rows.remove(rowNumber + 1);
+                rows.set(rowNumber, rows.get(rowNumber) + " " + rows.get(rowNumber + 1)); //merge lines
+                rows.remove(rowNumber + 1); // remove the line that's been merged with previous line
+
             }
-
         }
 
         //fill empty dates
         for (int i = 0; i < rows.size(); i++) {
-            if (startsWithFormattedDate(rows.get(i))) {
-                String[] words = rows.get(i).split(" ");
-                date = words[0];
+            String[] columns = rows.get(i).split(" "); //split the line by word/column
+
+            if (hsbcRegex.startsWithFormattedDate(rows.get(i))) { //try and get the date of the first transaction of the day
+                date = columns[0];
             }
             //if(!startsWithFormattedDate(rows.get(i))){
             else {
-                String[] words = rows.get(i).split(" ");
-                StringBuilder reformattedLine = new StringBuilder();
-                reformattedLine.append(date).append(" ");
-                for (int j = 0; j < words.length; j++) {
+                //String[] columns = rows.get(i).split(" ");
+                StringBuilder newLineWithDateAdded = new StringBuilder();
+                newLineWithDateAdded.append(date).append(" "); //Add the date to a new line
 
-                    if (j != words.length - 1) {
-                        reformattedLine.append(words[j]).append(" ");
-                    } else {
-                        reformattedLine.append(words[j]);
-                    }
+
+                for (int j = 0; j < columns.length; j++) {
+                    newLineWithDateAdded.append(columns[j]).append(" "); //join up all the words/columns back up
                 }
-                rows.set(i, reformattedLine.toString());
-                rows.set(i, rows.get(i).trim());
+                rows.set(i, newLineWithDateAdded.toString().trim()); //set to rows list
+
             }
         }
 
@@ -282,6 +253,11 @@ public class PDFProcessor {
     }
 
 
+    /**
+     * TODO FATAL issue, sometimes vis turns out to be payment in
+     * @param word
+     * @return
+     */
     public boolean isPaymentOut(String word) {
         if ("BP".equals(word) || "CR".equals(word)) {
             return false;
@@ -290,46 +266,47 @@ public class PDFProcessor {
     }
 
     public List<String> addCommas(List<String> rows) {
+
+        String date, type, details, paidOut, painIn, Balance;
+
         //add commas
         for (int i = 0; i < rows.size(); i++) {
-            if (startsWithFormattedDate(rows.get(i))) {
-                String[] words = rows.get(i).split(" ");
+
+            String[] words = rows.get(i).split(" "); //spaces disappear after split so re-append spaces
+
+
+            if (hsbcRegex.startsWithFormattedDate(rows.get(i))) {
+
                 paymentOut = isPaymentOut(words[1]);
-                //add comma to 'date, type, + rest'
-                StringBuilder reformattedLine = new StringBuilder(words[0] + ", " + words[1] + ", ");
+                StringBuilder reformattedLine = new StringBuilder(words[0] + ", " + words[1] + ", "); //add coma 'date, type, '
 
                 for (int j = 2; j < words.length; j++) {
-                    reformattedLine.append(words[j]).append(" ");
+                    reformattedLine.append(words[j]).append(" "); //append rest of the line 'date, type, + rest'
                 }
-                rows.set(i, reformattedLine.toString());
-                rows.set(i, rows.get(i).trim());
-            } else {
-
-                String[] words = rows.get(i).split(" ");
-                paymentOut = isPaymentOut(words[0]);
-                //add blank cell if there is no date and comma: ' ,type,
-                StringBuilder reformattedLine = new StringBuilder("," + words[0] + ", ");
-                for (int j = 1; j < words.length; j++) {
-                    reformattedLine.append(words[j]).append(" ");
-                }
-                rows.set(i, reformattedLine.toString());
-                rows.set(i, rows.get(i).trim());
+                rows.set(i, reformattedLine.toString().trim());
+                words = rows.get(i).split(" "); //update words array with modified rows
             }
 
 
+
+
             // if you get 2 money values, first is either a pay in or out, second is a balance
-            if (endsWith2MoneyValues(rows.get(i))) {
-                String[] words = rows.get(i).split(" ");
+            if (hsbcRegex.endsWith2MoneyValues(rows.get(i))) {
+
+
+
                 StringBuilder reformattedLine = new StringBuilder();
-                for (int j = 0; j < words.length - 2; j++) {
+                for (int j = 0; j < words.length - 2; j++) { // break into columns append up to 'date, type, details'
                     if (j != words.length - 3) {
                         reformattedLine.append(words[j]).append(" ");
                     } else {
                         reformattedLine.append(words[j]);
                     }
+                    System.out.println(reformattedLine);
                 }
-                //add comma in the end 'rest, moneyValue, moneyValue'
 
+
+                //add comma in the end 'rest, moneyValue, moneyValue'
                 if (paymentOut) {
                     //add extra comma for payment out 'rest, moneyValue,, moneyValue'
                     reformattedLine.append(", ").append(words[words.length - 2]).append(",, ").append(words[words.length - 1]);
@@ -338,31 +315,33 @@ public class PDFProcessor {
                     reformattedLine.append(",, ").append(words[words.length - 2]).append(", ").append(words[words.length - 1]);
                 }
 
-                rows.set(i, reformattedLine.toString());
-                rows.set(i, rows.get(i).trim());
+                rows.set(i, reformattedLine.toString().trim());
             }
 
-            //if(endsWith1MoneyValue(rows.get(i))){
+            //if(hsbcRegex.endsWith1MoneyValue(rows.get(i))){
             else {
-                String[] words = rows.get(i).split(" ");
+                System.out.println("bef: " + rows.get(i));
+
                 StringBuilder reformattedLine = new StringBuilder();
-                for (int j = 0; j < words.length - 1; j++) {
+                for (int j = 0; j < words.length - 1; j++) { // break into columns append up to 'date, type, details'
                     if (j != words.length - 2) {
                         reformattedLine.append(words[j]).append(" ");
                     } else {
                         reformattedLine.append(words[j]);
                     }
                 }
+
                 //add comma in the end: 'rest, moneyvalue'
-                //reformattedLine.append(", ").append(words[words.length-1]);
                 if (paymentOut) {
                     reformattedLine.append(", ").append(words[words.length - 1]);
                 } else {
                     reformattedLine.append(",, ").append(words[words.length - 1]);
                 }
-                rows.set(i, reformattedLine.toString());
-                rows.set(i, rows.get(i).trim());
+                rows.set(i, reformattedLine.toString().trim());
+
+                System.out.println("aft: " + rows.get(i));
             }
+
         }
         return rows;
     }
