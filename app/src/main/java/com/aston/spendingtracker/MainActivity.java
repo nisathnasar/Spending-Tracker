@@ -119,194 +119,21 @@ public class MainActivity extends AppCompatActivity {
         String path = this.fragment.getPath();
         Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
 
-        PDFBoxResourceLoader.init(getApplicationContext());
-
-
-
-
         Uri pathURI = this.fragment.getPathURI();
 
-        PDFProcessor pdftocsv = new PDFProcessor(getApplicationContext(), pathURI);
+        PDFProcessor pdfProcessor = new PDFProcessor(getApplicationContext(), pathURI);
 
         //pdftocsv.activateSequence(r);
 
 
         // Create an adapter and supply the data to be displayed.
-        mAdapter = new WordListAdapter(this, pdftocsv.getTransactionList());
+        mAdapter = new WordListAdapter(this, pdfProcessor.getTransactionList());
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     }
-
-
-//    public void activateSequence(Uri pathURI) throws IOException {
-//        PDFtoCSV pdftocsv = new PDFtoCSV();
-//        //int numOfPagesToExtractFrom = numOfPagesToExtract;
-//        int numOfPagesToExtractFrom = 1;
-////        String readFilePath = sourceFilePath;
-////        File oldFile = new File(readFilePath);
-//
-//
-//
-//        ParcelFileDescriptor r = getApplicationContext().getContentResolver().openFileDescriptor(pathURI, "r");
-//
-//        InputStream fileStream = new FileInputStream(r.getFileDescriptor());
-//
-//        PDDocument document = PDDocument.load(fileStream);
-//
-//        //PDDocument document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
-//
-//
-////        PyObject obj = pyobj.callAttr("extract_text");
-////        addTextView(obj.toString());
-//
-//
-//
-//        Splitter splitter = new Splitter();
-//        List<PDDocument> splitPages = splitter.split(document);
-//        PDFTextStripper stripper = new PDFTextStripper();
-//        String text = stripper.getText(splitPages.get(0));
-//        String[] lines = text.split("\\r?\\n");
-//        List<String> rows = pdftocsv.synthesiseList(lines);
-//
-//
-//        // Remove the first irrelevant lines
-//        for(int i=30; i > 1; i-- ){
-//            rows.remove(rows.remove(rows.size()-1));
-//        }
-//
-//        // Remove the last useless lines
-//        for(int i=2; i > -1; i--){
-//            rows.remove(i);
-//        }
-//
-//        rows = pdftocsv.processLines(rows);
-//        pdftocsv.printList(rows);
-//
-//        FileWriter fw = new FileWriter(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/Created.csv");
-//
-//        //FileWriter fw = new FileWriter(root.getAbsolutePath() + "/Created.csv");
-//        Log.d("MainActivity.java", root.getAbsolutePath() + "/Created.csv");
-//
-//        //write header
-//        fw.write("Date, Type, Details, Pay Out, Pay In, Balance\n");
-//
-//        //addTextView("Date, Type, Details, Pay Out, Pay In, Balance\n");
-//
-//        LinkedList<String> listTransaction = new LinkedList<>();
-//
-//        //write to file
-//        for(String str : rows){
-//            fw.write(str+"\n");
-//            //addTextView(str+"\n");
-//            listTransaction.addLast(str+"\n");
-//        }
-//
-//        //Page 2
-//        if(numOfPagesToExtractFrom>1){
-//            String text2 = stripper.getText(splitPages.get(1));
-//            String[] lines2 = text2.split("\\r?\\n");
-//            List<String> rows2 = pdftocsv.synthesiseList(lines2);
-//
-//            /*
-//             * Remove the last irrelevant lines
-//             */
-//            for(int i=16; i > 1; i-- ){
-//                rows2.remove(rows2.remove(rows2.size()-1));
-//            }
-//            /*
-//             * Remove the first useless lines
-//             */
-//            for(int i=1; i > -1; i--){
-//                rows2.remove(i);
-//            }
-//
-//            pdftocsv.processLines(rows2);
-//            pdftocsv.printList(rows2);
-//
-//            //write to file
-//            for(String str : rows2){
-//                fw.write(str+"\n");
-//                //addTextView(str + "\n");
-//                listTransaction.addLast(str+"\n");
-//            }
-//        }
-//
-//        //Page 3
-//
-//        if(numOfPagesToExtractFrom>2){
-//            String text3 = stripper.getText(splitPages.get(2));
-//            String[] lines3 = text3.split("\\r?\\n");
-//            List<String> rows3 = pdftocsv.synthesiseList(lines3);
-//
-//            /*
-//             * Remove the last irrelevant lines
-//             */
-//            for(int i=16; i > 1; i-- ){
-//                rows3.remove(rows3.remove(rows3.size()-1));
-//            }
-//            /*
-//             * Remove the first useless lines
-//             */
-//            for(int i=1; i > -1; i--){
-//                rows3.remove(i);
-//            }
-//
-//            pdftocsv.processLines(rows3);
-//            pdftocsv.printList(rows3);
-//
-//            //write to file
-//            for(String str : rows3){
-//                fw.write(str+"\n");
-//                //addTextView(str + "\n");
-//            }
-//        }
-//
-//        //Page 3
-//
-//        if(numOfPagesToExtractFrom>3){
-//            String text3 = stripper.getText(splitPages.get(3));
-//            String[] lines3 = text3.split("\\r?\\n");
-//            List<String> rows3 = pdftocsv.synthesiseList(lines3);
-//
-//            /*
-//             * Remove the last irrelevant lines
-//             */
-//            for(int i=16; i > 1; i-- ){
-//                rows3.remove(rows3.remove(rows3.size()-1));
-//            }
-//
-//            /*
-//             * Remove the first useless lines
-//             */
-//            for(int i=1; i > -1; i--){
-//                rows3.remove(i);
-//            }
-//
-//            pdftocsv.processLines(rows3);
-//            pdftocsv.printList(rows3);
-//
-//            //write to file
-//            for(String str : rows3){
-//                fw.write(str+"\n");
-//                //addTextView(str + "\n");
-//            }
-//        }
-//
-//        document.close();
-//        fw.close();
-//
-//        // Create an adapter and supply the data to be displayed.
-//        mAdapter = new WordListAdapter(this, listTransaction);
-//        // Connect the adapter with the RecyclerView.
-//        mRecyclerView.setAdapter(mAdapter);
-//        // Give the RecyclerView a default layout manager.
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//
-//    }
-
 
     private void addTextView(String text){
         TextView valueTV = new TextView(this);
