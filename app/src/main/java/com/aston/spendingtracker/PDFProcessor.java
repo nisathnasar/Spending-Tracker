@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -249,6 +250,9 @@ public class PDFProcessor {
         }
 
         rows = addCommas(rows);
+
+        rows = addBalanceToAll(rows);
+
         return rows;
     }
 
@@ -274,7 +278,6 @@ public class PDFProcessor {
 
             String[] words = rows.get(i).split(" "); //spaces disappear after split so re-append spaces
 
-
             if (hsbcRegex.startsWithFormattedDate(rows.get(i))) {
 
                 paymentOut = isPaymentOut(words[1]);
@@ -287,13 +290,8 @@ public class PDFProcessor {
                 words = rows.get(i).split(" "); //update words array with modified rows
             }
 
-
-
-
             // if you get 2 money values, first is either a pay in or out, second is a balance
             if (hsbcRegex.endsWith2MoneyValues(rows.get(i))) {
-
-
 
                 StringBuilder reformattedLine = new StringBuilder();
                 for (int j = 0; j < words.length - 2; j++) { // break into columns append up to 'date, type, details'
@@ -302,17 +300,15 @@ public class PDFProcessor {
                     } else {
                         reformattedLine.append(words[j]);
                     }
-                    System.out.println(reformattedLine);
                 }
-
 
                 //add comma in the end 'rest, moneyValue, moneyValue'
                 if (paymentOut) {
                     //add extra comma for payment out 'rest, moneyValue,, moneyValue'
-                    reformattedLine.append(", ").append(words[words.length - 2]).append(",, ").append(words[words.length - 1]);
+                    reformattedLine.append(", ").append(words[words.length - 2]).append(", , ").append(words[words.length - 1]);
                 } else {
                     //add extra comma for payment in 'rest,, moneyValue, moneyValue'
-                    reformattedLine.append(",, ").append(words[words.length - 2]).append(", ").append(words[words.length - 1]);
+                    reformattedLine.append(", , ").append(words[words.length - 2]).append(", ").append(words[words.length - 1]);
                 }
 
                 rows.set(i, reformattedLine.toString().trim());
@@ -320,7 +316,7 @@ public class PDFProcessor {
 
             //if(hsbcRegex.endsWith1MoneyValue(rows.get(i))){
             else {
-                System.out.println("bef: " + rows.get(i));
+                //System.out.println("bef: " + rows.get(i));
 
                 StringBuilder reformattedLine = new StringBuilder();
                 for (int j = 0; j < words.length - 1; j++) { // break into columns append up to 'date, type, details'
@@ -337,9 +333,58 @@ public class PDFProcessor {
                 } else {
                     reformattedLine.append(",, ").append(words[words.length - 1]);
                 }
-                rows.set(i, reformattedLine.toString().trim());
+                rows.set(i, reformattedLine.toString());
 
-                System.out.println("aft: " + rows.get(i));
+                //System.out.println("aft: " + rows.get(i));
+            }
+
+        }
+        return rows;
+    }
+
+    private List<String> addBalanceToAll(List<String> rows){
+
+        //get last transaction
+        //get the balance
+        //for each transaction from last
+        //if there is a line before this
+        //if payment out,
+        //lastBalance = lastBalance + payment out of same transaction
+        //else if payment in
+        //lastBalance = lastBalance - payment in of same transaction
+        //set lastBalance as previous balance
+
+
+        System.out.println("-------------addbalance last row=" + rows.get(rows.size()-1));
+        double lastBalance = Double.parseDouble(rows.get(rows.size()-1).split(", ")[5]);
+        System.out.println("-------------lastBalance=" + lastBalance);
+
+        for (int i = 0; i < rows.size(); i++) {
+            int currIndexOfRows = rows.size() - i - 1;
+
+            //words.length == 4 if doesn't have balance, ==6 if has balance and has paid in or out
+            String[] words = rows.get(currIndexOfRows).split(", "); //break into columns without commas and spaces in the end.
+
+            System.out.println("bef: " + Arrays.toString(words));
+            if(words.length == 6) {
+                if (isPaymentOut(words[1])) {
+                    System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
+                    lastBalance = lastBalance + Double.parseDouble(words[3]);
+                } else {
+                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
+                    lastBalance = lastBalance - Double.parseDouble(words[3]);
+                }
+            } else {
+                System.out.println("adding balance field: " + lastBalance);
+                rows.set(currIndexOfRows, words[0] + ", " + words[1] + ", " + words[2] + ", " + words[3] + ", ," + lastBalance);
+
+                if (isPaymentOut(words[1])) {
+                    System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
+                    lastBalance = lastBalance + Double.parseDouble(words[3]);
+                } else {
+                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
+                    lastBalance = lastBalance - Double.parseDouble(words[3]);
+                }
             }
 
         }
