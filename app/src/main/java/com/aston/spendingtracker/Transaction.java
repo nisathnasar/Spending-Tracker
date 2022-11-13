@@ -8,6 +8,38 @@ public class Transaction {
     String paymentDetails;
     String paidOut;
     String painIn;
+
+    public String getDateOfTransaction() {
+        return dateOfTransaction;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+
+    public String getPaymentDetails() {
+        return paymentDetails;
+    }
+
+
+
+    public String getPaidOut() {
+        return paidOut;
+    }
+
+
+
+    public String getPainIn() {
+        return painIn;
+    }
+
+
+    public String getBalance() {
+        return balance;
+    }
+
+
     String balance;
 
     Transaction(){

@@ -32,6 +32,7 @@ public class PDFProcessor {
     private Transaction transaction;
     private String transactionDate, transactionPaymentType, transactionPaymentDetails, transactionPaidOut, transactionPaidIn, transactionBalance;
     private HSBCRegex hsbcRegex;
+    private double balanceCarriedForward;
 
     public PDFProcessor(Context context, Uri pathURI) throws IOException {
 
@@ -66,10 +67,27 @@ public class PDFProcessor {
         String text = stripper.getText(splitPages.get(0)); // reads all of the page
         String[] lines = text.split("\\r?\\n"); // each line is broken into array
 
+        System.out.println("---------------------------------------------");
+
+        for(String line : lines){
+            System.out.println(line);
+        }
+        System.out.println("---------------------------------------------");
+
         List<String> rows = stringArrayToArrayList(lines); //change string array to arraylist
 
+
+        String line = rows.get(rows.size()-28).replaceAll(",", "");
+        String[] splitlines = line.split(" ");
+        balanceCarriedForward = Double.parseDouble(splitlines[3]);
+
+        System.out.println("-----------------: " + balanceCarriedForward);
+
         // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
+        //int count = rows.size()-1;
         for (int i = 29; i > 0; i--) {
+
+            //count--;
             rows.remove(rows.size() - 1);
         }
 
@@ -94,6 +112,14 @@ public class PDFProcessor {
                     words[4].trim(),
                     words[5].trim());
             listTransactionItems.add(transaction);
+            System.out.println(
+                    "date: " + words[0].trim() +
+                    "type: " + words[1].trim() +
+                    "details: " + words[2].trim() +
+                    "paid in: " + words[3].trim() +
+                    "paid out: " + words[4].trim()+
+                    "balance: " + words[5].trim()
+            );
 
         }
 
@@ -368,7 +394,9 @@ public class PDFProcessor {
 
 
         System.out.println("-------------addbalance last row=" + rows.get(rows.size()-1));
-        double lastBalance = Double.parseDouble(rows.get(rows.size()-1).split(", ")[5]);
+        //double lastBalance = Double.parseDouble(rows.get(rows.size()-1).split(", ")[5]);
+        double lastBalance = balanceCarriedForward;
+
         System.out.println("-------------lastBalance=" + lastBalance);
 
         for (int i = 0; i < rows.size(); i++) {
@@ -383,8 +411,9 @@ public class PDFProcessor {
                     System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
                     lastBalance = lastBalance + Double.parseDouble(words[3]);
                 } else {
-                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
-                    lastBalance = lastBalance - Double.parseDouble(words[3]);
+//                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3].trim()));
+                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " );
+                    lastBalance = lastBalance - Double.parseDouble(words[4].trim());
                 }
             } else {
                 System.out.println("adding balance field: " + lastBalance);

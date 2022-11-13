@@ -6,14 +6,40 @@
     android:padding="6dp"
     android:background="@color/cardview_dark_background"
     android:layout_margin="10dp"
+    android:weightSum="1"
+    android:id="@+id/linearLayoutRV"
     >
 
     <TextView
-        android:id="@+id/word"
-        style="@style/word_title"
-        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/transaction_tv"
         android:textSize="15sp"
-        android:text="abs"/>
+        android:textStyle="bold"
+        android:paddingStart="5dp"
+        android:paddingEnd="25dp"
+        android:layout_weight="0.1"
+        android:maxLines="1"/>
 
+    <TextView
+        android:id="@+id/details_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        style="@style/word_title"
+        android:textSize="15sp"
+        android:layout_weight="0.8"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/balance_tv"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:textSize="15sp"
+        android:paddingStart="25dp"
+        android:paddingEnd="5dp"
+        android:layout_weight="0.1"/>
 
 </LinearLayout>
