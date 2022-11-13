@@ -76,7 +76,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         String mDetails = mTransactionList.get(position).getPaymentDetails();
         holder.detailsView.setText(mDetails);
 
-        String mBalance = mTransactionList.get(position).getBalance();
+        String mBalance = "£" + mTransactionList.get(position).getBalance();
         holder.balanceView.setText(mBalance);
 
     }

@@ -13,6 +13,7 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,10 +34,11 @@ public class PDFProcessor {
     private String transactionDate, transactionPaymentType, transactionPaymentDetails, transactionPaidOut, transactionPaidIn, transactionBalance;
     private HSBCRegex hsbcRegex;
     private double balanceCarriedForward;
+    private int numOfPagesToExtractFrom;
 
     public PDFProcessor(Context context, Uri pathURI) throws IOException {
 
-        int numOfPagesToExtractFrom = 1;
+        numOfPagesToExtractFrom = 1;
         listTransaction = new LinkedList<>();
         listTransactionItems = new LinkedList<>();
         hsbcRegex = new HSBCRegex();
@@ -57,12 +59,15 @@ public class PDFProcessor {
 
         activateSequence(document, numOfPagesToExtractFrom);
         parcelFileDescriptor.close();
+        fileStream.close();
+        document.close();
     }
 
     private void activateSequence(PDDocument document, int numOfPagesToExtractFrom) throws IOException {
 
         Splitter splitter = new Splitter();
         List<PDDocument> splitPages = splitter.split(document);
+        numOfPagesToExtractFrom = splitPages.size();
         PDFTextStripper stripper = new PDFTextStripper();
         String text = stripper.getText(splitPages.get(0)); // reads all of the page
         String[] lines = text.split("\\r?\\n"); // each line is broken into array
@@ -151,6 +156,16 @@ public class PDFProcessor {
                 //fw.write(str+"\n");
                 //addTextView(str + "\n");
                 listTransaction.addLast(str + "\n");
+
+                String[] words = str.split(",");
+                Transaction transaction = new Transaction(
+                        words[0].trim(),
+                        words[1].trim(),
+                        words[2].trim(),
+                        words[3].trim(),
+                        words[4].trim(),
+                        words[5].trim());
+                listTransactionItems.add(transaction);
             }
         }
 
@@ -405,6 +420,8 @@ public class PDFProcessor {
             //words.length == 4 if doesn't have balance, ==6 if has balance and has paid in or out
             String[] words = rows.get(currIndexOfRows).split(", "); //break into columns without commas and spaces in the end.
 
+            DecimalFormat df = new DecimalFormat("0.00");
+
             System.out.println("bef: " + Arrays.toString(words));
             if(words.length == 6) {
                 if (isPaymentOut(words[1])) {
@@ -417,7 +434,7 @@ public class PDFProcessor {
                 }
             } else {
                 System.out.println("adding balance field: " + lastBalance);
-                rows.set(currIndexOfRows, words[0] + ", " + words[1] + ", " + words[2] + ", " + words[3] + ", ," + lastBalance);
+                rows.set(currIndexOfRows, words[0] + ", " + words[1] + ", " + words[2] + ", " + words[3] + ", ," + df.format(lastBalance));
 
                 if (isPaymentOut(words[1])) {
                     System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
