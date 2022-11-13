@@ -27,8 +27,8 @@ public class PDFProcessor {
     public List<Integer> rowIndexListToMergeWith;
     public boolean paymentOut;
     public String date = "";
-    private FileDescriptor fileDescriptor;
     private LinkedList<String> listTransaction;
+    private LinkedList<Transaction> listTransactionItems;
     private Transaction transaction;
     private String transactionDate, transactionPaymentType, transactionPaymentDetails, transactionPaidOut, transactionPaidIn, transactionBalance;
     private HSBCRegex hsbcRegex;
@@ -37,11 +37,12 @@ public class PDFProcessor {
 
         int numOfPagesToExtractFrom = 1;
         listTransaction = new LinkedList<>();
+        listTransactionItems = new LinkedList<>();
         hsbcRegex = new HSBCRegex();
         PDFBoxResourceLoader.init(context);
         ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(pathURI, "r");
-        this.fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-        InputStream fileStream = new FileInputStream(this.fileDescriptor);
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        InputStream fileStream = new FileInputStream(fileDescriptor);
         PDDocument document = PDDocument.load(fileStream);
 
 //        PDDocument document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
@@ -82,6 +83,17 @@ public class PDFProcessor {
         for (String str : rows) {
             //fw.write(str+"\n"); //write to file
             listTransaction.addLast(str + "\n");
+
+            String[] words = str.split(",");
+            Transaction transaction = new Transaction(
+                    words[0].trim(),
+                    words[1].trim(),
+                    words[2].trim(),
+                    words[3].trim(),
+                    words[4].trim(),
+                    words[5].trim());
+            listTransactionItems.add(transaction);
+
         }
 
         //Page 2
@@ -151,6 +163,10 @@ public class PDFProcessor {
 
     public LinkedList<String> getTransactionList() {
         return listTransaction;
+    }
+
+    public LinkedList<Transaction> getTransactionListItems(){
+        return listTransactionItems;
     }
 
     public List<String> stringArrayToArrayList(String[] strArr) {

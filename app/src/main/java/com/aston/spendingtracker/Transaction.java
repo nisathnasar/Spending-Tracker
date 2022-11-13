@@ -23,5 +23,15 @@ public class Transaction {
         this.balance = balance;
     }
 
-
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "dateOfTransaction='" + dateOfTransaction + '\'' +
+                ", paymentType='" + paymentType + '\'' +
+                ", paymentDetails='" + paymentDetails + '\'' +
+                ", paidOut='" + paidOut + '\'' +
+                ", painIn='" + painIn + '\'' +
+                ", balance='" + balance + '\'' +
+                '}';
+    }
 }

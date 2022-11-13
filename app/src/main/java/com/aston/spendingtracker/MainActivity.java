@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private final LinkedList<String> mWordList = new LinkedList<>();
 
     private RecyclerView mRecyclerView;
-    private WordListAdapter mAdapter;
+    private RecyclerViewAdapter mAdapter;
 
 //    PyObject pyobj;
 
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Create an adapter and supply the data to be displayed.
-        mAdapter = new WordListAdapter(this, pdfProcessor.getTransactionList());
+        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionList());
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
