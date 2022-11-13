@@ -1,9 +1,12 @@
 package com.aston.spendingtracker;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,12 +16,16 @@ import java.util.LinkedList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.WordViewHolder> {
 
-    private final LinkedList<String> mWordList;
+    //private final LinkedList<String> mWordList;
+    private final LinkedList<Transaction> mTransactionList;
     private LayoutInflater mInflater;
+    Context context;
 
-    public RecyclerViewAdapter(Context context, LinkedList<String> wordList){
+    public RecyclerViewAdapter(Context context, LinkedList<Transaction> transactionList){
         mInflater = LayoutInflater.from(context);
-        this.mWordList = wordList;
+        //this.mWordList = wordList;
+        this.mTransactionList = transactionList;
+        this.context = context;
     }
 
     @NonNull
@@ -30,21 +37,65 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapter.WordViewHolder holder, int position) {
-        String mCurrent = mWordList.get(position);
-        holder.wordItemView.setText(mCurrent);
+        //String mCurrent = mWordList.get(position);
+        //holder.detailsView.setText(mCurrent);
+        String paidOut = mTransactionList.get(position).getPaidOut().trim();
+        String paidIn = mTransactionList.get(position).getPainIn().trim();
+        String mtransaction;
+
+        int nightModeFlags = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        if(!paidOut.equals("")){
+            mtransaction = "-£" + paidOut;
+
+            switch (nightModeFlags) {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    break;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    holder.linearLayoutRV.setBackgroundColor(Color.parseColor("#5c859c"));
+                    break;
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                    break;
+            }
+
+        } else{
+            mtransaction = "+£" + paidIn;
+
+            switch (nightModeFlags) {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    break;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    holder.linearLayoutRV.setBackgroundColor(Color.parseColor("#53b075"));
+                    break;
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                    break;
+            }
+        }
+        holder.transactionView.setText(mtransaction);
+
+        String mDetails = mTransactionList.get(position).getPaymentDetails();
+        holder.detailsView.setText(mDetails);
+
+        String mBalance = mTransactionList.get(position).getBalance();
+        holder.balanceView.setText(mBalance);
+
     }
 
     @Override
     public int getItemCount() {
-        return mWordList.size();
+        return mTransactionList.size();
     }
 
     class WordViewHolder extends RecyclerView.ViewHolder{
-        public final TextView wordItemView;
+        public final TextView detailsView, transactionView, balanceView;
+        public LinearLayout linearLayoutRV;
         final RecyclerViewAdapter mAdapter;
         public WordViewHolder(View itemView, RecyclerViewAdapter adapter) {
             super(itemView);
-            wordItemView = itemView.findViewById(R.id.word);
+            detailsView = itemView.findViewById(R.id.details_tv);
+            transactionView = itemView.findViewById(R.id.transaction_tv);
+            balanceView = itemView.findViewById(R.id.balance_tv);
+            linearLayoutRV = itemView.findViewById(R.id.linearLayoutRV);
             this.mAdapter = adapter;
         }
     }

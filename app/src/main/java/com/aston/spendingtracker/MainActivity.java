@@ -127,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Create an adapter and supply the data to be displayed.
-        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionList());
+//        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionList());
+        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionListItems());
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
