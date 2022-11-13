@@ -7,31 +7,43 @@
     tools:context=".MainActivity"
 
     >
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_fileChooser"
-        android:name="com.aston.spendingtracker.FileSelectorFragment"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:layout="@layout/fragment_file_selector" />
+        android:id="@+id/linearLayoutMA"
+        android:weightSum="1">
 
-    <Button
-        android:id="@+id/button_showInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/strip_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_fileChooser" />
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_fileChooser"
+            android:name="com.aston.spendingtracker.FileSelectorFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout="@layout/fragment_file_selector"
+            android:layout_weight="0.5"/>
+
+        <Button
+            android:id="@+id/button_showInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/strip_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/fragment_fileChooser"
+            android:layout_weight="0.5"
+            />
+
+    </LinearLayout>
+
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/button_showInfo"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutMA"
         android:id="@+id/recyclerview"
         android:paddingBottom="100dp"
         >
