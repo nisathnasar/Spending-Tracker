@@ -74,9 +74,10 @@ public class PDFProcessor {
         }
 
         // Remove the first non transaction lines
-        for (int i = 3; i >= 0; i--) {
-            rows.remove(i);
-        }
+//            for (int i = 3; i >= 0; i--) {
+//                rows.remove(i);
+//            }
+        rows.subList(0, 4).clear();
 
         rows = processLines(rows);
 
@@ -108,12 +109,13 @@ public class PDFProcessor {
             for (int i = 16; i > 1; i--) {
                 rows2.remove(rows2.remove(rows2.size() - 1));
             }
-            /*
-             * Remove the first useless lines
-             */
-            for (int i = 1; i >= 0; i--) {
-                rows2.remove(i);
-            }
+
+            // Remove the first non transaction lines
+
+//            for (int i = 1; i >= 0; i--) {
+//                rows2.remove(i);
+//            }
+            rows2.subList(0, 2).clear();
 
             processLines(rows2);
             printList(rows2);
@@ -139,21 +141,21 @@ public class PDFProcessor {
             for (int i = 16; i > 1; i--) {
                 rows3.remove(rows3.remove(rows3.size() - 1));
             }
-            /*
-             * Remove the first useless lines
-             */
-            for (int i = 1; i > -1; i--) {
-                rows3.remove(i);
-            }
+
+            //Remove the first useless lines
+//            for (int i = 1; i > -1; i--) {
+//                rows3.remove(i);
+//            }
+            rows3.subList(0, 2).clear();
 
             processLines(rows3);
             printList(rows3);
 
             //write to file
-            for (String str : rows3) {
+            //for (String str : rows3) {
                 //fw.write(str+"\n");
                 //addTextView(str + "\n");
-            }
+            //}
         }
 
         document.close();
@@ -223,13 +225,12 @@ public class PDFProcessor {
                     rowIndexListToMergeWith.add(i);
                 }
             }
-            else if (hsbcRegex.endsWithMoneyValue(rows.get(i))) { //if doesn't start with date nor ends with money value, ignore, it will be merged with a prev line: 'prev+this'
-//                System.out.println(i + ". ends with money: " + rows.get(i));
-            }
-            else { //if the row doesn't start with a date nor end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'date+this+next'
+            else if (!hsbcRegex.endsWithMoneyValue(rows.get(i))) { //if the row doesn't start with a date nor end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'date+this+next'
 //                System.out.println( i + ". regex fail:      " + rows.get(i));
                 rowIndexListToMergeWith.add(i);
             }
+            //if doesn't start with date nor ends with money value, ignore, it will be merged with a prev line: 'prev+this'
+
         }
 
         //join together broken lines
@@ -257,8 +258,8 @@ public class PDFProcessor {
                 newLineWithDateAdded.append(date).append(" "); //Add the date to a new line
 
 
-                for (int j = 0; j < columns.length; j++) {
-                    newLineWithDateAdded.append(columns[j]).append(" "); //join up all the words/columns back up
+                for (String column : columns) {
+                    newLineWithDateAdded.append(column).append(" "); //join up all the words/columns back up
                 }
                 rows.set(i, newLineWithDateAdded.toString().trim()); //set to rows list
 
@@ -267,7 +268,7 @@ public class PDFProcessor {
 
         rows = addCommas(rows);
 
-        rows = addBalanceToAll(rows);
+        addBalanceToAll(rows);
 
         return rows;
     }
@@ -275,14 +276,9 @@ public class PDFProcessor {
 
     /**
      * TODO FATAL issue, sometimes vis turns out to be payment in
-     * @param word
-     * @return
      */
     public boolean isPaymentOut(String word) {
-        if ("BP".equals(word) || "CR".equals(word)) {
-            return false;
-        }
-        return true;
+        return !"BP".equals(word) && !"CR".equals(word);
     }
 
     public List<String> addCommas(List<String> rows) {
@@ -411,14 +407,11 @@ public class PDFProcessor {
      * return int month for given 3 letter string i.e. "feb" returns 2
      *
      * @param month 3 letter string
-     * @return
+     * @return integer 0 for jan
      */
     private int formatMonth(String month) {
-        int result = 0;
+        int result;
         switch (month.toLowerCase(Locale.ROOT)) {
-            case "jan":
-                result = 0;
-                break;
             case "feb":
                 result = 1;
                 break;
