@@ -4,6 +4,13 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
@@ -19,7 +26,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public class PDFProcessor {
 
@@ -35,6 +41,7 @@ public class PDFProcessor {
     private HSBCRegex hsbcRegex;
     private double balanceCarriedForward;
     private int numOfPagesToExtractFrom;
+    private int countOfTransaction;
 
     public PDFProcessor(Context context, Uri pathURI) throws IOException {
 
@@ -69,62 +76,43 @@ public class PDFProcessor {
         List<PDDocument> splitPages = splitter.split(document);
         numOfPagesToExtractFrom = splitPages.size();
         PDFTextStripper stripper = new PDFTextStripper();
-        String text = stripper.getText(splitPages.get(0)); // reads all of the page
-        String[] lines = text.split("\\r?\\n"); // each line is broken into array
 
-        System.out.println("---------------------------------------------");
+        //page 1
+        {
+            String text = stripper.getText(splitPages.get(0)); // reads all of the page
+            String[] lines = text.split("\\r?\\n"); // each line is broken into array
 
-        for(String line : lines){
-            System.out.println(line);
-        }
-        System.out.println("---------------------------------------------");
+            //print all text
+            {
+                System.out.println("-------------------text read on first page--------------------------");
+                for (String line : lines) {
+                    System.out.println(line);
+                }
+                System.out.println("---------------------------------------------");
+            }
 
-        List<String> rows = stringArrayToArrayList(lines); //change string array to arraylist
+            List<String> rows = stringArrayToArrayList(lines); //change string array to arraylist
+
+            //get carry forward balance
+            {
+                String line = rows.get(rows.size() - 28).replaceAll(",", "");
+                String[] splitlines = line.split(" ");
+                balanceCarriedForward = Double.parseDouble(splitlines[3]);
+                System.out.println("-----------------: " + balanceCarriedForward);
+            }
+
+            // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
+            for (int i = 29; i > 0; i--) {
+                rows.remove(rows.size() - 1);
+            }
+
+            // Remove the first non transaction lines
+            rows.subList(0, 4).clear();
 
 
-        String line = rows.get(rows.size()-28).replaceAll(",", "");
-        String[] splitlines = line.split(" ");
-        balanceCarriedForward = Double.parseDouble(splitlines[3]);
+            rows = processLines(rows);
 
-        System.out.println("-----------------: " + balanceCarriedForward);
-
-        // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
-        //int count = rows.size()-1;
-        for (int i = 29; i > 0; i--) {
-
-            //count--;
-            rows.remove(rows.size() - 1);
-        }
-
-        // Remove the first non transaction lines
-//            for (int i = 3; i >= 0; i--) {
-//                rows.remove(i);
-//            }
-        rows.subList(0, 4).clear();
-
-        rows = processLines(rows);
-
-        for (String str : rows) {
-            //fw.write(str+"\n"); //write to file
-            listTransaction.addLast(str + "\n");
-
-            String[] words = str.split(",");
-            Transaction transaction = new Transaction(
-                    words[0].trim(),
-                    words[1].trim(),
-                    words[2].trim(),
-                    words[3].trim(),
-                    words[4].trim(),
-                    words[5].trim());
-            listTransactionItems.add(transaction);
-            System.out.println(
-                    "date: " + words[0].trim() +
-                    "type: " + words[1].trim() +
-                    "details: " + words[2].trim() +
-                    "paid in: " + words[3].trim() +
-                    "paid out: " + words[4].trim()+
-                    "balance: " + words[5].trim()
-            );
+            addToDataBase(rows);
 
         }
 
@@ -149,7 +137,6 @@ public class PDFProcessor {
             rows2.subList(0, 2).clear();
 
             processLines(rows2);
-            printList(rows2);
 
             //write to file
             for (String str : rows2) {
@@ -170,7 +157,6 @@ public class PDFProcessor {
         }
 
         //Page 3
-
         if (numOfPagesToExtractFrom > 2) {
             String text3 = stripper.getText(splitPages.get(2));
             String[] lines3 = text3.split("\\r?\\n");
@@ -190,17 +176,20 @@ public class PDFProcessor {
             rows3.subList(0, 2).clear();
 
             processLines(rows3);
-            printList(rows3);
 
             //write to file
             //for (String str : rows3) {
-                //fw.write(str+"\n");
-                //addTextView(str + "\n");
+            //fw.write(str+"\n");
+            //addTextView(str + "\n");
             //}
         }
 
         document.close();
         //fw.close();
+
+        for(String transaction : listTransaction){
+            System.out.println(transaction);
+        }
 
     }
 
@@ -208,7 +197,7 @@ public class PDFProcessor {
         return listTransaction;
     }
 
-    public LinkedList<Transaction> getTransactionListItems(){
+    public LinkedList<Transaction> getTransactionListItems() {
         return listTransactionItems;
     }
 
@@ -218,14 +207,6 @@ public class PDFProcessor {
         System.out.println("synthesised list: " + result);
         return result;
     }
-
-    public void printList(List<String> list) {
-
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + ". " + list.get(i));
-        }
-    }
-
 
     /**
      * //System.out.println("10 aug 22 whatever d563 rfr".matches("^[0-9]{2}\\s[a-zA-Z]{3}\\s[0-9]{2}\\s[a-zA-Z0-9_-].*$"));
@@ -265,8 +246,7 @@ public class PDFProcessor {
                 if (!hsbcRegex.endsWithMoneyValue(rows.get(i))) {  //if the row doesn't end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'this+next'
                     rowIndexListToMergeWith.add(i);
                 }
-            }
-            else if (!hsbcRegex.endsWithMoneyValue(rows.get(i))) { //if the row doesn't start with a date nor end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'date+this+next'
+            } else if (!hsbcRegex.endsWithMoneyValue(rows.get(i))) { //if the row doesn't start with a date nor end with money value, it means this transaction is broken into multiple lines. add the index to rownumtojoin. this is to be merged 'date+this+next'
 //                System.out.println( i + ". regex fail:      " + rows.get(i));
                 rowIndexListToMergeWith.add(i);
             }
@@ -309,7 +289,7 @@ public class PDFProcessor {
 
         rows = addCommas(rows);
 
-        addBalanceToAll(rows);
+        addBalanceToAllLines(rows);
 
         return rows;
     }
@@ -395,7 +375,7 @@ public class PDFProcessor {
         return rows;
     }
 
-    private List<String> addBalanceToAll(List<String> rows){
+    private List<String> addBalanceToAllLines(List<String> rows) {
 
         //get last transaction
         //get the balance
@@ -408,7 +388,7 @@ public class PDFProcessor {
         //set lastBalance as previous balance
 
 
-        System.out.println("-------------addbalance last row=" + rows.get(rows.size()-1));
+        System.out.println("-------------addbalance last row=" + rows.get(rows.size() - 1));
         //double lastBalance = Double.parseDouble(rows.get(rows.size()-1).split(", ")[5]);
         double lastBalance = balanceCarriedForward;
 
@@ -423,13 +403,13 @@ public class PDFProcessor {
             DecimalFormat df = new DecimalFormat("0.00");
 
             System.out.println("bef: " + Arrays.toString(words));
-            if(words.length == 6) {
+            if (words.length == 6) {
                 if (isPaymentOut(words[1])) {
                     System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
                     lastBalance = lastBalance + Double.parseDouble(words[3]);
                 } else {
 //                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3].trim()));
-                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " );
+                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = ");
                     lastBalance = lastBalance - Double.parseDouble(words[4].trim());
                 }
             } else {
@@ -445,56 +425,54 @@ public class PDFProcessor {
                 }
             }
 
+
         }
+
         return rows;
     }
 
-    /**
-     * return int month for given 3 letter string i.e. "feb" returns 2
-     *
-     * @param month 3 letter string
-     * @return integer 0 for jan
-     */
-    private int formatMonth(String month) {
-        int result;
-        switch (month.toLowerCase(Locale.ROOT)) {
-            case "feb":
-                result = 1;
-                break;
-            case "mar":
-                result = 2;
-                break;
-            case "apr":
-                result = 3;
-                break;
-            case "may":
-                result = 4;
-                break;
-            case "jun":
-                result = 5;
-                break;
-            case "jul":
-                result = 6;
-                break;
-            case "aug":
-                result = 7;
-                break;
-            case "sep":
-                result = 8;
-                break;
-            case "oct":
-                result = 9;
-                break;
-            case "nov":
-                result = 10;
-                break;
-            case "dec":
-                result = 11;
-                break;
-            default:
-                result = 0;
-                break;
+    private void addToDataBase(List<String> rows){
+
+        DatabaseReference dbRef = FirebaseDatabase.getInstance()
+                .getReference("Transaction")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        for (String str : rows) {
+
+            //fw.write(str+"\n"); //write to file
+            listTransaction.addLast(str + "\n");
+
+            String[] words = str.split(",");
+            Transaction transaction = new Transaction(
+                    words[0].trim(),
+                    words[1].trim(),
+                    words[2].trim(),
+                    words[3].trim(),
+                    words[4].trim(),
+                    words[5].trim());
+
+            dbRef.child(Integer.toString(transaction.getTransactionID())).setValue(transaction).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        //if successful
+                    } else {
+                        //if not successful
+                    }
+                }
+            });
+            countOfTransaction++;
+
+            listTransactionItems.add(transaction);
+            System.out.println(
+                    "date: " + words[0].trim() +
+                            "type: " + words[1].trim() +
+                            "details: " + words[2].trim() +
+                            "paid in: " + words[3].trim() +
+                            "paid out: " + words[4].trim() +
+                            "balance: " + words[5].trim()
+            );
         }
-        return result;
     }
+
 }

@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +22,11 @@ import com.aston.spendingtracker.ui.login.LoginActivity;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
 import java.io.File;
@@ -51,17 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
 //    PyObject pyobj;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         if(FirebaseAuth.getInstance().getCurrentUser() == null){
             signOut();
         }
-
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
@@ -94,6 +97,14 @@ public class MainActivity extends AppCompatActivity {
 //        Python py = Python.getInstance();
 //        pyobj = py.getModule("listoftransactions");
 
+
+
+        //if list already exists, retrieve and past into adapter
+//        DatabaseReference dbRef = FirebaseDatabase.getInstance()
+//                .getReference("Transaction")
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+
     }
 
     @Override
@@ -124,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
         PDFProcessor pdfProcessor = new PDFProcessor(getApplicationContext(), pathURI);
 
         //pdftocsv.activateSequence(r);
+
+
 
 
         // Create an adapter and supply the data to be displayed.
