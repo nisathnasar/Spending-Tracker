@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void stripText() throws IOException, URISyntaxException {
         String path = this.fragment.getPath();
-        Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
 
         Uri pathURI = this.fragment.getPathURI();
 

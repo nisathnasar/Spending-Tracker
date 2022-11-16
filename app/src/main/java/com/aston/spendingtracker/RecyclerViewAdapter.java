@@ -79,6 +79,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         String mBalance = "£" + mTransactionList.get(position).getBalance();
         holder.balanceView.setText(mBalance);
 
+        String mDate = mTransactionList.get(position).getDateOfTransaction();
+        holder.dateView.setText(mDate);
+
     }
 
     @Override
@@ -87,7 +90,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     class WordViewHolder extends RecyclerView.ViewHolder{
-        public final TextView detailsView, transactionView, balanceView;
+        public final TextView detailsView, transactionView, balanceView, dateView;
         public LinearLayout linearLayoutRV;
         final RecyclerViewAdapter mAdapter;
         public WordViewHolder(View itemView, RecyclerViewAdapter adapter) {
@@ -95,6 +98,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             detailsView = itemView.findViewById(R.id.details_tv);
             transactionView = itemView.findViewById(R.id.transaction_tv);
             balanceView = itemView.findViewById(R.id.balance_tv);
+            dateView = itemView.findViewById(R.id.date_tv);
             linearLayoutRV = itemView.findViewById(R.id.linearLayoutRV);
             this.mAdapter = adapter;
         }

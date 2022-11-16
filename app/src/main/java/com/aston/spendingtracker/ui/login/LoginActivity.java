@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    Toast.makeText(LoginActivity.this, "signed in.", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(LoginActivity.this, "signed in.", Toast.LENGTH_LONG).show();
                     loadingProgressBar.setVisibility(View.GONE);
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }else{
