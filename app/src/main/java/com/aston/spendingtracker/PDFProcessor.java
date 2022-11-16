@@ -75,36 +75,48 @@ public class PDFProcessor {
         Splitter splitter = new Splitter();
         List<PDDocument> splitPages = splitter.split(document);
         numOfPagesToExtractFrom = splitPages.size();
+
         PDFTextStripper stripper = new PDFTextStripper();
 
         //page 1
         {
             String text = stripper.getText(splitPages.get(0)); // reads all of the page
             String[] lines = text.split("\\r?\\n"); // each line is broken into array
-
-            //print all text
-            {
-                System.out.println("-------------------text read on first page--------------------------");
-                for (String line : lines) {
-                    System.out.println(line);
-                }
-                System.out.println("---------------------------------------------");
-            }
-
             List<String> rows = stringArrayToArrayList(lines); //change string array to arraylist
 
-            //get carry forward balance
-            {
-                String line = rows.get(rows.size() - 28).replaceAll(",", "");
-                String[] splitlines = line.split(" ");
-                balanceCarriedForward = Double.parseDouble(splitlines[3]);
-                System.out.println("-----------------: " + balanceCarriedForward);
+            int lastIndexToKeep = -1;
+            System.out.println("-------------------text read on first page--------------------------");
+            for (int i = 0; i < rows.size(); i++) {
+                String row = rows.get(i);
+                System.out.println(row);
+
+                if(row.matches(".*BALANCE CARRIED FORWARD\\s[()a-zA-Z0-9_-].*$")){
+                    lastIndexToKeep = i-2;
+
+                    //get carry forward balance
+                    {
+                        //String line = rows.get(rows.size() - 28).replaceAll(",", "");
+                        String[] splitlines = row.split(" ");
+                        balanceCarriedForward = Double.parseDouble(splitlines[3]);
+                        System.out.println("-----------------: " + balanceCarriedForward);
+                    }
+                }
+
+            }
+            System.out.println("---------------------------------------------");
+
+            if(lastIndexToKeep == -1){
+                throw new NullPointerException("regex fail");
             }
 
+
+
             // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
-            for (int i = 29; i > 0; i--) {
+
+            while(rows.size()-1 != lastIndexToKeep){
                 rows.remove(rows.size() - 1);
             }
+
 
             // Remove the first non transaction lines
             rows.subList(0, 4).clear();
@@ -122,18 +134,54 @@ public class PDFProcessor {
             String[] lines2 = text2.split("\\r?\\n");
             List<String> rows2 = stringArrayToArrayList(lines2);
 
-            /*
-             * Remove the last irrelevant lines: removes the first 16 lines by traversing in reverse
-             */
-            for (int i = 16; i > 1; i--) {
-                rows2.remove(rows2.remove(rows2.size() - 1));
+
+            int lastIndexToKeep = -1;
+            System.out.println("-------------------text read on second page--------------------------");
+            for (int i = 0; i < rows2.size(); i++) {
+                String row = rows2.get(i);
+                System.out.println(row);
+
+                if(row.matches(".*BALANCE CARRIED FORWARD\\s[()a-zA-Z0-9_-].*$")){
+                    lastIndexToKeep = i-2;
+
+                    //get carry forward balance
+                    balanceCarriedForward = -1;
+                    //String line = rows.get(rows.size() - 28).replaceAll(",", "");
+
+                    String[] splitlines = row.replaceAll(",", "").split(" ");
+                    for(String line : splitlines){
+                        if(line.trim().matches("[0-9]{1}[0-9]*\\.[0-9]{2}$")){
+                            balanceCarriedForward = Double.parseDouble(line);
+                            System.out.println("-----------------: " + balanceCarriedForward);
+                        }
+                    }
+                    if(balanceCarriedForward == -1){
+                        throw new NullPointerException("regex Fail");
+                    }
+
+                }
+
+            }
+            System.out.println("---------------------------------------------");
+
+
+            if(lastIndexToKeep == -1){
+                throw new NullPointerException("regex fail");
+            }
+
+
+            //Remove the last irrelevant lines: removes all the lines until it reaches the (line-2) with the text
+            //".*BALANCE CARRIED FORWARD\\s[()a-zA-Z0-9_-].*$"
+            while(rows2.size()-1 != lastIndexToKeep){
+                rows2.remove(rows2.size() - 1);
+            }
+
+            System.out.println("----------------after removing last lines:----------------\n");
+            for(int i = 0; i <rows2.size(); i++){
+                System.out.println(rows2.get(i));
             }
 
             // Remove the first non transaction lines
-
-//            for (int i = 1; i >= 0; i--) {
-//                rows2.remove(i);
-//            }
             rows2.subList(0, 2).clear();
 
             processLines(rows2);
@@ -144,16 +192,20 @@ public class PDFProcessor {
                 //addTextView(str + "\n");
                 listTransaction.addLast(str + "\n");
 
-                String[] words = str.split(",");
-                Transaction transaction = new Transaction(
-                        words[0].trim(),
-                        words[1].trim(),
-                        words[2].trim(),
-                        words[3].trim(),
-                        words[4].trim(),
-                        words[5].trim());
-                listTransactionItems.add(transaction);
+//                String[] words = str.split(",");
+//                Transaction transaction = new Transaction(
+//                        words[0].trim(),
+//                        words[1].trim(),
+//                        words[2].trim(),
+//                        words[3].trim(),
+//                        words[4].trim(),
+//                        words[5].trim());
+//                listTransactionItems.add(transaction);
             }
+
+
+            addToDataBase(rows2);
+
         }
 
         //Page 3
@@ -402,26 +454,25 @@ public class PDFProcessor {
 
             DecimalFormat df = new DecimalFormat("0.00");
 
-            System.out.println("bef: " + Arrays.toString(words));
             if (words.length == 6) {
                 if (isPaymentOut(words[1])) {
-                    System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
-                    lastBalance = lastBalance + Double.parseDouble(words[3]);
+                    lastBalance = lastBalance + Double.parseDouble(words[3].trim());
                 } else {
-//                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3].trim()));
-                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = ");
                     lastBalance = lastBalance - Double.parseDouble(words[4].trim());
                 }
             } else {
-                System.out.println("adding balance field: " + lastBalance);
-                rows.set(currIndexOfRows, words[0] + ", " + words[1] + ", " + words[2] + ", " + words[3] + ", ," + df.format(lastBalance));
+                if(isPaymentOut(words[1])){
+                    rows.set(currIndexOfRows, words[0] + ", " + words[1] + ", " + words[2] + ", " + words[3] + ", , " + df.format(lastBalance));
+                }
+                else{
+                    rows.set(currIndexOfRows, words[0] + ", " + words[1] + ", " + words[2] + ", " + words[3] + ", " + df.format(lastBalance));
+                }
+
 
                 if (isPaymentOut(words[1])) {
-                    System.out.println("payment out: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
-                    lastBalance = lastBalance + Double.parseDouble(words[3]);
+                    lastBalance = lastBalance + Double.parseDouble(words[3].trim());
                 } else {
-                    System.out.println("payment in: " + lastBalance + " + " + words[3] + " = " + lastBalance + Double.parseDouble(words[3]));
-                    lastBalance = lastBalance - Double.parseDouble(words[3]);
+                    lastBalance = lastBalance - Double.parseDouble(words[3].trim());
                 }
             }
 
@@ -466,11 +517,11 @@ public class PDFProcessor {
             listTransactionItems.add(transaction);
             System.out.println(
                     "date: " + words[0].trim() +
-                            "type: " + words[1].trim() +
-                            "details: " + words[2].trim() +
-                            "paid in: " + words[3].trim() +
-                            "paid out: " + words[4].trim() +
-                            "balance: " + words[5].trim()
+                            ", type: " + words[1].trim() +
+                            ", details: " + words[2].trim() +
+                            ", paid in: " + words[3].trim() +
+                            ", paid out: " + words[4].trim() +
+                            ", balance: " + words[5].trim()
             );
         }
     }

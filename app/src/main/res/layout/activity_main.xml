@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/linearLayoutMA"
         android:id="@+id/recyclerview"
-        android:paddingBottom="50dp"
+        android:paddingBottom="150dp"
         >
 
     </androidx.recyclerview.widget.RecyclerView>
