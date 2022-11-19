@@ -53,6 +53,10 @@ public class Transaction {
 
     }
 
+    Transaction(){
+
+    }
+
     @Override
     public String toString() {
         return "Transaction{" +
@@ -115,4 +119,32 @@ public class Transaction {
         return result;
     }
 
+
+    public void setTransactionID(int transactionID) {
+        this.transactionID = transactionID;
+    }
+
+    public void setDateOfTransaction(String dateOfTransaction) {
+        this.dateOfTransaction = dateOfTransaction;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    public void setPaymentDetails(String paymentDetails) {
+        this.paymentDetails = paymentDetails;
+    }
+
+    public void setPaidOut(String paidOut) {
+        this.paidOut = paidOut;
+    }
+
+    public void setPainIn(String painIn) {
+        this.painIn = painIn;
+    }
+
+    public void setBalance(String balance) {
+        this.balance = balance;
+    }
 }
