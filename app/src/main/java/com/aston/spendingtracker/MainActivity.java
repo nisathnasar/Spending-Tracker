@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,10 +31,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
+import org.bouncycastle.asn1.dvcs.Data;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mAdapter;
+
+    private Boolean transactionDataVisible = false;
+
+    private final String KEY_RECYCLER_STATE = "recycler_state";
+    private static Bundle mBundleRecyclerViewState;
 
 //    PyObject pyobj;
 
@@ -97,15 +108,84 @@ public class MainActivity extends AppCompatActivity {
 //        Python py = Python.getInstance();
 //        pyobj = py.getModule("listoftransactions");
 
+        LinkedList<Transaction> transactionList = new LinkedList<>();
+
+        // Create an adapter and supply the data to be displayed.
+        mAdapter = new RecyclerViewAdapter(this, transactionList);
+        // Connect the adapter with the RecyclerView.
+        mRecyclerView.setAdapter(mAdapter);
+        // Give the RecyclerView a default layout manager.
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
 
-        //if list already exists, retrieve and past into adapter
-//        DatabaseReference dbRef = FirebaseDatabase.getInstance()
-//                .getReference("Transaction")
-//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        mTransactionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        System.out.println(transaction);
+                        transactionList.add(transaction);
+                    }
 
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("db data retrieval fail: " + error);
+            }
+        });
 
     }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+//        if(transactionDataVisible){
+//            // save RecyclerView state
+//            mBundleRecyclerViewState = new Bundle();
+//            Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+//            mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
+//        }
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+//        if(transactionDataVisible){
+//            // save RecyclerView state
+//            mBundleRecyclerViewState = new Bundle();
+//            Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+//            mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
+//
+//        }
+
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if(FirebaseAuth.getInstance().getCurrentUser() == null){
+            signOut();
+        }
+
+        // restore RecyclerView state
+//        if (mBundleRecyclerViewState != null && mRecyclerView != null) {
+//            Parcelable listState = mBundleRecyclerViewState.getParcelable(KEY_RECYCLER_STATE);
+//            Objects.requireNonNull(mRecyclerView.getLayoutManager()).onRestoreInstanceState(listState);
+//        }
+    }
+
 
     @Override
     protected void onStart() {
@@ -139,14 +219,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // Create an adapter and supply the data to be displayed.
-//        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionList());
-        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionListItems());
-        // Connect the adapter with the RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
-        // Give the RecyclerView a default layout manager.
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+//        // Create an adapter and supply the data to be displayed.
+//        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionListItems());
+//        // Connect the adapter with the RecyclerView.
+//        mRecyclerView.setAdapter(mAdapter);
+//        // Give the RecyclerView a default layout manager.
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        transactionDataVisible = true;
     }
 
     private void addTextView(String text){
@@ -156,16 +237,6 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.addView(valueTV);
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(FirebaseAuth.getInstance().getCurrentUser() == null){
-            signOut();
-        }
-
-    }
 
     @Override
     public void onBackPressed() {
