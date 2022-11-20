@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.entity;
 
 public class User {
     public String firstName, surname, email;

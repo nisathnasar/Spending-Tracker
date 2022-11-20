@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.pdf;
 
 public class HSBCRegex {
 

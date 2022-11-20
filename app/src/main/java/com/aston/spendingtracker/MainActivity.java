@@ -4,25 +4,28 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.aston.spendingtracker.ui.login.LoginActivity;
+import com.aston.spendingtracker.authorization.LoginActivity;
+import com.aston.spendingtracker.entity.Transaction;
+import com.aston.spendingtracker.pdf.FileSelectorFragment;
+import com.aston.spendingtracker.pdf.PDFProcessor;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,14 +34,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
-import org.bouncycastle.asn1.dvcs.Data;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
 //    PyObject pyobj;
 
+    ViewPager2 pager;
+    TabLayout mTabLayout;
+    TabItem transactionItem, analyticsItem, uploadItem;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
         if(FirebaseAuth.getInstance().getCurrentUser() == null){
             signOut();
         }
+
+        pager = findViewById(R.id.viewPager);
+        mTabLayout = findViewById(R.id.tab_layout);
+        transactionItem = findViewById(R.id.AnalyticsItem);
+        uploadItem = findViewById(R.id.UploadItem);
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);

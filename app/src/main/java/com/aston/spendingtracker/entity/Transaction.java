@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.entity;
 
 import java.util.Date;
 import java.util.Locale;
@@ -41,7 +41,7 @@ public class Transaction {
         return balance;
     }
 
-    Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance){
+    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance){
         this.dateOfTransaction = dateOfTransaction;
         this.paymentType = paymentType;
         this.paymentDetails = paymentDetails;
@@ -53,7 +53,7 @@ public class Transaction {
 
     }
 
-    Transaction(){
+    public Transaction(){
 
     }
 

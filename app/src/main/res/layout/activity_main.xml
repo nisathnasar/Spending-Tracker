@@ -16,20 +16,33 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/TransactionsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transactions" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/AnalyticsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Analytics" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/UploadItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload" />
     </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tab_layout" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +54,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_fileChooser"
-            android:name="com.aston.spendingtracker.FileSelectorFragment"
+            android:name="com.aston.spendingtracker.pdf.FileSelectorFragment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
