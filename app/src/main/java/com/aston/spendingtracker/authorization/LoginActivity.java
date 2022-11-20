@@ -1,4 +1,4 @@
-package com.aston.spendingtracker.ui.login;
+package com.aston.spendingtracker.authorization;
 
 import android.content.Intent;
 import android.content.IntentSender;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.view.ViewStructure;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -19,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
-import com.aston.spendingtracker.RegisterUser;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.Identity;

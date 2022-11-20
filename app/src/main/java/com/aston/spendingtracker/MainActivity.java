@@ -4,25 +4,32 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.aston.spendingtracker.ui.login.LoginActivity;
+import com.aston.spendingtracker.authorization.LoginActivity;
+import com.aston.spendingtracker.entity.Transaction;
+import com.aston.spendingtracker.pdf.FileSelectorFragment;
+import com.aston.spendingtracker.pdf.PDFProcessor;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,14 +38,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
-import org.bouncycastle.asn1.dvcs.Data;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_RESULT_CODE_FILECHOOSER = 2000;
 
     private FileSelectorFragment fragment;
-    private Button buttonShowInfo;
+//    private Button buttonShowInfo;
 
     private File root;
     private AssetManager assetManager;
@@ -61,12 +64,18 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mAdapter;
 
+
     private Boolean transactionDataVisible = false;
 
     private final String KEY_RECYCLER_STATE = "recycler_state";
     private static Bundle mBundleRecyclerViewState;
 
 //    PyObject pyobj;
+
+    ViewPager2 pager;
+    TabLayout mTabLayout;
+    TabItem transactionItem, analyticsItem, uploadItem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,28 +86,46 @@ public class MainActivity extends AppCompatActivity {
             signOut();
         }
 
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
+        pager = findViewById(R.id.viewPager);
+        mTabLayout = findViewById(R.id.tab_layout);
+        transactionItem = findViewById(R.id.AnalyticsItem);
+        uploadItem = findViewById(R.id.UploadItem);
 
-        this.buttonShowInfo = this.findViewById(R.id.button_showInfo);
+        PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle() , mTabLayout.getTabCount());
+        pager.setAdapter(adapter);
 
-        this.buttonShowInfo.setOnClickListener(v -> {
-            try {
-                stripText();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
+        new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
+            if(position == 0){
+                tab.setText("List");
+            } else if (position == 1){
+                tab.setText("Analytics");
+            } else if (position == 2){
+                tab.setText("Upload");
             }
-        });
+            else{
+                tab.setText("Tab " + (position+1));
+            }
 
+        }).attach();
 
-        for(int i = 0; i < 20; i++){
-            mWordList.addLast("Word " + i);
-        }
+//        FragmentManager fragmentManager = this.getSupportFragmentManager();
+//        this.fragment = (FileSelectorFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
+
+//        this.buttonShowInfo = this.findViewById(R.id.button_showInfo);
+//
+//        this.buttonShowInfo.setOnClickListener(v -> {
+//            try {
+//                stripText();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (URISyntaxException e) {
+//                e.printStackTrace();
+//            }
+//        });
+
 
         // Get a handle to the RecyclerView.
-        mRecyclerView = findViewById(R.id.recyclerview);
+        //mRecyclerView = findViewById(R.id.recyclerview);
 
 
         if(!Python.isStarted()){
@@ -108,38 +135,39 @@ public class MainActivity extends AppCompatActivity {
 //        Python py = Python.getInstance();
 //        pyobj = py.getModule("listoftransactions");
 
-        LinkedList<Transaction> transactionList = new LinkedList<>();
 
-        // Create an adapter and supply the data to be displayed.
-        mAdapter = new RecyclerViewAdapter(this, transactionList);
-        // Connect the adapter with the RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
-        // Give the RecyclerView a default layout manager.
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
-
-
-        mTransactionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
-                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
-                        System.out.println(transaction);
-                        transactionList.add(transaction);
-                    }
-
-                }
-                mAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("db data retrieval fail: " + error);
-            }
-        });
+//        LinkedList<Transaction> transactionList = new LinkedList<>();
+//
+//        // Create an adapter and supply the data to be displayed.
+//        mAdapter = new RecyclerViewAdapter(this, transactionList);
+//        // Connect the adapter with the RecyclerView.
+//        mRecyclerView.setAdapter(mAdapter);
+//        // Give the RecyclerView a default layout manager.
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//
+//        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+//
+//
+//        mTransactionRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+//                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+//                        System.out.println(transaction);
+//                        transactionList.add(transaction);
+//                    }
+//
+//                }
+//                mAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                System.out.println("db data retrieval fail: " + error);
+//            }
+//        });
 
     }
 
@@ -215,10 +243,6 @@ public class MainActivity extends AppCompatActivity {
         PDFProcessor pdfProcessor = new PDFProcessor(getApplicationContext(), pathURI);
 
         //pdftocsv.activateSequence(r);
-
-
-
-
 
 //        // Create an adapter and supply the data to be displayed.
 //        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionListItems());

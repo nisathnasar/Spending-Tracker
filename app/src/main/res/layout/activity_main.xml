@@ -4,66 +4,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    >
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tab_layout"
-        android:layout_weight="0.5"
+        app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/TransactionsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transactions" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/AnalyticsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Analytics" />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/UploadItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload" />
     </com.google.android.material.tabs.TabLayout>
 
+<!--
     <LinearLayout
+        android:id="@+id/linearLayoutMA"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/tab_layout"
-        android:id="@+id/linearLayoutMA"
-        android:weightSum="1">
+        android:weightSum="1"
+        app:layout_constraintTop_toBottomOf="@+id/tab_layout">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_fileChooser"
-            android:name="com.aston.spendingtracker.FileSelectorFragment"
+            android:name="com.aston.spendingtracker.pdf.FileSelectorFragment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_weight="0.5"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:layout="@layout/fragment_file_selector"
-            android:layout_weight="0.5"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_file_selector" />
 
         <Button
             android:id="@+id/button_showInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:text="@string/strip_text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/fragment_fileChooser"
-            android:layout_weight="0.5"
-            />
+            app:layout_constraintStart_toStartOf="@+id/fragment_fileChooser" />
 
     </LinearLayout>
+-->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/tab_layout"
+        />
 
-
-
+    </LinearLayout>
+    <!--
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -73,9 +87,7 @@
         >
 
     </androidx.recyclerview.widget.RecyclerView>
-
-
-
+-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

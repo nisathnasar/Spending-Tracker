@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.pdf;
 
 import android.Manifest;
 import android.app.Activity;
@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -20,7 +22,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.File;
+import com.aston.spendingtracker.R;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +48,7 @@ public class FileSelectorFragment extends Fragment {
 
     private Button buttonBrowse;
     private EditText editTextPath;
+    private Button buttonShowInfo;
 
     private static final String LOG_TAG = "AndroidExample";
 
@@ -99,6 +105,23 @@ public class FileSelectorFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        this.buttonShowInfo = getView().findViewById(R.id.button_showInfo);
+
+        this.buttonShowInfo.setOnClickListener(v -> {
+            try {
+                stripText();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void askPermissionAndBrowseFile()  {
@@ -205,6 +228,26 @@ public class FileSelectorFragment extends Fragment {
     public Uri getPathURI()  {
 
         return uripath;
+    }
+
+
+    private void stripText() throws IOException, URISyntaxException {
+        String path = getPath();
+        //Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
+
+        Uri pathURI = getPathURI();
+
+        PDFProcessor pdfProcessor = new PDFProcessor(getContext(), pathURI);
+
+        //pdftocsv.activateSequence(r);
+
+//        // Create an adapter and supply the data to be displayed.
+//        mAdapter = new RecyclerViewAdapter(this, pdfProcessor.getTransactionListItems());
+//        // Connect the adapter with the RecyclerView.
+//        mRecyclerView.setAdapter(mAdapter);
+//        // Give the RecyclerView a default layout manager.
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
 }
