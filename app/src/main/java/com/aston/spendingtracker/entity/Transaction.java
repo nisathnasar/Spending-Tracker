@@ -65,6 +65,12 @@ public class Transaction {
 
     }
 
+    public void parseDBDate(){
+        String[] dateElements = dateOfTransaction.split("-");
+        //date-month-year
+        dateOfTransaction = dateElements[2] +"-"+ dateElements[1] +"-"+ dateElements[0];
+    }
+
     public static void sortTransactionListByDate(LinkedList<Transaction> tList) throws ParseException {
 
         for(Transaction t : tList){
@@ -108,11 +114,12 @@ public class Transaction {
      * @param month 3 letter string
      * @return integer 0 for jan
      */
-    private static int formatMonth(String month) {
-        int result;
-        switch (month.toLowerCase(Locale.ROOT)) {
+    public static int formatMonth(String month) {
+        int result=0;
+        switch (month.toLowerCase()) {
             case "jan":
                 result = 1;
+                break;
             case "feb":
                 result = 2;
                 break;
@@ -146,11 +153,59 @@ public class Transaction {
             case "dec":
                 result = 12;
                 break;
-            default:
-                result = 0;
-                break;
+
         }
         return result;
+    }
+
+
+    /**
+     *
+     */
+    public void parseDBMonth() {
+        String parsedDBDate = dateOfTransaction;
+        String[] dateElements = parsedDBDate.trim().split("-");
+        int month = Integer.parseInt(dateElements[1].trim());
+        String result="";
+        switch (month) {
+            case 1:
+                result = "jan";
+                break;
+            case 2:
+                result = "feb";
+                break;
+            case 3:
+                result = "mar";
+                break;
+            case 4:
+                result = "apr";
+                break;
+            case 5:
+                result = "may";
+                break;
+            case 6:
+                result = "jun";
+                break;
+            case 7:
+                result = "jul";
+                break;
+            case 8:
+                result = "aug";
+                break;
+            case 9:
+                result = "sep";
+                break;
+            case 10:
+                result = "oct";
+                break;
+            case 11:
+                result = "nov";
+                break;
+            case 12:
+                result = "dec";
+                break;
+        }
+        dateOfTransaction = dateElements[0] + " " + result + " " + dateElements[2];
     }
 
 

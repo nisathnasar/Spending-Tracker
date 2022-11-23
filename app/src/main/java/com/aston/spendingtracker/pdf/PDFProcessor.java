@@ -602,9 +602,14 @@ public class PDFProcessor {
 
             String[] words = str.split(",");
 
+            //reconstructed date to match date order on db
+            String[] dateElements = words[0].trim().split("-");
+            String reconstructedDate = dateElements[2] + "-" + Transaction.formatMonth(dateElements[1].trim()) + "-" + dateElements[0];
+
             Transaction transaction = new Transaction(
                     //new Timestamp(Transaction.getDateObjectFromString(words[0].trim()).getTime()),
-                    words[0].trim(),
+                    //words[0].trim(),
+                    reconstructedDate,
                     words[1].trim(),
                     words[2].trim(),
                     words[3].trim(),
@@ -612,29 +617,9 @@ public class PDFProcessor {
                     words[5].trim());
 
 
-//            dbRefContainsDateCommencing.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    if(!snapshot.hasChild(dateCommencing)){
-//                        System.out.println("------!snapshot.hasChild("+dateCommencing+")");
-//                        dbRefTransaction
-//                                .child(words[0])
-//                                .child(Integer.toString(transaction.getTransactionID()))
-//                                .setValue(transaction);
-//                    }
-//                    else{
-//                        System.out.println("------snapshot.hasChild("+dateCommencing+")");
-//                        //throw new NullPointerException("duplicate entry");
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//                }
-//            });
 
             dbRefTransaction
-                    .child(words[0])
+                    .child(reconstructedDate)
                     .child(Integer.toString(transaction.getTransactionID()))
                     .setValue(transaction);
 

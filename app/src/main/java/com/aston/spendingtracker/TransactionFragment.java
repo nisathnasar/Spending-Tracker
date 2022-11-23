@@ -120,6 +120,8 @@ public class TransactionFragment extends Fragment {
                     for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
                         Transaction transaction = dataSnapshot2.getValue(Transaction.class);
                         //System.out.println(transaction);
+                        transaction.parseDBDate();
+                        transaction.parseDBMonth();
                         transactionList.add(transaction);
 
 //                        try {
