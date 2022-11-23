@@ -81,7 +81,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         String mBalance = "£" + mTransactionList.get(position).getBalance();
         holder.balanceView.setText(mBalance);
 
-        String mDate = mTransactionList.get(position).getDateOfTransaction();
+        String mDate = mTransactionList.get(position).getDateOfTransaction().toString();
         holder.dateView.setText(mDate);
 
     }
