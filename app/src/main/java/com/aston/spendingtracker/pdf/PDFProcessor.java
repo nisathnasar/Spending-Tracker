@@ -3,6 +3,7 @@ package com.aston.spendingtracker.pdf;
 import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -22,7 +23,9 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -44,13 +47,14 @@ public class PDFProcessor {
     private int numOfPagesToExtractFrom;
     private int countOfTransaction;
     private String dateCommencing;
+    Context thisContext;
     DatabaseReference mrootRef;
     DatabaseReference dbRefContainsDateCommencing, dbRefTransaction;
 
-    public PDFProcessor(Context context, Uri pathURI) throws IOException {
+    public PDFProcessor(Context context, Uri pathURI) throws IOException, ParseException {
 
         numOfPagesToExtractFrom = 1;
-
+        thisContext = context;
         listTransactionItems = new LinkedList<>();
         hsbcRegex = new HSBCRegex();
         PDFBoxResourceLoader.init(context);
@@ -74,11 +78,13 @@ public class PDFProcessor {
         document.close();
     }
 
-    private void activateSequence(PDDocument document, int numOfPagesToExtractFrom) throws IOException {
+    private void activateSequence(PDDocument document, int numOfPagesToExtractFrom) throws IOException, ParseException {
 
         Splitter splitter = new Splitter();
         List<PDDocument> splitPages = splitter.split(document);
         numOfPagesToExtractFrom = splitPages.size();
+
+        //numOfPagesToExtractFrom = 2;
 
         PDFTextStripper stripper = new PDFTextStripper();
 
@@ -86,6 +92,87 @@ public class PDFProcessor {
         dbRefContainsDateCommencing = mrootRef.child("ContainsDateCommencing");
         dbRefTransaction = mrootRef.child("Transaction");
 
+
+        for(int e = 0; e<numOfPagesToExtractFrom; e++){
+            String text = stripper.getText(splitPages.get(e)); // reads all of the page
+            String[] lines = text.split("\\r?\\n"); // each line is broken into array
+            List<String> rows = stringArrayToArrayList(lines); //change string array to arraylist
+
+            int lastIndexToKeep = -1;
+            int firstIndexToKeep = 0;
+            boolean firstDateFound = false;
+            System.out.println("-------------------text read on first page--------------------------");
+            for (int i = 0; i < rows.size(); i++) {
+                String row = rows.get(i);
+                //System.out.println(row);
+
+                if(row.matches(".*BALANCE CARRIED FORWARD\\s[()a-zA-Z0-9_-].*$")){
+                    lastIndexToKeep = i-2;
+
+                    //get carry forward balance
+                    if(e == 0){
+                        //String line = rows.get(rows.size() - 28).replaceAll(",", "");
+                        String[] splitlines = row.replaceAll(",", "").split(" ");
+                        balanceCarriedForward = Double.parseDouble(splitlines[3]);
+                        //System.out.println("-----------------: " + balanceCarriedForward);
+                    }
+                    else{
+                        //get carry forward balance
+                        balanceCarriedForward = -1;
+
+                        String[] splitlines = row.replaceAll(",", "").split(" ");
+                        for(String line : splitlines){
+                            if(line.trim().matches("[0-9]{1}[0-9]*\\.[0-9]{2}$")){
+                                balanceCarriedForward = Double.parseDouble(line);
+                                //System.out.println("-----------------: " + balanceCarriedForward);
+                            }
+                        }
+                    }
+                }
+
+                if(HSBCRegex.startsWithDate(row)){
+                    firstDateFound = true;
+                }
+                if(!firstDateFound){
+                    firstIndexToKeep++;
+                }
+
+            }
+            System.out.println("---------------------------------------------");
+
+            if(lastIndexToKeep == -1){
+                Toast.makeText(thisContext, "page "+ (e+1) + " doesn't have any transaction data.", Toast.LENGTH_SHORT).show();
+                break;
+                //throw new NullPointerException("regex fail");
+            }
+
+            // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
+
+            while(rows.size()-1 != lastIndexToKeep){
+                rows.remove(rows.size() - 1);
+            }
+
+
+            // Remove the first non transaction lines
+            //rows.subList(0, 4).clear();
+            rows.subList(0, firstIndexToKeep).clear();
+
+            String[] preprocessedRowWords = rows.get(0).split(" ");
+            //dateCommencing  = (preprocessedRowWords[0] + "-" + preprocessedRowWords[1] + "-" + preprocessedRowWords[2]).trim();
+            //System.out.println("dateCommencing assigned for first page: " + dateCommencing);
+
+            rows = processLines(rows);
+
+            addToDataBase(rows);
+        }
+
+
+
+
+
+
+
+/*
         //page 1
         {
             String text = stripper.getText(splitPages.get(0)); // reads all of the page
@@ -238,9 +325,9 @@ public class PDFProcessor {
             System.out.println("---------------------------------------------");
 
 
-            /*
-             * Remove the last irrelevant lines: removes the first 16 lines by traversing in reverse
-             */
+
+            // Remove the last irrelevant lines: removes the first 16 lines by traversing in reverse
+
             for (int i = 16; i > 1; i--) {
                 rows3.remove(rows3.remove(rows3.size() - 1));
             }
@@ -259,6 +346,8 @@ public class PDFProcessor {
             //addTextView(str + "\n");
             //}
         }
+*/
+
 
         document.close();
         //fw.close();
@@ -504,7 +593,7 @@ public class PDFProcessor {
         return rows;
     }
 
-    private void addToDataBase(List<String> rows){
+    private void addToDataBase(List<String> rows) throws ParseException {
 
         for (String str : rows) {
 
@@ -512,7 +601,9 @@ public class PDFProcessor {
             //listTransaction.addLast(str + "\n");
 
             String[] words = str.split(",");
+
             Transaction transaction = new Transaction(
+                    //new Timestamp(Transaction.getDateObjectFromString(words[0].trim()).getTime()),
                     words[0].trim(),
                     words[1].trim(),
                     words[2].trim(),
@@ -521,26 +612,31 @@ public class PDFProcessor {
                     words[5].trim());
 
 
-            dbRefContainsDateCommencing.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(!snapshot.hasChild(dateCommencing)){
-                        System.out.println("------!snapshot.hasChild("+dateCommencing+")");
-                        dbRefTransaction
-                                .child(words[0])
-                                .child(Integer.toString(transaction.getTransactionID()))
-                                .setValue(transaction);
-                    }
-                    else{
-                        System.out.println("------snapshot.hasChild("+dateCommencing+")");
-                        //throw new NullPointerException("duplicate entry");
-                    }
-                }
+//            dbRefContainsDateCommencing.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    if(!snapshot.hasChild(dateCommencing)){
+//                        System.out.println("------!snapshot.hasChild("+dateCommencing+")");
+//                        dbRefTransaction
+//                                .child(words[0])
+//                                .child(Integer.toString(transaction.getTransactionID()))
+//                                .setValue(transaction);
+//                    }
+//                    else{
+//                        System.out.println("------snapshot.hasChild("+dateCommencing+")");
+//                        //throw new NullPointerException("duplicate entry");
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//                }
+//            });
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
-            });
+            dbRefTransaction
+                    .child(words[0])
+                    .child(Integer.toString(transaction.getTransactionID()))
+                    .setValue(transaction);
 
 
             countOfTransaction++;

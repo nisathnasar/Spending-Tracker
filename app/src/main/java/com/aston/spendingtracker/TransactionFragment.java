@@ -20,7 +20,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,6 +99,7 @@ public class TransactionFragment extends Fragment {
         mRecyclerView = getView().findViewById(R.id.recyclerview);
 
         LinkedList<Transaction> transactionList = new LinkedList<>();
+        TreeMap<Timestamp, Transaction> transactionsMap = new TreeMap<>();
 
         // Create an adapter and supply the data to be displayed.
         mAdapter = new RecyclerViewAdapter(getActivity(), transactionList);
@@ -108,11 +115,18 @@ public class TransactionFragment extends Fragment {
         mTransactionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                transactionList.clear(); //------------------
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
                         Transaction transaction = dataSnapshot2.getValue(Transaction.class);
-                        System.out.println(transaction);
+                        //System.out.println(transaction);
                         transactionList.add(transaction);
+
+//                        try {
+//                            Transaction.sortTransactionListByDate(transactionList);
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
                     }
 
                 }

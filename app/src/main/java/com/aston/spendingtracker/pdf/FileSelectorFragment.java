@@ -26,6 +26,7 @@ import com.aston.spendingtracker.R;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -112,6 +113,7 @@ public class FileSelectorFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         this.buttonShowInfo = getView().findViewById(R.id.button_showInfo);
+        this.buttonShowInfo.setEnabled(false);
 
         this.buttonShowInfo.setOnClickListener(v -> {
             try {
@@ -120,8 +122,12 @@ public class FileSelectorFragment extends Fragment {
                 e.printStackTrace();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         });
+
+
     }
 
     private void askPermissionAndBrowseFile()  {
@@ -206,7 +212,7 @@ public class FileSelectorFragment extends Fragment {
                         try {
                             filePath = FileUtils.getPath(this.getContext(),fileUri);
                             uripath = fileUri;
-
+                            buttonShowInfo.setEnabled(true);
                             //File file = new File(fileUri.getPath());
                         } catch (Exception e) {
                             Log.e(LOG_TAG,"Error: " + e);
@@ -231,13 +237,15 @@ public class FileSelectorFragment extends Fragment {
     }
 
 
-    private void stripText() throws IOException, URISyntaxException {
+    private void stripText() throws IOException, URISyntaxException, ParseException {
         String path = getPath();
         //Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
 
         Uri pathURI = getPathURI();
 
         PDFProcessor pdfProcessor = new PDFProcessor(getContext(), pathURI);
+
+
 
         //pdftocsv.activateSequence(r);
 
@@ -247,6 +255,9 @@ public class FileSelectorFragment extends Fragment {
 //        mRecyclerView.setAdapter(mAdapter);
 //        // Give the RecyclerView a default layout manager.
 //        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        Toast.makeText(getActivity(), "Submitted", Toast.LENGTH_SHORT).show();
+        buttonShowInfo.setEnabled(false);
 
     }
 

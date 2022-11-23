@@ -31,19 +31,6 @@
         android:weightSum="1">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/transaction_tv"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:paddingStart="5dp"
-            android:paddingEnd="15dp"
-            android:layout_weight="0.4"
-            android:maxLines="1"
-            android:text="£2454"
-            />
-
-        <TextView
             android:id="@+id/details_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -53,6 +40,20 @@
             android:textSize="15sp"
             android:layout_weight="0.6"
             android:text="gaerboerbkeorbke"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/transaction_tv"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:layout_weight="0.4"
+            android:maxLines="1"
+            android:gravity="end"
+            android:text="£2454"
+            />
 
 
     </LinearLayout>
@@ -66,29 +67,31 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/balance_tv"
-            android:textStyle="bold"
-            android:maxLines="1"
-            android:textSize="15sp"
-            android:paddingStart="15dp"
-            android:paddingEnd="5dp"
-            android:layout_weight="0.5"
-            android:gravity="start"
-            android:text="£2454"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:id="@+id/date_tv"
             android:textSize="15sp"
             android:textStyle="bold"
             android:paddingStart="5dp"
             android:paddingEnd="15dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.6"
             android:maxLines="1"
-            android:gravity="end"
+            android:gravity="start"
             android:text="23-rfv-22"
             />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/balance_tv"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:textSize="15sp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:layout_weight="0.4"
+            android:gravity="end"
+            android:text="£2454"/>
+
+
 
     </LinearLayout>
 </LinearLayout>
