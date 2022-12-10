@@ -11,9 +11,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +33,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,6 +53,8 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
     private RecyclerViewAdapter mAdapter;
 
     LinkedList<Transaction> transactionList = new LinkedList<>();
+
+    EditText filterET;
 
 
     // TODO: Rename and change types of parameters
@@ -154,7 +160,41 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
         });
 
 
+        filterET = getView().findViewById(R.id.filter_et);
 
+        filterET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                filter(editable.toString());
+            }
+        });
+
+    }
+
+    private void filter(String text){
+        if(!text.trim().isEmpty()){
+            LinkedList<Transaction> filteredTransactionList = new LinkedList<>();
+
+            for(Transaction t : transactionList){
+                if(t.getPaymentDetails().toLowerCase().contains(text.toLowerCase())){
+                    filteredTransactionList.add(t);
+                }
+            }
+
+            mAdapter.filterList(filteredTransactionList);
+        }else{
+            mAdapter.filterList(transactionList);
+        }
 
     }
 
