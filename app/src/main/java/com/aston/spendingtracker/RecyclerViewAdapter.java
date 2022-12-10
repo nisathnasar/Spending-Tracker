@@ -19,7 +19,7 @@ import java.util.LinkedList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.WordViewHolder> {
 
     //private final LinkedList<String> mWordList;
-    private final LinkedList<Transaction> mTransactionList;
+    private LinkedList<Transaction> mTransactionList;
     private LayoutInflater mInflater;
     Context context;
 
@@ -129,6 +129,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void setClickListener(ItemClickListener itemClickListener) {
         this.clickListener = itemClickListener;
+    }
+
+    public void filterList(LinkedList<Transaction> list){
+        mTransactionList = list;
+        notifyDataSetChanged();
     }
 
 }
