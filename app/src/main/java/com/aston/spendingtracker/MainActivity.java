@@ -193,6 +193,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void switchFragment(int i){
+        pager.setCurrentItem(i);
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

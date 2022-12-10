@@ -8,6 +8,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +18,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -179,6 +182,13 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
             }
         });
 
+        if(transactionList.size()==0){
+            getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+            getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
+            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
+
+        }
     }
 
     private void filter(String text){

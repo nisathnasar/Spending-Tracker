@@ -15,9 +15,26 @@
         android:hint="Search"
         android:id="@+id/filter_et"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:id="@+id/welcome_msg_tv"
+        android:text="Welcome to Spending Tracker. Please upload your bank statements to start tracking your spending."/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:id="@+id/welcome_msg_upload_bt"
+        android:text="Upload"/>
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/frame_layout">
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
@@ -28,6 +45,7 @@
 
         </androidx.recyclerview.widget.RecyclerView>
     </FrameLayout>
+
 
 
 </LinearLayout>
