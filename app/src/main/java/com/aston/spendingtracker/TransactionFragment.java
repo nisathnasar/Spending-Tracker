@@ -1,5 +1,8 @@
 package com.aston.spendingtracker;
 
+import static androidx.fragment.app.FragmentManager.TAG;
+
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,7 +38,7 @@ import java.util.TreeMap;
  * Use the {@link TransactionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TransactionFragment extends Fragment {
+public class TransactionFragment extends Fragment implements ItemClickListener{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,6 +47,9 @@ public class TransactionFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mAdapter;
+
+    LinkedList<Transaction> transactionList = new LinkedList<>();
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -98,15 +106,19 @@ public class TransactionFragment extends Fragment {
 
         mRecyclerView = getView().findViewById(R.id.recyclerview);
 
-        LinkedList<Transaction> transactionList = new LinkedList<>();
+
         TreeMap<Timestamp, Transaction> transactionsMap = new TreeMap<>();
 
         // Create an adapter and supply the data to be displayed.
         mAdapter = new RecyclerViewAdapter(getActivity(), transactionList);
+
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mAdapter.setClickListener(this::onClick); // Bind the listener
+
 
         DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         DatabaseReference mTransactionRef = mRootRef.child("Transaction");
@@ -141,5 +153,21 @@ public class TransactionFragment extends Fragment {
             }
         });
 
+
+
+
     }
+
+    @Override
+    public void onClick(View view, int position) {
+        // The onClick implementation of the RecyclerView item click
+
+        Intent i = new Intent(getActivity(), ViewTransaction.class);
+        i.putExtra("detail", transactionList.get(position).getPaymentDetails());
+
+        startActivity(i);
+
+    }
+
 }
+

@@ -23,6 +23,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private LayoutInflater mInflater;
     Context context;
 
+    ItemClickListener clickListener;
+
     public RecyclerViewAdapter(Context context, LinkedList<Transaction> transactionList){
         mInflater = LayoutInflater.from(context);
         //this.mWordList = wordList;
@@ -34,7 +36,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public RecyclerViewAdapter.WordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View mItemView = mInflater.inflate(R.layout.recyclerview_item, parent, false);
+
         return new WordViewHolder(mItemView, this);
+
+
+
     }
 
     @Override
@@ -91,7 +97,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mTransactionList.size();
     }
 
-    class WordViewHolder extends RecyclerView.ViewHolder{
+    class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView detailsView, transactionView, balanceView, dateView;
         public LinearLayout linearLayoutRV;
         final RecyclerViewAdapter mAdapter;
@@ -103,10 +109,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             dateView = itemView.findViewById(R.id.date_tv);
             linearLayoutRV = itemView.findViewById(R.id.linearLayoutRV);
             this.mAdapter = adapter;
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (clickListener != null) clickListener.onClick(view, getAdapterPosition());
         }
     }
 
+    public interface ItemClickListener {
+        void onClick(View view, int position);
+    }
 
+    public interface OnItemClickListener {
+        public void onClick(View view, int position);
+    }
 
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.clickListener = itemClickListener;
+    }
 
 }
