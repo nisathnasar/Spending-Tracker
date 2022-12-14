@@ -133,9 +133,12 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
         DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
 
+
         mTransactionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                float maximumBal = 0;
+
                 transactionList.clear(); //------------------
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
@@ -145,6 +148,10 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                         transaction.parseDBMonth();
                         transactionList.add(transaction);
 
+                        if(maximumBal < Float.valueOf(transaction.getBalance())){
+                            maximumBal = Float.valueOf(transaction.getBalance());
+                        }
+
 //                        try {
 //                            Transaction.sortTransactionListByDate(transactionList);
 //                        } catch (ParseException e) {
@@ -153,7 +160,25 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                     }
 
                 }
+
+                //update max bal on db:
+//                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//                mRootRef.child("MaximumBalance").setValue(maximumBal);
+
+
                 mAdapter.notifyDataSetChanged();
+
+                if(transactionList.size()==0){
+                    getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+                    //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
+                    //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
+                }
+                else{
+                    getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
+                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
+                }
+
             }
 
             @Override
@@ -182,13 +207,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
             }
         });
 
-        if(transactionList.size()==0){
-            getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-            getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
-            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
-            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
 
-        }
     }
 
     private void filter(String text){
@@ -203,6 +222,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
 
             mAdapter.filterList(filteredTransactionList);
         }else{
+
             mAdapter.filterList(transactionList);
         }
 

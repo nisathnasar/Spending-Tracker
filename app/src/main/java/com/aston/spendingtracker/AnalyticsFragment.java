@@ -1,28 +1,63 @@
 package com.aston.spendingtracker;
 
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
+import com.aston.spendingtracker.entity.Transaction;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
+import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.Utils;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import android.widget.SeekBar.OnSeekBarChangeListener;
+
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -30,9 +65,14 @@ import java.util.Random;
  * Use the {@link AnalyticsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AnalyticsFragment extends Fragment {
+public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListener,
+        OnChartValueSelectedListener {
 
-    BarChart chart;
+    private LineChart chart;
+    private SeekBar seekBarX, seekBarY;
+    private TextView tvX, tvY;
+    LinkedList<Transaction> transactionList = new LinkedList<>();
+
 
     private static final int MAX_X_VALUE = 7;
     private static final int MAX_Y_VALUE = 50;
@@ -81,11 +121,14 @@ public class AnalyticsFragment extends Fragment {
         }
 
 
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_analytics, container, false);
     }
@@ -94,114 +137,453 @@ public class AnalyticsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        chart = (BarChart) getActivity().findViewById(R.id.chart);
-//
-//
-//        IBarDataSet ibds = new BarDataSet(getDataSet(), "label1");
-//        BarData data = new BarData(ibds);
-//        chart.setData(data);
-//        Description des = new Description();
-//        des.setText("My Chart");
-//        chart.setDescription(des);
-//        chart.animateXY(2000, 2000);
-//        chart.invalidate();
+        //getActivity().setTitle("LineChartActivity1");
 
-        //BarData data = createChartData();
-        //configureChartAppearance();
-        //prepareChartData(data);
-    }
+        final float[] maxBal = new float[1];
+        /*
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mMaxBalRef = mRootRef.child("MaximumBalance");
 
-    private void configureChartAppearance() {
-        chart.getDescription().setEnabled(false);
-        chart.setDrawValueAboveBar(false);
 
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setValueFormatter(new ValueFormatter() {
+        mMaxBalRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public String getFormattedValue(float value) {
-                return DAYS[(int) value];
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                //maxBal[0] = task.getResult().getValue(Float.class)[0];
             }
         });
 
-        YAxis axisLeft = chart.getAxisLeft();
-        axisLeft.setGranularity(10f);
-        axisLeft.setAxisMinimum(0);
+        mMaxBalRef.addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // for example: if you're expecting your user's data as an object of the "User" class.
+                        maxBal[0] = dataSnapshot.getValue(Float.class);
+                        System.out.println(dataSnapshot);
+                    }
 
-        YAxis axisRight = chart.getAxisRight();
-        axisRight.setGranularity(10f);
-        axisRight.setAxisMinimum(0);
-    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // read query is cancelled.
+                    }
+                });
+*/
+        System.out.println(maxBal[0] + "----------------------");
 
-    private BarData createChartData() {
-        ArrayList<BarEntry> values = new ArrayList<>();
-        for (int i = 0; i < MAX_X_VALUE; i++) {
-            float x = i;
-//            float y = new Util.randomFloatBetween(MIN_Y_VALUE, MAX_Y_VALUE);
-//            Random rn = new Random(MIN_Y_VALUE, MAX_Y_VALUE);
-//
-//            values.add(new BarEntry(x, y));
+
+        tvX = getView().findViewById(R.id.tvXMax);
+        tvY = getView().findViewById(R.id.tvYMax);
+
+        seekBarX = getView().findViewById(R.id.seekBar1);
+        seekBarX.setOnSeekBarChangeListener(this);
+
+        seekBarY = getView().findViewById(R.id.seekBar2);
+//        seekBarY.setMax(180);
+        seekBarY.setMax(2536);
+        seekBarY.setOnSeekBarChangeListener(this);
+
+        {   // // Chart Style // //
+            chart = getView().findViewById(R.id.chart1);
+
+            // background color
+            chart.setBackgroundColor(Color.WHITE);
+
+            // disable description text
+            chart.getDescription().setEnabled(false);
+
+            // enable touch gestures
+            chart.setTouchEnabled(true);
+
+            // set listeners
+            chart.setOnChartValueSelectedListener(this);
+            chart.setDrawGridBackground(false);
+
+            // create marker to display box when values are selected
+            MyMarkerView mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
+
+            // Set the marker to the chart
+            mv.setChartView(chart);
+            chart.setMarker(mv);
+
+            // enable scaling and dragging
+            chart.setDragEnabled(false);
+            //chart.setScaleEnabled(true);//-----------------
+            chart.setScaleXEnabled(true);
+            chart.setScaleYEnabled(false);
+
+            // force pinch zoom along both axis
+            chart.setPinchZoom(true);
         }
 
-        BarDataSet set1 = new BarDataSet(values, SET_LABEL);
+        XAxis xAxis;
+        {   // // X-Axis Style // //
+            xAxis = chart.getXAxis();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
-        ArrayList<IBarDataSet> dataSets = new ArrayList<>();
-        dataSets.add(set1);
+            //xAxis.setValueFormatter(new MyXAxisValueFormatter());
 
-        BarData data = new BarData(dataSets);
+            // vertical grid lines
+            //xAxis.enableGridDashedLine(10f, 10f, 0f);
+        }
 
-        return data;
+        YAxis yAxis;
+        {   // // Y-Axis Style // //
+            yAxis = chart.getAxisLeft();
+
+            // disable dual axis (only use LEFT axis)
+            chart.getAxisRight().setEnabled(false);
+
+            // horizontal grid lines
+            //yAxis.enableGridDashedLine(10f, 10f, 0f);
+
+            // axis range
+            yAxis.setAxisMaximum(2535f);
+            yAxis.setAxisMinimum(0f);
+        }
+
+
+        {   // // Create Limit Lines // //
+            /*
+            LimitLine llXAxis = new LimitLine(9f, "Index 10");
+            llXAxis.setLineWidth(4f);
+            llXAxis.enableDashedLine(10f, 10f, 0f);
+            llXAxis.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+            llXAxis.setTextSize(10f);
+             */
+            //llXAxis.setTypeface(tfRegular);
+
+            /*
+            LimitLine ll1 = new LimitLine(150f, "Upper Limit");
+            ll1.setLineWidth(4f);
+            ll1.enableDashedLine(10f, 10f, 0f);
+            ll1.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+            ll1.setTextSize(10f);
+             */
+            //ll1.setTypeface(tfRegular);
+
+            /*
+            LimitLine ll2 = new LimitLine(-30f, "Lower Limit");
+            ll2.setLineWidth(4f);
+            ll2.enableDashedLine(10f, 10f, 0f);
+            ll2.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+            ll2.setTextSize(10f);
+            */
+            //ll2.setTypeface(tfRegular);
+
+            // draw limit lines behind data instead of on top
+
+            yAxis.setDrawLimitLinesBehindData(true);
+            xAxis.setDrawLimitLinesBehindData(true);
+
+            // add limit lines
+            /*
+            yAxis.addLimitLine(ll1);
+            yAxis.addLimitLine(ll2);
+             */
+            //xAxis.addLimitLine(llXAxis);
+        }
+
+        // add data
+        seekBarX.setProgress(45);
+        seekBarY.setProgress(180);
+
+        //setData(45, 180);
+        setDataFromDB();
+
+        // draw points over time
+        chart.animateX(1500);
+
+        // get the legend (only possible after setting data)
+        Legend l = chart.getLegend();
+
+        // draw legend entries as lines
+        l.setForm(Legend.LegendForm.LINE);
+
+
     }
 
-    private ArrayList<BarEntry> getDataSet() {
-        ArrayList<BarDataSet> dataSets = null;
 
-        ArrayList<BarEntry> valueSet1 = new ArrayList<>();
-        BarEntry v1e1 = new BarEntry(110.000f, 0); // Jan
-        valueSet1.add(v1e1);
-        BarEntry v1e2 = new BarEntry(40.000f, 1); // Feb
-        valueSet1.add(v1e2);
-        BarEntry v1e3 = new BarEntry(60.000f, 2); // Mar
-        valueSet1.add(v1e3);
-        BarEntry v1e4 = new BarEntry(30.000f, 3); // Apr
-        valueSet1.add(v1e4);
-        BarEntry v1e5 = new BarEntry(90.000f, 4); // May
-        valueSet1.add(v1e5);
-        BarEntry v1e6 = new BarEntry(100.000f, 5); // Jun
-        valueSet1.add(v1e6);
+    private void setData(int count, float range) {
 
-        ArrayList<BarEntry> valueSet2 = new ArrayList<>();
-        BarEntry v2e1 = new BarEntry(150.000f, 0); // Jan
-        valueSet2.add(v2e1);
-        BarEntry v2e2 = new BarEntry(90.000f, 1); // Feb
-        valueSet2.add(v2e2);
-        BarEntry v2e3 = new BarEntry(120.000f, 2); // Mar
-        valueSet2.add(v2e3);
-        BarEntry v2e4 = new BarEntry(60.000f, 3); // Apr
-        valueSet2.add(v2e4);
-        BarEntry v2e5 = new BarEntry(20.000f, 4); // May
-        valueSet2.add(v2e5);
-        BarEntry v2e6 = new BarEntry(80.000f, 5); // Jun
-        valueSet2.add(v2e6);
+        ArrayList<Entry> values = new ArrayList<>();
 
-        BarDataSet barDataSet1 = new BarDataSet(valueSet1, "Brand 1");
-        barDataSet1.setColor(Color.rgb(0, 155, 0));
-        BarDataSet barDataSet2 = new BarDataSet(valueSet2, "Brand 2");
-        barDataSet2.setColors(ColorTemplate.COLORFUL_COLORS);
+        for (int i = 0; i < count; i++) {
 
-        dataSets = new ArrayList<>();
-        dataSets.add(barDataSet1);
-        dataSets.add(barDataSet2);
-        return valueSet1;
+            float val = (float) (Math.random() * range) - 30;
+            values.add(new Entry(i, val, getResources().getDrawable(R.drawable.star)));
+
+        }
+
+        LineDataSet set1;
+
+        if (chart.getData() != null &&
+                chart.getData().getDataSetCount() > 0) {
+            set1 = (LineDataSet) chart.getData().getDataSetByIndex(0);
+
+            set1.setValues(values);
+            set1.notifyDataSetChanged();
+            chart.getData().notifyDataChanged();
+            chart.notifyDataSetChanged();
+        } else {
+            // create a dataset and give it a type
+            set1 = new LineDataSet(values, "DataSet 1");
+
+            set1.setDrawIcons(false);
+
+            // draw dashed line
+            set1.enableDashedLine(10f, 5f, 0f);
+
+            // black lines and points
+            set1.setColor(Color.BLACK);
+            set1.setCircleColor(Color.BLACK);
+
+            // line thickness and point size
+            set1.setLineWidth(1f);
+            set1.setCircleRadius(3f);
+
+            // draw points as solid circles
+            set1.setDrawCircleHole(false);
+
+            // customize legend entry
+            set1.setFormLineWidth(1f);
+            set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
+            set1.setFormSize(15.f);
+
+            // text size of values
+            set1.setValueTextSize(9f);
+
+            // draw selection line as dashed
+            set1.enableDashedHighlightLine(10f, 5f, 0f);
+
+            // set the filled area
+            set1.setDrawFilled(true);
+            set1.setFillFormatter(new IFillFormatter() {
+                @Override
+                public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+                    return chart.getAxisLeft().getAxisMinimum();
+                }
+            });
+
+            // set color of filled area
+            if (Utils.getSDKInt() >= 18) {
+                // drawables only supported on api level 18 and above
+                Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.fade_red);
+                set1.setFillDrawable(drawable);
+            } else {
+                set1.setFillColor(Color.BLACK);
+            }
+
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1); // add the data sets
+
+            // create a data object with the data sets
+            LineData data = new LineData(dataSets);
+
+            // set data
+            chart.setData( data);
+        }
     }
 
-    private ArrayList<String> getXAxisValues() {
-        ArrayList<String> xAxis = new ArrayList<>();
-        xAxis.add("JAN");
-        xAxis.add("FEB");
-        xAxis.add("MAR");
-        xAxis.add("APR");
-        xAxis.add("MAY");
-        xAxis.add("JUN");
-        return xAxis;
+
+    private void setDataFromDB() {
+
+        ArrayList<Entry> values = new ArrayList<>();
+
+
+
+//        for (int i = 0; i < count; i++) {
+//
+//            float val = (float) (Math.random() * range) - 30;
+//            values.add(new Entry(i, val, getResources().getDrawable(R.drawable.star)));
+//
+//        }
+
+
+/*
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //transactionList.clear(); //------------------
+                //values.clear();
+
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        //System.out.println(transaction);
+                        transaction.parseDBDate();
+                        transaction.parseDBMonth();
+//                        transactionList.add(transaction);
+
+                        float x;
+                        float y;
+//
+                        x = transaction.getDateInMilliseconds();
+                        y = Float.valueOf(transaction.getBalance().trim());
+
+                        values.add(new Entry(x, y, getResources().getDrawable(R.drawable.star)));
+                        //System.out.println("x = " + x + "   , y = " + y + "    : parsed: " + Transaction.getParsedDateInMilliseconds(x));
+
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("db data retrieval fail: " + error);
+            }
+        });
+*/
+
+//        for(int i  = 0; i < 100; i++){
+//            values.add(new Entry(i, i*2, getResources().getDrawable(R.drawable.star)));
+//        }
+
+
+        LineDataSet set1;
+
+        if (chart.getData() != null &&
+                chart.getData().getDataSetCount() > 0) {
+            set1 = (LineDataSet) chart.getData().getDataSetByIndex(0);
+
+            set1.setValues(values);
+            set1.notifyDataSetChanged();
+            chart.getData().notifyDataChanged();
+            chart.notifyDataSetChanged();
+        } else {
+            // create a dataset and give it a type
+            set1 = new LineDataSet(values, "DataSet 1");
+
+            set1.setDrawIcons(false);
+
+            // draw dashed line
+            set1.enableDashedLine(10f, 5f, 0f);
+
+            // black lines and points
+            set1.setColor(Color.BLACK);
+            set1.setCircleColor(Color.BLACK);
+
+            // line thickness and point size
+            set1.setLineWidth(1f);
+            set1.setCircleRadius(3f);
+
+            // draw points as solid circles
+            set1.setDrawCircleHole(false);
+
+            // customize legend entry
+            set1.setFormLineWidth(1f);
+            set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
+            set1.setFormSize(15.f);
+
+            // text size of values
+            set1.setValueTextSize(9f);
+
+            // draw selection line as dashed
+            set1.enableDashedHighlightLine(10f, 5f, 0f);
+
+            // set the filled area
+            set1.setDrawFilled(true);
+            set1.setFillFormatter(new IFillFormatter() {
+                @Override
+                public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+                    return chart.getAxisLeft().getAxisMinimum();
+                }
+            });
+
+            // set color of filled area
+            if (Utils.getSDKInt() >= 18) {
+                // drawables only supported on api level 18 and above
+                Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.fade_red);
+                set1.setFillDrawable(drawable);
+            } else {
+                set1.setFillColor(Color.BLACK);
+            }
+
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1); // add the data sets
+
+            // create a data object with the data sets
+            LineData data = new LineData(dataSets);
+
+            // set data
+            chart.setData( data);
+        }
+    }
+
+
+
+    private void getDataFromDB(){
+
+//        String x, y;
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                transactionList.clear(); //------------------
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        //System.out.println(transaction);
+                        transaction.parseDBDate();
+                        transaction.parseDBMonth();
+                        transactionList.add(transaction);
+
+                        float x;
+                        String y;
+
+                        x = transaction.getDateInMilliseconds();
+                        y = transaction.getBalance();
+
+                        System.out.println("x = " + x + "   , y = " + y + "    : parsed: " + Transaction.getParsedDateInMilliseconds(x));
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("db data retrieval fail: " + error);
+            }
+        });
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        tvX.setText(String.valueOf(seekBarX.getProgress()));
+        tvY.setText(String.valueOf(seekBarY.getProgress()));
+
+//        setData(seekBarX.getProgress(), seekBarY.getProgress());
+        setDataFromDB();
+
+        // redraw
+        chart.invalidate();
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onValueSelected(Entry e, Highlight h) {
+
+    }
+
+    @Override
+    public void onNothingSelected() {
+
     }
 }
