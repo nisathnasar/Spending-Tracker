@@ -153,6 +153,18 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                     }
 
                 }
+
+                if(transactionList.size()==0){
+                    getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+                    //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
+                    //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
+
+                } else{
+                    getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
+                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
+                }
+
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -182,13 +194,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
             }
         });
 
-        if(transactionList.size()==0){
-            getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-            getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
-            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
-            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
 
-        }
     }
 
     private void filter(String text){
