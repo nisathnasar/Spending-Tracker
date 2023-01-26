@@ -132,10 +132,13 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
         DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
+        final float[] finalMaximumBal = new float[1];
 
         mTransactionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                float maximumBal = 0;
+
                 transactionList.clear(); //------------------
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
@@ -145,6 +148,10 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                         transaction.parseDBMonth();
                         transactionList.add(transaction);
 
+                        if(maximumBal < Float.valueOf(transaction.getBalance())){
+                            maximumBal = Float.valueOf(transaction.getBalance());
+                        }
+
 //                        try {
 //                            Transaction.sortTransactionListByDate(transactionList);
 //                        } catch (ParseException e) {
@@ -153,6 +160,12 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                     }
 
                 }
+
+                //finalMaximumBal[0] = maximumBal;
+
+                //update max bal on db:
+                mRootRef.child("MaximumBalance").setValue(maximumBal);
+
 
                 if(transactionList.size()==0){
                     getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
@@ -175,6 +188,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
         });
 
 
+
         filterET = getView().findViewById(R.id.filter_et);
 
         filterET.addTextChangedListener(new TextWatcher() {
@@ -194,7 +208,13 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
             }
         });
 
+        if(transactionList.size()==0){
+            getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+            getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
+            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
 
+        }
     }
 
     private void filter(String text){

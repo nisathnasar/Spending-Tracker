@@ -19,6 +19,7 @@ public class Transaction {
     private String paidOut;
     private String painIn;
     private String balance;
+    private float dateInMilliseconds;
     private static int TRANSACTIONCOUNT;
 
     public int getTransactionID(){
@@ -93,6 +94,49 @@ public class Transaction {
         //date = elements[0] +"-"+ String.valueOf(month)  +"-"+ elements[2] ;
         return sdf.parse(date);
 
+    }
+
+    public float getDateInMilliseconds(){
+
+        String[] elements;
+        if(dateOfTransaction.contains("-")){
+            System.out.println("str contains dash: " + dateOfTransaction);
+            elements = dateOfTransaction.split("-");
+        } else{
+            System.out.println("str contains space: " + dateOfTransaction);
+            elements = dateOfTransaction.split(" ");
+        }
+
+        int day = Integer.parseInt(elements[0]);
+        int month = formatMonth(elements[1]);
+        int year = Integer.parseInt(elements[2]);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day);
+
+        return cal.getTimeInMillis();
+    }
+
+    public void setDateInMilliseconds(float str){
+        System.out.println("attempt to set date in milliseconds :" + str);
+
+        dateInMilliseconds = str;
+
+    }
+
+    public static String getParsedDateInMilliseconds(float timeStamp){
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis((long) timeStamp);
+
+        int mYear = calendar.get(Calendar.YEAR);
+        int mMonth = calendar.get(Calendar.MONTH);
+        int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String str = mDay + " " + mMonth + " " + mYear;
+
+        return str;
+        //return Transaction.parseDBMonth(str, " ");
     }
 
     @Override
@@ -208,6 +252,52 @@ public class Transaction {
         dateOfTransaction = dateElements[0] + " " + result + " " + dateElements[2];
     }
 
+
+    public static String parseDBMonth(String parsedDBDate, String splitText) {
+        //String parsedDBDate = dateOfTransaction;
+        String[] dateElements = parsedDBDate.trim().split(splitText);
+        int month = Integer.parseInt(dateElements[1].trim());
+        String result="";
+        switch (month) {
+            case 1:
+                result = "jan";
+                break;
+            case 2:
+                result = "feb";
+                break;
+            case 3:
+                result = "mar";
+                break;
+            case 4:
+                result = "apr";
+                break;
+            case 5:
+                result = "may";
+                break;
+            case 6:
+                result = "jun";
+                break;
+            case 7:
+                result = "jul";
+                break;
+            case 8:
+                result = "aug";
+                break;
+            case 9:
+                result = "sep";
+                break;
+            case 10:
+                result = "oct";
+                break;
+            case 11:
+                result = "nov";
+                break;
+            case 12:
+                result = "dec";
+                break;
+        }
+        return dateElements[0] + splitText + result + splitText + dateElements[2];
+    }
 
     public void setTransactionID(int transactionID) {
         this.transactionID = transactionID;
