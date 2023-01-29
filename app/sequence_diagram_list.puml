@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+User -> TransactionFragment : request to display transactions
+
+TransactionFragment -> Firebase_Database : get transaction data
+
+Firebase_Database -> TransactionFragment : send response
+
+group
+
+alt success
+
+
+TransactionFragment -> RecyclerViewAdapter : request for list management
+
+RecyclerViewAdapter --> TransactionFragment : response
+
+TransactionFragment --> User : display data
+
+
+else failure
+
+TransactionFragment --> User : Display no data message
+
+end
+
+
+
+
+@enduml

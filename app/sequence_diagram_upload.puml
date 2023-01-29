@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+
+
+User -> FileSelectorFragment : upload bank statement
+
+FileSelectorFragment -> FileUtils : get file path
+
+FileUtils --> FileSelectorFragment : response
+
+FileSelectorFragment -> PDFProcessor : process all the pages
+
+group PDF processing
+
+alt success
+
+FileSelectorFragment -> Firebase_Database : upload data
+
+Firebase_Database -> PDFProcessor : Notify success
+
+PDFProcessor -> FileSelectorFragment : Notify success
+
+FileSelectorFragment --> User : Notify success
+
+else failure
+
+FileSelectorFragment --> User : fail error
+
+end
+
+
+
+@enduml
