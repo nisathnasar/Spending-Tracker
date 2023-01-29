@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "539281120180",
+    "project_id": "spending-tracker-36c6b",
+    "storage_bucket": "spending-tracker-36c6b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539281120180:android:141a867faa01f4f5f4f0e1",
+        "android_client_info": {
+          "package_name": "com.aston.spendingtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "539281120180-7439ug3dbm14kuvgulirs8h4ch7r9plb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXXcZe60ag6mTRWPigGiy9OaEJoVVS_Yw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "539281120180-7439ug3dbm14kuvgulirs8h4ch7r9plb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
