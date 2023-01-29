@@ -124,8 +124,6 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
         }
 
 
-
-
     }
 
     @Override
@@ -173,16 +171,16 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
         System.out.println(maxBal[0] + "----------------------");
 
 
-        tvX = getView().findViewById(R.id.tvXMax);
-        tvY = getView().findViewById(R.id.tvYMax);
+        //tvX = getView().findViewById(R.id.tvXMax);
+        //tvY = getView().findViewById(R.id.tvYMax);
 
-        seekBarX = getView().findViewById(R.id.seekBar1);
-        seekBarX.setOnSeekBarChangeListener(this);
+        //seekBarX = getView().findViewById(R.id.seekBar1);
+        //seekBarX.setOnSeekBarChangeListener(this);
 
-        seekBarY = getView().findViewById(R.id.seekBar2);
+        //seekBarY = getView().findViewById(R.id.seekBar2);
 //        seekBarY.setMax(180);
-        seekBarY.setMax(1763);
-        seekBarY.setOnSeekBarChangeListener(this);
+        //seekBarY.setMax(1763);
+        //seekBarY.setOnSeekBarChangeListener(this);
 
         {   // // Chart Style // //
             chart = getView().findViewById(R.id.chart1);
@@ -201,17 +199,17 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
             chart.setDrawGridBackground(false);
 
             // create marker to display box when values are selected
-            MyMarkerView mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
+            //MyMarkerView mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
 
             // Set the marker to the chart
-            mv.setChartView(chart);
-            chart.setMarker(mv);
+            //mv.setChartView(chart);
+            //chart.setMarker(mv);
 
             // enable scaling and dragging
             chart.setDragEnabled(true);
             //chart.setScaleEnabled(true);//-----------------
             chart.setScaleXEnabled(true);
-            chart.setScaleYEnabled(false);
+            chart.setScaleYEnabled(true);
 
             // force pinch zoom along both axis
             chart.setPinchZoom(true);
@@ -287,8 +285,8 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
         }
 
         // add data
-        seekBarX.setProgress(45);
-        seekBarY.setProgress(180);
+       //seekBarX.setProgress(45);
+        //seekBarY.setProgress(180);
 
         //setData(45, 180);
         setDataFromDB();

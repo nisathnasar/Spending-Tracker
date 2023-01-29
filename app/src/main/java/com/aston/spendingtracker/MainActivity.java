@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         }).attach();
 
+        pager.setUserInputEnabled(false);
+
         if(!Python.isStarted()){
             Python.start(new AndroidPlatform(this));
         }
@@ -182,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
 
             case R.id.action_logout:
                 // User chose the "Favorite" action, mark the current item
