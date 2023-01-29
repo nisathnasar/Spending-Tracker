@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Spending Tracker"
 include ':app'
+
