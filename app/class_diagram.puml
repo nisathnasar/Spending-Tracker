@@ -1,0 +1,37 @@
+@startuml
+
+class MainActivity
+class RegisterUser
+class LoginActivity
+class Transaction
+class User
+class FileSelectorFragment
+class FileUtils
+class HSBCRegex
+class PDFProcessor
+class AnalyticsFragment
+class PagerAdapter
+class RecyclerViewAdapter
+class TransactionFragment
+class ViewTransaction
+class MyXAxisValueFormatter
+
+RegisterUser ..> MainActivity : calls
+LoginActivity ..> MainActivity : calls
+RegisterUser *-- User
+MainActivity *-- PagerAdapter
+PagerAdapter *-- TransactionFragment
+PagerAdapter *-- AnalyticsFragment
+PagerAdapter *-- FileSelectorFragment
+AnalyticsFragment *-- MyXAxisValueFormatter
+PDFProcessor o-- Transaction
+FileSelectorFragment ..> PDFProcessor : calls
+FileSelectorFragment *-- FileUtils
+PDFProcessor *-- HSBCRegex
+TransactionFragment *-- RecyclerViewAdapter
+TransactionFragment *-- ViewTransaction
+
+
+
+
+@enduml

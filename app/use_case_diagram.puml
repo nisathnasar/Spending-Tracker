@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+
+(Monitor Family or multiple people finance) as (mf)
+
+(View list of transactions with friendly user interface) as (frui)
+
+(Informed decision making {using understandable data and visual}) as (ifd)
+
+User --> (Monitor Finance)
+
+(Monitor Finance) --> (mf)
+
+(Monitor Finance) --> (frui)
+
+(frui) --> (ifd)
+
+User --> (Export as Excel File)
+
+(Export as Excel File) --> (ifd)
+
+User --> (Categorise Transactions)
+
+(Categorise Transactions) --> (ifd)
+
+User --> (Query Transactions)
+
+(Query Transactions) --> (ifd)
+
+User --> (Secure database storage of data)
+
+
+
+
+
+
+@enduml
