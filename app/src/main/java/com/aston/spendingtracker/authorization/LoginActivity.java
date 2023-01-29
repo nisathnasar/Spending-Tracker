@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.aston.spendingtracker.AndroidTools;
 import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
@@ -133,7 +134,16 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loginUser();
+
+                AndroidTools at = new AndroidTools();
+                if(at.isNetworkAvailable(getApplicationContext())){
+                    loginUser();
+                }
+                else{
+                    Toast.makeText(LoginActivity.this, "Check your internet connection", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
 
@@ -156,6 +166,9 @@ public class LoginActivity extends AppCompatActivity {
     private void loginUser(){
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
+
+
+
         if(email.isEmpty()){
             Toast.makeText(this, "Please enter email", Toast.LENGTH_LONG).show();
             emailEditText.requestFocus();
