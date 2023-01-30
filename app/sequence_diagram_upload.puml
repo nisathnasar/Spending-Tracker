@@ -17,7 +17,7 @@ group PDF processing
 
 alt success
 
-FileSelectorFragment -> Firebase_Database : upload data
+PDFProcessor -> Firebase_Database : upload data
 
 Firebase_Database -> PDFProcessor : Notify success
 

@@ -8,7 +8,8 @@ class User
 class FileSelectorFragment
 class FileUtils
 class HSBCRegex
-class PDFProcessor
+interface PDFProcessor
+class HSBCPDFProcessor
 class AnalyticsFragment
 class PagerAdapter
 class RecyclerViewAdapter
@@ -25,11 +26,12 @@ PagerAdapter *-- AnalyticsFragment
 PagerAdapter *-- FileSelectorFragment
 AnalyticsFragment *-- MyXAxisValueFormatter
 PDFProcessor o-- Transaction
-FileSelectorFragment ..> PDFProcessor : calls
+FileSelectorFragment *-- PDFProcessor
 FileSelectorFragment *-- FileUtils
-PDFProcessor *-- HSBCRegex
+HSBCPDFProcessor *-- HSBCRegex
 TransactionFragment *-- RecyclerViewAdapter
 TransactionFragment *-- ViewTransaction
+PDFProcessor *-- HSBCPDFProcessor
 
 
 
