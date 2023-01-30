@@ -11,6 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:weightSum="1">
     <EditText
         android:id="@+id/editText_path"
@@ -28,8 +30,32 @@
         android:text="Browse" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:weightSum="1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select your bank:"
+            android:layout_weight="0.5"
+            android:textSize="15sp"/>
+
+        <Spinner
+            android:id="@+id/bank_group_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:layout_weight="0.5"
+            />
+    </LinearLayout>
+
+
     <Button
-        android:id="@+id/button_showInfo"
+        android:id="@+id/button_submit_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 

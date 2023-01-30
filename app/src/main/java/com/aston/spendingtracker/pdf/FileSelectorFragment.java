@@ -18,8 +18,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.aston.spendingtracker.R;
@@ -33,7 +36,7 @@ import java.text.ParseException;
  * Use the {@link FileSelectorFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FileSelectorFragment extends Fragment {
+public class FileSelectorFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -49,7 +52,8 @@ public class FileSelectorFragment extends Fragment {
 
     private Button buttonBrowse;
     private EditText editTextPath;
-    private Button buttonShowInfo;
+    private Button buttonSubmitFile;
+    private String selectedBank;
 
     private static final String LOG_TAG = "AndroidExample";
 
@@ -95,6 +99,20 @@ public class FileSelectorFragment extends Fragment {
         this.editTextPath = (EditText) rootView.findViewById(R.id.editText_path);
         this.buttonBrowse = (Button) rootView.findViewById(R.id.button_browse);
 
+
+        Spinner spinner = (Spinner) rootView.findViewById(R.id.bank_group_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.banking_group_list, android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
+
+
         this.buttonBrowse.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -108,14 +126,16 @@ public class FileSelectorFragment extends Fragment {
         return rootView;
     }
 
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        this.buttonShowInfo = getView().findViewById(R.id.button_showInfo);
-        this.buttonShowInfo.setEnabled(false);
+        this.buttonSubmitFile = getView().findViewById(R.id.button_submit_file);
+        this.buttonSubmitFile.setEnabled(false);
 
-        this.buttonShowInfo.setOnClickListener(v -> {
+        this.buttonSubmitFile.setOnClickListener(v -> {
             try {
                 stripText();
             } catch (IOException e) {
@@ -138,10 +158,10 @@ public class FileSelectorFragment extends Fragment {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // Level 23
             Log.d(getClass().toString(), "android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M------------------------------------");
             // Check if we have Call permission
-            int permisson = ActivityCompat.checkSelfPermission(this.getContext(),
+            int permission = ActivityCompat.checkSelfPermission(this.getContext(),
                     Manifest.permission.READ_EXTERNAL_STORAGE);
 
-            if (permisson != PackageManager.PERMISSION_GRANTED) {
+            if (permission != PackageManager.PERMISSION_GRANTED) {
                 Log.d(getClass().toString(), "don't have permission so prompt the user------------------------------------");
                 // If don't have permission so prompt the user.
                 this.requestPermissions(
@@ -212,7 +232,7 @@ public class FileSelectorFragment extends Fragment {
                         try {
                             filePath = FileUtils.getPath(this.getContext(),fileUri);
                             uripath = fileUri;
-                            buttonShowInfo.setEnabled(true);
+                            buttonSubmitFile.setEnabled(true);
                             //File file = new File(fileUri.getPath());
                         } catch (Exception e) {
                             Log.e(LOG_TAG,"Error: " + e);
@@ -241,9 +261,41 @@ public class FileSelectorFragment extends Fragment {
         String path = getPath();
         //Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
 
-        Uri pathURI = getPathURI();
+        if(selectedBank.equals("")){
+            Toast.makeText(getActivity(), "Select a bank", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            try{
 
-        PDFProcessor pdfProcessor = new PDFProcessor(getContext(), pathURI);
+
+                Uri pathURI = getPathURI();
+                PDFProcessor pdfProcessor;
+                switch(selectedBank){
+                    case "HSBC":
+                        pdfProcessor = new HSBCPDFProcessor(getContext(), pathURI);
+                        break;
+                    default:
+                        pdfProcessor = null;
+                }
+
+                if(pdfProcessor != null){
+                    pdfProcessor.processPDF();
+
+                    Toast.makeText(getActivity(), "Submitted", Toast.LENGTH_SHORT).show();
+                    buttonSubmitFile.setEnabled(false);
+                }
+                else{
+                    Toast.makeText(getActivity(), "PDF Processing failed, try again", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+            catch (IOException | ParseException ex){
+
+                Toast.makeText(getActivity(), "PDF Processing failed, try again", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+
 
 
 
@@ -256,9 +308,20 @@ public class FileSelectorFragment extends Fragment {
 //        // Give the RecyclerView a default layout manager.
 //        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        Toast.makeText(getActivity(), "Submitted", Toast.LENGTH_SHORT).show();
-        buttonShowInfo.setEnabled(false);
+
 
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        String str = adapterView.getItemAtPosition(i).toString();
+
+        selectedBank = str;
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 }
