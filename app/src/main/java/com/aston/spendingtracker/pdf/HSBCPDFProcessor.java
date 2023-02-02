@@ -5,10 +5,16 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.aston.spendingtracker.Party;
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
@@ -16,7 +22,6 @@ import com.tom_roush.pdfbox.text.PDFTextStripper;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -44,6 +49,9 @@ public class HSBCPDFProcessor implements PDFProcessor{
     Uri pathURI;
     DatabaseReference mrootRef;
     DatabaseReference dbRefContainsDateCommencing, dbRefTransaction;
+
+    boolean partyExists = false;
+
 
     public HSBCPDFProcessor(Context context, Uri pathURI) {
 
@@ -169,12 +177,14 @@ public class HSBCPDFProcessor implements PDFProcessor{
 
             rows = processLines(rows);
 
+
             addToDataBase(rows);
         }
 
 
         document.close();
 
+        document.close();
     }
 
 
@@ -432,6 +442,9 @@ public class HSBCPDFProcessor implements PDFProcessor{
                     words[4].trim(),
                     words[5].trim());
 
+            //extract party
+            extractParty(transaction);
+
             dbRefTransaction
                     .child(reconstructedDate)
                     .child(Integer.toString(transaction.getTransactionID()))
@@ -445,6 +458,123 @@ public class HSBCPDFProcessor implements PDFProcessor{
         //add datcommencing to database to prevent future duplicate entries
 
 
+    }
+
+    /**
+     * Get list of all parties (both senders and recievers) from database.
+     * If description is a new user, then add as a new user.
+     *
+     * should be called before items are added to database, because we need to check
+     */
+    public void extractParty(Transaction t){
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mPartyRef = mRootRef.child("Party");
+
+
+        //try different kind of listener
+        mPartyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                System.out.println("valueEventListener is being run ....................... for " + t.getPaymentDetails());
+
+                System.out.println(snapshot.toString());
+
+                String sanitisedPaymentDetails = Party.SanitiseName(t.getPaymentDetails());
+                if(snapshot.hasChild(sanitisedPaymentDetails)){
+                    System.out.println("from inside snapshot.haschild, party exists ......................... " + t.getPaymentDetails());
+
+                    snapshot.child(sanitisedPaymentDetails).getValue(Party.class).addTransaction(t);
+
+                }
+                else{
+
+                    Party p = new Party(t.getPaymentDetails());
+                    p.addTransaction(t);
+                    mPartyRef.child(p.getName()).setValue(p);
+                    mPartyRef.push();
+
+                    System.out.println("Party added: " + p.getName() + ", " + p.getListOfTransactions().toString());
+                }
+
+                System.out.println(snapshot.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // ...
+            }
+        });
+
+/*
+        if(!isPartyExists(t)){
+            Party p = new Party(t.getPaymentDetails());
+            p.addTransaction(t);
+
+            mPartyRef.child(p.getName()).setValue(p);
+
+
+            System.out.println("Party added: " + p.getName() + ", " + p.getListOfTransactions().toString());
+        }
+        else{
+            //find the party and add transaction
+            System.out.println("Party exists: " + t.getPaymentDetails() + ", " + t);
+
+            mPartyRef.child(t.getPaymentDetails()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        Party p = dataSnapshot.getValue(Party.class);
+
+                        p.addTransaction(t);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+        }
+*/
+    }
+
+    public boolean isPartyExists(Transaction transaction){
+
+        partyExists = false;
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mPartyRef = mRootRef.child("Party");
+
+        //try different kind of listener
+        mPartyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.hasChild(Party.SanitiseName(transaction.getPaymentDetails()))){
+                    System.out.println("from inside snapshot.haschild, party exists ......................... " + transaction.getPaymentDetails());
+                    partyExists = true;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // ...
+            }
+        });
+
+
+        if(partyExists){
+            System.out.println(transaction.getPaymentDetails()  + ": exists in db");
+        }
+        else{
+            System.out.println(transaction.getPaymentDetails()  + ": does not exist in db");
+        }
+
+        return partyExists;
     }
 
 }

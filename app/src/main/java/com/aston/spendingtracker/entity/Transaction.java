@@ -100,10 +100,10 @@ public class Transaction {
 
         String[] elements;
         if(dateOfTransaction.contains("-")){
-            System.out.println("str contains dash: " + dateOfTransaction);
+            //System.out.println("str contains dash: " + dateOfTransaction);
             elements = dateOfTransaction.split("-");
         } else{
-            System.out.println("str contains space: " + dateOfTransaction);
+            //System.out.println("str contains space: " + dateOfTransaction);
             elements = dateOfTransaction.split(" ");
         }
 
@@ -118,8 +118,6 @@ public class Transaction {
     }
 
     public void setDateInMilliseconds(float str){
-        System.out.println("attempt to set date in milliseconds :" + str);
-
         dateInMilliseconds = str;
 
     }
