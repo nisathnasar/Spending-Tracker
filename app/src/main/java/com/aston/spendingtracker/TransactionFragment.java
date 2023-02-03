@@ -146,6 +146,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                         //System.out.println(transaction);
                         transaction.parseDBDate();
                         transaction.parseDBMonth();
+                        transaction.parseDBYear();
                         transactionList.add(transaction);
 
                         if(maximumBal < Float.valueOf(transaction.getBalance())){

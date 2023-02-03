@@ -55,18 +55,20 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         pager = findViewById(R.id.viewPager);
         mTabLayout = findViewById(R.id.tab_layout);
-        transactionItem = findViewById(R.id.AnalyticsItem);
-        uploadItem = findViewById(R.id.UploadItem);
+        //transactionItem = findViewById(R.id.AnalyticsItem);
+        //uploadItem = findViewById(R.id.UploadItem);
 
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle() , mTabLayout.getTabCount());
         pager.setAdapter(adapter);
 
         new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
             if(position == 0){
-                tab.setText("List");
+                tab.setText("Dashboard");
             } else if (position == 1){
-                tab.setText("Analytics");
+                tab.setText("List");
             } else if (position == 2){
+                tab.setText("Analytics");
+            } else if (position == 3){
                 tab.setText("Upload");
             }
             else{

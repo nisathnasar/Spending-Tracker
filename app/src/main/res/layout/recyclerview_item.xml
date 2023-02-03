@@ -30,6 +30,91 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:background="@color/cardview_dark_background"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:id="@+id/linearLayoutRV">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="0.4">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/date_tv"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:layout_weight="0.6"
+                    android:maxLines="1"
+                    android:gravity="start"
+                    android:text="23-rfv-22"
+                    android:layout_marginBottom="0dp"
+                    />
+
+                <TextView
+                    android:id="@+id/details_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollHorizontally="true"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    style="@style/word_title"
+                    android:textSize="15sp"
+                    android:layout_weight="0.6"
+                    android:text="Amazon"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="0.6">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/transaction_tv"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:layout_weight="0.4"
+                    android:maxLines="1"
+                    android:gravity="end"
+                    android:text="£2454"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/balance_tv"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:textSize="12sp"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:layout_weight="0.4"
+                    android:gravity="end"
+                    android:text="£2454"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@color/cardview_dark_background"
             android:paddingStart="5dp"
@@ -38,6 +123,22 @@
             android:paddingBottom="5dp"
             android:id="@+id/linearLayoutRV"
             >
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/date_tv"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:layout_weight="0.6"
+                android:maxLines="1"
+                android:gravity="start"
+                android:text="23-rfv-22"
+                android:layout_marginBottom="0dp"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -49,18 +150,19 @@
                     android:id="@+id/details_tv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:scrollHorizontally="true"
                     android:maxLines="1"
                     android:ellipsize="end"
                     style="@style/word_title"
                     android:textSize="15sp"
                     android:layout_weight="0.6"
-                    android:text="gaerboerbkeorbke"/>
+                    android:text="Amazon"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/transaction_tv"
-                    android:textSize="15sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
@@ -82,7 +184,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/date_tv"
+                    android:id="@+id/empty_tv"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:paddingStart="5dp"
@@ -90,7 +192,7 @@
                     android:layout_weight="0.6"
                     android:maxLines="1"
                     android:gravity="start"
-                    android:text="23-rfv-22"
+
                     />
 
                 <TextView
@@ -99,7 +201,7 @@
                     android:id="@+id/balance_tv"
                     android:textStyle="bold"
                     android:maxLines="1"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
                     android:layout_weight="0.4"
@@ -110,6 +212,8 @@
 
             </LinearLayout>
         </LinearLayout>
+        -->
+
     </androidx.cardview.widget.CardView>
 
 

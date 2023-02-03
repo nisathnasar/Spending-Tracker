@@ -25,14 +25,18 @@ public class PagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
+                Fragment dashboardFragment = new DashboardFragment();
+                return dashboardFragment;
+            case 1:
                 Fragment transactionFragment = new TransactionFragment();
                 return transactionFragment;
-            case 1:
+            case 2:
                 Fragment analyticsFragment = new AnalyticsFragment();
                 return analyticsFragment;
-            case 2:
+            case 3:
                 Fragment fileSelector = new FileSelectorFragment();
                 return fileSelector;
+
             default:
                 return null;
         }

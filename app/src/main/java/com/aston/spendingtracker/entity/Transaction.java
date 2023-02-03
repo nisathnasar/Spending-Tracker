@@ -211,43 +211,63 @@ public class Transaction {
         String result="";
         switch (month) {
             case 1:
-                result = "jan";
+                result = "January";
                 break;
             case 2:
-                result = "feb";
+                result = "February";
                 break;
             case 3:
-                result = "mar";
+                result = "March";
                 break;
             case 4:
-                result = "apr";
+                result = "April";
                 break;
             case 5:
-                result = "may";
+                result = "May";
                 break;
             case 6:
-                result = "jun";
+                result = "June";
                 break;
             case 7:
-                result = "jul";
+                result = "July";
                 break;
             case 8:
-                result = "aug";
+                result = "August";
                 break;
             case 9:
-                result = "sep";
+                result = "September";
                 break;
             case 10:
-                result = "oct";
+                result = "October";
                 break;
             case 11:
-                result = "nov";
+                result = "November";
                 break;
             case 12:
-                result = "dec";
+                result = "December";
                 break;
         }
         dateOfTransaction = dateElements[0] + " " + result + " " + dateElements[2];
+    }
+
+    /**
+     * TODO: implement a method to get current year.
+     */
+    public void parseDBYear() {
+        String parsedDBDate = dateOfTransaction;
+        String[] dateElements = parsedDBDate.trim().split(" ");
+        //dateElements = parsedDBDate.trim().split("-");
+        int year = Integer.parseInt(dateElements[2].trim());
+        String result="";
+
+        if(year>=0 && year<=23){
+            result="20"+year;
+        }else{
+            result="19"+year;
+        }
+
+        dateOfTransaction = dateElements[0] + " " + dateElements[1] + " " + result;
+
     }
 
 

@@ -2,6 +2,7 @@ package com.aston.spendingtracker.pdf;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.widget.Toast;
 
@@ -20,8 +21,11 @@ import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -70,24 +74,41 @@ public class HSBCPDFProcessor implements PDFProcessor{
 
 
 
-            ParcelFileDescriptor parcelFileDescriptor = thisContext.getContentResolver().openFileDescriptor(pathURI, "r");
-            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-            InputStream fileStream = new FileInputStream(fileDescriptor);
-            PDDocument document = PDDocument.load(fileStream);
+        ParcelFileDescriptor parcelFileDescriptor = thisContext.getContentResolver().openFileDescriptor(pathURI, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        InputStream fileStream = new FileInputStream(fileDescriptor);
+        PDDocument document = PDDocument.load(fileStream);
 
 //        PDDocument document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
 //        PyObject obj = pyobj.callAttr("extract_text");
 //        String result = obj.toString();
-//        FileWriter fw = new FileWriter(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/Created.csv");
+
+        //File path = thisContext.getFilesDir();
+
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        System.out.println(path);
+        try{
+            FileOutputStream writer = new FileOutputStream(new File(path, "someFileName.csv"));
+
+            writer.write("date, type, balance".getBytes());
+            writer.close();
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+//        FileWriter fw = new FileWriter(thisContext.getFilesDir() + "/Created.csv");
 //        FileWriter fw = new FileWriter(root.getAbsolutePath() + "/Created.csv");
+
 //        Log.d("MainActivity.java", root.getAbsolutePath() + "/Created.csv");
 //        write header
 //        fw.write("Date, Type, Details, Pay Out, Pay In, Balance\n");
 
-            activateSequence(document, numOfPagesToExtractFrom);
-            parcelFileDescriptor.close();
-            fileStream.close();
-            document.close();
+        activateSequence(document, numOfPagesToExtractFrom);
+        parcelFileDescriptor.close();
+        fileStream.close();
+        document.close();
 
 
     }

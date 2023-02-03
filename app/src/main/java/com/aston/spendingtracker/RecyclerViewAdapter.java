@@ -58,6 +58,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             switch (nightModeFlags) {
                 case Configuration.UI_MODE_NIGHT_YES:
+                    TextView tv = holder.linearLayoutRV.findViewById(R.id.transaction_tv);
+                    tv.setTextColor(Color.parseColor("#d98b8b"));
+
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
                     holder.linearLayoutRV.setBackgroundColor(Color.parseColor("#5c859c"));
@@ -71,6 +74,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             switch (nightModeFlags) {
                 case Configuration.UI_MODE_NIGHT_YES:
+                    TextView tv = holder.linearLayoutRV.findViewById(R.id.transaction_tv);
+                    tv.setTextColor(Color.parseColor("#82b889"));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
                     holder.linearLayoutRV.setBackgroundColor(Color.parseColor("#53b075"));
