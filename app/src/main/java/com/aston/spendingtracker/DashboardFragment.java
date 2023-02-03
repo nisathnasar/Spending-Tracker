@@ -1,5 +1,6 @@
 package com.aston.spendingtracker;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.drawable.Drawable;
@@ -13,12 +14,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.aston.spendingtracker.entity.Transaction;
@@ -35,6 +38,7 @@ import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -101,11 +105,16 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_dashboard, container, false);
     }
@@ -125,6 +134,23 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 //        childFragTrans.addToBackStack("B");
 //        childFragTrans.commit();
 
+
+        Button btn = getView().findViewById(R.id.btn_more_analytics);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try{
+                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
+                    mParent.onChange(2);
+                }
+                catch(ClassCastException e){
+                    System.out.println(e);
+                }
+
+
+            }
+        });
 
 
         mRecyclerView = getView().findViewById(R.id.recyclerview);
@@ -289,6 +315,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
         // draw legend entries as lines
         l.setForm(Legend.LegendForm.LINE);
+
 
 
 
@@ -462,4 +489,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
     public void onNothingSelected() {
 
     }
+
+
+
 }

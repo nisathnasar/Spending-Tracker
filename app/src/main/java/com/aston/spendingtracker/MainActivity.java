@@ -27,7 +27,7 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener,
-        OnChartValueSelectedListener {
+        OnChartValueSelectedListener, FragmentChangeListener {
 
     // Request code for selecting a PDF document.
     private static final int PICK_PDF_FILE = 2;
@@ -41,8 +41,14 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 //    PyObject pyobj;
 
     ViewPager2 pager;
+    PagerAdapter adapter;
     TabLayout mTabLayout;
     TabItem transactionItem, analyticsItem, uploadItem;
+
+    public static final int DASHBOARD_POSITION = 0;
+    public static final int TRANSACTION_LIST_POSITION = 1;
+    public static final int ANALYTICS_POSITION = 2;
+    public static final int UPLOAD_POSITION = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +64,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         //transactionItem = findViewById(R.id.AnalyticsItem);
         //uploadItem = findViewById(R.id.UploadItem);
 
-        PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle() , mTabLayout.getTabCount());
+        adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle() , mTabLayout.getTabCount());
         pager.setAdapter(adapter);
+
+
 
         new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
             if(position == 0){
@@ -224,5 +232,11 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     @Override
     public void onNothingSelected() {
 
+    }
+
+    @Override
+    public void onChange(int newFragmentPosition) {
+
+        pager.setCurrentItem(newFragmentPosition);
     }
 }
