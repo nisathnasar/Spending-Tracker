@@ -18,7 +18,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Balance over the days:"
+                android:text="Balance overview:"
                 android:textSize="15sp"
                 android:layout_margin="15dp"/>
 
@@ -61,6 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
+                android:id="@+id/btn_all_transactions"
                 android:text="View All Transactions"/>
 
 

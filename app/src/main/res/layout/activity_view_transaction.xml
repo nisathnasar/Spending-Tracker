@@ -12,10 +12,15 @@
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/details_tv">
 
         </TextView>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add to Category"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

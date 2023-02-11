@@ -1,5 +1,6 @@
 package com.aston.spendingtracker;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -135,8 +136,8 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 //        childFragTrans.commit();
 
 
-        Button btn = getView().findViewById(R.id.btn_more_analytics);
-        btn.setOnClickListener(new View.OnClickListener() {
+        Button viewAllAnalyticsBtn = getView().findViewById(R.id.btn_more_analytics);
+        viewAllAnalyticsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -149,6 +150,20 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                 }
 
 
+            }
+        });
+
+        Button viewAllTransactionsBtn = getView().findViewById(R.id.btn_all_transactions);
+        viewAllTransactionsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try{
+                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
+                    mParent.onChange(1);
+                }
+                catch(ClassCastException e){
+                    System.out.println(e);
+                }
             }
         });
 
@@ -343,6 +358,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
 
         mTransactionRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("UseCompatLoadingForDrawables")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //transactionList.clear(); //------------------
