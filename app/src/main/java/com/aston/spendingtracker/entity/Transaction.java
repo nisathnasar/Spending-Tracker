@@ -20,6 +20,8 @@ public class Transaction {
     private String painIn;
     private String balance;
     private float dateInMilliseconds;
+    private String partyID;
+
     private static int TRANSACTIONCOUNT;
 
     public int getTransactionID(){
@@ -50,13 +52,21 @@ public class Transaction {
         return balance;
     }
 
-    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance) throws ParseException {
+    public String getPartyID() {
+        return partyID;
+    }
+
+    public void setPartyID(String partyID) {
+        this.partyID = partyID;
+    }
+    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance, String partyID) throws ParseException {
         this.dateOfTransaction = dateOfTransaction;
         this.paymentType = paymentType;
         this.paymentDetails = paymentDetails;
         this.paidOut = paidOut;
         this.painIn = painIn;
         this.balance = balance;
+        this.partyID = partyID;
         transactionID = TRANSACTIONCOUNT;
         TRANSACTIONCOUNT++;
 

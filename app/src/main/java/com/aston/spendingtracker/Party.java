@@ -3,10 +3,23 @@ package com.aston.spendingtracker;
 import com.aston.spendingtracker.entity.Transaction;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Party {
 
-    private ArrayList<Transaction> listOfTransactions;
+    //private ArrayList<Transaction> listOfTransactions = new ArrayList<>();
+
+    private String name;
+
+    public String getUniqueID() {
+        return uniqueID;
+    }
+
+    public void setUniqueID(String uniqueID) {
+        this.uniqueID = uniqueID;
+    }
+
+    private String uniqueID;
 
 
     public Party(String name) {
@@ -20,8 +33,8 @@ public class Party {
 
         this.name = tmpName;
 
+        uniqueID = UUID.randomUUID().toString();
 
-        listOfTransactions = new ArrayList<>();
     }
 
     public Party(){
@@ -37,12 +50,6 @@ public class Party {
         return tmpName;
     }
 
-    public void addTransaction(Transaction transaction){
-        listOfTransactions.add(transaction);
-    }
-
-
-
     public String getName() {
 
         return name;
@@ -51,18 +58,5 @@ public class Party {
     public void setName(String name) {
         this.name = name;
     }
-
-    public ArrayList<Transaction> getListOfTransactions() {
-        return listOfTransactions;
-    }
-
-    public void setListOfTransactions(ArrayList<Transaction> listOfTransactions) {
-        this.listOfTransactions = listOfTransactions;
-    }
-
-
-
-    private String name;
-
 
 }

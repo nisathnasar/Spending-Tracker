@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 
 import com.aston.spendingtracker.Party;
 import com.aston.spendingtracker.entity.Transaction;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -440,6 +442,8 @@ public class HSBCPDFProcessor implements PDFProcessor{
         return rows;
     }
 
+    String partyUID = "";
+
     private void addToDataBase(List<String> rows) throws ParseException {
 
         for (String str : rows) {
@@ -453,6 +457,29 @@ public class HSBCPDFProcessor implements PDFProcessor{
             String[] dateElements = words[0].trim().split("-");
             String reconstructedDate = dateElements[2] + "-" + Transaction.formatMonth(dateElements[1].trim()) + "-" + dateElements[0];
 
+
+            String sanitisedPaymentDetails = Party.SanitiseName(words[2].trim());
+            if(mrootRef.child("Party").child(sanitisedPaymentDetails).getKey().equals(sanitisedPaymentDetails)){
+
+                System.out.println("party exists for: " + sanitisedPaymentDetails);
+
+                mrootRef.child("Party").child(sanitisedPaymentDetails).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        Party p = task.getResult().getValue(Party.class);
+                        partyUID = p.getUniqueID();
+
+                    }
+                });
+
+            } else{
+                System.out.println("party doesn't exist for: " + sanitisedPaymentDetails);
+
+                Party p = new Party(sanitisedPaymentDetails);
+                mrootRef.child("Party").setValue(p);
+            }
+
+
             Transaction transaction = new Transaction(
                     //new Timestamp(Transaction.getDateObjectFromString(words[0].trim()).getTime()),
                     //words[0].trim(),
@@ -461,10 +488,11 @@ public class HSBCPDFProcessor implements PDFProcessor{
                     words[2].trim(),
                     words[3].trim(),
                     words[4].trim(),
-                    words[5].trim());
+                    words[5].trim(),
+                    partyUID);
 
             //extract party
-            extractParty(transaction);
+            //extractParty(transaction);
 
             dbRefTransaction
                     .child(reconstructedDate)
@@ -506,17 +534,17 @@ public class HSBCPDFProcessor implements PDFProcessor{
                 if(snapshot.hasChild(sanitisedPaymentDetails)){
                     System.out.println("from inside snapshot.haschild, party exists ......................... " + t.getPaymentDetails());
 
-                    snapshot.child(sanitisedPaymentDetails).getValue(Party.class).addTransaction(t);
+                    //snapshot.child(sanitisedPaymentDetails).getValue(Party.class).addTransaction(t);
 
                 }
                 else{
 
                     Party p = new Party(t.getPaymentDetails());
-                    p.addTransaction(t);
+                    //p.addTransaction(t);
                     mPartyRef.child(p.getName()).setValue(p);
                     mPartyRef.push();
 
-                    System.out.println("Party added: " + p.getName() + ", " + p.getListOfTransactions().toString());
+                    //System.out.println("Party added: " + p.getName() + ", " + p.getListOfTransactions().toString());
                 }
 
                 System.out.println(snapshot.toString());
