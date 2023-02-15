@@ -380,7 +380,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                         x = transaction.getDateInMilliseconds();
                         y = Float.valueOf(transaction.getBalance().trim());
 
-                        values.add(new Entry(x, y, getResources().getDrawable(R.drawable.star)));
+                        values.add(new Entry(x, y, ((MainActivity)getActivity()).getResources().getDrawable(R.drawable.star)));
 
 //                        values.add(new Entry(i, y));
 

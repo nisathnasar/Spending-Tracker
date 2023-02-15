@@ -241,6 +241,12 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
 
         Intent i = new Intent(getActivity(), ViewTransaction.class);
         i.putExtra("detail", transactionList.get(position).getPaymentDetails());
+        i.putExtra("type", transactionList.get(position).getPaymentType());
+        i.putExtra("date", transactionList.get(position).getDateOfTransaction());
+        i.putExtra("category", transactionList.get(position).getCategory());
+        i.putExtra("balance", transactionList.get(position).getBalance());
+        i.putExtra("paidOut", transactionList.get(position).getPaidOut());
+        i.putExtra("paidIn", transactionList.get(position).getPainIn());
 
         startActivity(i);
 

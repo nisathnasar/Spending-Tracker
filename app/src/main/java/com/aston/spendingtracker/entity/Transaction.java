@@ -1,6 +1,7 @@
 package com.aston.spendingtracker.entity;
 
 import java.sql.Timestamp;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -21,44 +22,12 @@ public class Transaction {
     private String balance;
     private float dateInMilliseconds;
     private String partyID;
+    private String category;
 
     private static int TRANSACTIONCOUNT;
 
-    public int getTransactionID(){
-        return transactionID;
-    }
 
-    public String getDateOfTransaction() {
-        return dateOfTransaction;
-    }
 
-    public String getPaymentType() {
-        return paymentType;
-    }
-
-    public String getPaymentDetails() {
-        return paymentDetails;
-    }
-
-    public String getPaidOut() {
-        return paidOut;
-    }
-
-    public String getPainIn() {
-        return painIn;
-    }
-
-    public String getBalance() {
-        return balance;
-    }
-
-    public String getPartyID() {
-        return partyID;
-    }
-
-    public void setPartyID(String partyID) {
-        this.partyID = partyID;
-    }
     public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance, String partyID) throws ParseException {
         this.dateOfTransaction = dateOfTransaction;
         this.paymentType = paymentType;
@@ -141,9 +110,12 @@ public class Transaction {
         int mMonth = calendar.get(Calendar.MONTH);
         int mDay = calendar.get(Calendar.DAY_OF_MONTH);
 
+        Format f = new SimpleDateFormat("dd MMM yy");
+        String strDate = f.format(calendar.getTime());
+
         String str = mDay + " " + mMonth + " " + mYear;
 
-        return str;
+        return strDate;
         //return Transaction.parseDBMonth(str, " ");
     }
 
@@ -354,4 +326,48 @@ public class Transaction {
     public void setBalance(String balance) {
         this.balance = balance;
     }
+
+    public int getTransactionID(){
+        return transactionID;
+    }
+
+    public String getDateOfTransaction() {
+        return dateOfTransaction;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public String getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public String getPaidOut() {
+        return paidOut;
+    }
+
+    public String getPainIn() {
+        return painIn;
+    }
+
+    public String getBalance() {
+        return balance;
+    }
+
+    public String getPartyID() {
+        return partyID;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    public void setPartyID(String partyID) {
+        this.partyID = partyID;
+    }
+
 }

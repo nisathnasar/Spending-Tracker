@@ -141,46 +141,8 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
         //getActivity().setTitle("LineChartActivity1");
 
         final float[] maxBal = new float[1];
-        /*
-        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        DatabaseReference mMaxBalRef = mRootRef.child("MaximumBalance");
 
-
-        mMaxBalRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                //maxBal[0] = task.getResult().getValue(Float.class)[0];
-            }
-        });
-
-        mMaxBalRef.addValueEventListener(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // for example: if you're expecting your user's data as an object of the "User" class.
-                        maxBal[0] = dataSnapshot.getValue(Float.class);
-                        System.out.println(dataSnapshot);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // read query is cancelled.
-                    }
-                });
-*/
         System.out.println(maxBal[0] + "----------------------");
-
-
-        //tvX = getView().findViewById(R.id.tvXMax);
-        //tvY = getView().findViewById(R.id.tvYMax);
-
-        //seekBarX = getView().findViewById(R.id.seekBar1);
-        //seekBarX.setOnSeekBarChangeListener(this);
-
-        //seekBarY = getView().findViewById(R.id.seekBar2);
-//        seekBarY.setMax(180);
-        //seekBarY.setMax(1763);
-        //seekBarY.setOnSeekBarChangeListener(this);
 
         {   // // Chart Style // //
             chart = getView().findViewById(R.id.chart1);
@@ -243,51 +205,6 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
         }
 
 
-        {   // // Create Limit Lines // //
-            /*
-            LimitLine llXAxis = new LimitLine(9f, "Index 10");
-            llXAxis.setLineWidth(4f);
-            llXAxis.enableDashedLine(10f, 10f, 0f);
-            llXAxis.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-            llXAxis.setTextSize(10f);
-             */
-            //llXAxis.setTypeface(tfRegular);
-
-            /*
-            LimitLine ll1 = new LimitLine(150f, "Upper Limit");
-            ll1.setLineWidth(4f);
-            ll1.enableDashedLine(10f, 10f, 0f);
-            ll1.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
-            ll1.setTextSize(10f);
-             */
-            //ll1.setTypeface(tfRegular);
-
-            /*
-            LimitLine ll2 = new LimitLine(-30f, "Lower Limit");
-            ll2.setLineWidth(4f);
-            ll2.enableDashedLine(10f, 10f, 0f);
-            ll2.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-            ll2.setTextSize(10f);
-            */
-            //ll2.setTypeface(tfRegular);
-
-            // draw limit lines behind data instead of on top
-
-            yAxis.setDrawLimitLinesBehindData(true);
-            xAxis.setDrawLimitLinesBehindData(true);
-
-            // add limit lines
-            /*
-            yAxis.addLimitLine(ll1);
-            yAxis.addLimitLine(ll2);
-             */
-            //xAxis.addLimitLine(llXAxis);
-        }
-
-        // add data
-       //seekBarX.setProgress(45);
-        //seekBarY.setProgress(180);
-
         //setData(45, 180);
         setDataFromDB();
 
@@ -299,8 +216,7 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
 
         // draw legend entries as lines
         l.setForm(Legend.LegendForm.LINE);
-
-
+        //l.setForm(Legend.LegendForm.CIRCLE);
     }
 
 
@@ -400,8 +316,7 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
         DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
-
-        mTransactionRef.addValueEventListener(new ValueEventListener() {
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //transactionList.clear(); //------------------
@@ -436,8 +351,6 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
                     }
 
                 }
-
-
 
 
                 LineDataSet set1;
@@ -477,6 +390,8 @@ public class AnalyticsFragment extends Fragment implements OnSeekBarChangeListen
 
                     // text size of values
                     set1.setValueTextSize(9f);
+
+                    set1.setDrawValues(false);
 
                     // draw selection line as dashed
                     set1.enableDashedHighlightLine(10f, 5f, 0f);

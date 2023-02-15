@@ -8,7 +8,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.aston.spendingtracker.AnalyticsFragment;
+import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.Party;
+import com.aston.spendingtracker.TransactionFragment;
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -203,7 +206,6 @@ public class HSBCPDFProcessor implements PDFProcessor{
 
             addToDataBase(rows);
         }
-
 
         document.close();
 
@@ -456,28 +458,6 @@ public class HSBCPDFProcessor implements PDFProcessor{
             //reconstructed date to match date order on db
             String[] dateElements = words[0].trim().split("-");
             String reconstructedDate = dateElements[2] + "-" + Transaction.formatMonth(dateElements[1].trim()) + "-" + dateElements[0];
-
-
-            String sanitisedPaymentDetails = Party.SanitiseName(words[2].trim());
-            if(mrootRef.child("Party").child(sanitisedPaymentDetails).getKey().equals(sanitisedPaymentDetails)){
-
-                System.out.println("party exists for: " + sanitisedPaymentDetails);
-
-                mrootRef.child("Party").child(sanitisedPaymentDetails).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        Party p = task.getResult().getValue(Party.class);
-                        partyUID = p.getUniqueID();
-
-                    }
-                });
-
-            } else{
-                System.out.println("party doesn't exist for: " + sanitisedPaymentDetails);
-
-                Party p = new Party(sanitisedPaymentDetails);
-                mrootRef.child("Party").setValue(p);
-            }
 
 
             Transaction transaction = new Transaction(

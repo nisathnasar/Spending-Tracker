@@ -10,17 +10,163 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/details_tv">
 
-        </TextView>
-
-        <Button
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add to Category"/>
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="40dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    style="@style/word_title"
+                    android:textSize="20sp"
+                    android:autoSizeTextType="uniform"
+                    android:maxLines="1"
+                    android:id="@+id/title_tv"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#4f4a4a"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:textAlignment="center"
+                    style="@style/word_title"
+                    android:textSize="16sp"
+                    android:id="@+id/date_of_transaction_tv"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    style="@style/word_title"
+                    android:textSize="20sp"
+                    android:id="@+id/transaction_tv"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:textAlignment="center"
+                    style="@style/word_title"
+                    android:textSize="16sp"
+                    android:id="@+id/type_tv"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="0dp"
+                        style="@style/word_title"
+                        android:textSize="16sp"
+                        android:id="@+id/balance_before_tv"
+                        />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="textEnd"
+                        android:layout_weight="0.5"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginEnd="15dp"
+                        style="@style/word_title"
+                        android:textSize="16sp"
+                        android:id="@+id/balance_tv"
+                        />
+                </LinearLayout>
+
+
+
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    style="@style/word_title"
+                    android:textSize="16sp"
+                    android:id="@+id/category_tv"
+                    />
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/unitBarChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp"
+                    android:layout_margin="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    style="@style/word_title"
+                    android:textSize="20sp"
+                    android:id="@+id/history_tv"
+                    android:text="History:">
+
+                </TextView>
+
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:id="@+id/frame_layout">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/recyclerviewfiltered"
+                        android:paddingBottom="10dp"
+                        >
+
+                    </androidx.recyclerview.widget.RecyclerView>
+                </FrameLayout>
+
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add to Category"/>
+            </LinearLayout>
+
+        </ScrollView>
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
