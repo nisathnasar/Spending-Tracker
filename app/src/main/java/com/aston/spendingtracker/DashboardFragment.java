@@ -181,7 +181,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mRecyclerView.setLayoutFrozen(true);
+        //mRecyclerView.setLayoutFrozen(true);
 
         //mAdapter.setClickListener(this::onClick); // Bind the listener
 
