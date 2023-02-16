@@ -36,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
                 android:id="@+id/btn_more_analytics"
+                android:layout_marginHorizontal="10dp"
                 android:text="View More Analytics"/>
 
             <TextView
@@ -47,7 +48,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="280dp"
                 android:id="@+id/recyclerview"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
@@ -61,8 +62,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
+                android:layout_marginHorizontal="10dp"
                 android:id="@+id/btn_all_transactions"
                 android:text="View All Transactions"/>
+
 
 
 

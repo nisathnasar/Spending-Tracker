@@ -1,8 +1,11 @@
 package com.aston.spendingtracker;
 
+import static android.view.View.GONE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +13,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.aston.spendingtracker.entity.Transaction;
@@ -255,6 +260,23 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
         setData();
 
+
+
+
+        Button btnCategory = findViewById(R.id.btn_add_to_category);
+        btnCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AddToCategoryFragment frg = new AddToCategoryFragment();
+                frg.show(getFragmentManager(), "idk");
+
+            }
+        });
+
+
+
+
     }
 
     private void setData() {
@@ -305,7 +327,10 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                 BarDataSet set1;
 
-                if (chart.getData() != null &&
+                if(values.size() < 2){
+                    findViewById(R.id.unitBarChart).setVisibility(GONE);
+                }
+                else if (chart.getData() != null &&
                         chart.getData().getDataSetCount() > 0) {
                     set1 = (BarDataSet) chart.getData().getDataSetByIndex(0);
                     set1.setValues(values);
@@ -346,7 +371,11 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     data.setValueTextColor(Color.WHITE);
 
                     chart.setData(data);
+
                 }
+
+                chart.invalidate();
+                chart.refreshDrawableState();
 
             }
 

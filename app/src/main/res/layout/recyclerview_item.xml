@@ -8,14 +8,17 @@
 
     >
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
 
         android:layout_marginTop="2dp"
         android:layout_marginBottom="10dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+
+        style="@style/Widget.Material3.CardView.Filled"
 
         android:padding="6dp"
         card_view:cardUseCompatPadding="true"
@@ -24,7 +27,6 @@
 
         android:focusable="true"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/cardLayourRV"
         >
         <LinearLayout
@@ -32,7 +34,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="1"
-            android:background="@color/cardview_dark_background"
+
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
             android:paddingTop="5dp"
@@ -215,7 +217,7 @@
         </LinearLayout>
         -->
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 
 

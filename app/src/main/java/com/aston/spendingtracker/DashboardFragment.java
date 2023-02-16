@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.aston.spendingtracker.entity.Transaction;
 import com.github.mikephil.charting.charts.LineChart;
@@ -168,18 +169,19 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         });
 
 
+
         mRecyclerView = getView().findViewById(R.id.recyclerview);
 
 
-        TreeMap<Timestamp, Transaction> transactionsMap = new TreeMap<>();
-
         // Create an adapter and supply the data to be displayed.
-        mAdapter = new RecyclerViewAdapter(getActivity(), transactionList);
+        mAdapter = new MostRecentRVAdapter(getActivity(), transactionList);
 
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mRecyclerView.setLayoutFrozen(true);
 
         //mAdapter.setClickListener(this::onClick); // Bind the listener
 
@@ -243,6 +245,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                 System.out.println("db data retrieval fail: " + error);
             }
         });
+
 
 
         if(transactionList.size()==0){
@@ -332,7 +335,10 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         l.setForm(Legend.LegendForm.LINE);
 
 
+        //ListView transactionListView = getView().findViewById(R.id.transaction_list_view);
 
+
+        //transactionListView.setAdapter(new MostRecentRVAdapter(getActivity(), transactionList));
 
 
     }
