@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+
+
+<androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,7 +12,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".authorization.LoginActivity">
+    android:layout_gravity="center"
+
+    android:gravity="center"
+    tools:context=".authorization.LoginActivity"
+    android:orientation="vertical">
 
 
     <TextView
@@ -21,19 +27,14 @@
         android:text="Sign In"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        />
 
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text_input_email_layout"
-        app:layout_constraintTop_toBottomOf="@+id/page_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/login_button"
+        android:hint="@string/prompt_email"
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -41,8 +42,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-
-            android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
             android:minHeight="48dp"
             android:selectAllOnFocus="true"
@@ -59,11 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text_input_password_layout"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_email_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/login_button"
-
+        android:hint="@string/prompt_password"
         >
 
         <EditText
@@ -71,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/prompt_password"
+
             android:imeActionLabel="@string/action_sign_in_short"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
@@ -79,7 +74,7 @@
             android:selectAllOnFocus="true"
 
             android:text="87654321"
-             />
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,44 +84,37 @@
         android:enabled="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
+        android:layout_gravity="center"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="15dp"
         android:text="Sign In"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_password_layout"
-        app:layout_constraintVertical_bias="0.2" />
+         />
 
-    <Button
-        android:id="@+id/register_button"
+    <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="64dp"
-        android:text="Register"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_button"
-        app:layout_constraintVertical_bias="0.2" />
 
-    <Button
+        android:id="@+id/register_button"
+
+        android:layout_gravity="center"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="64dp"
+
+        style="?attr/materialButtonOutlinedStyle"
+
+        android:text="Register"
+        />
+
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/sign_in_up_google"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
+        android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="64dp"
         android:text="@string/sign_in_or_register_with_google"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_button"
-        app:layout_constraintVertical_bias="0.2"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
 
     <ProgressBar
         android:id="@+id/loading"
@@ -135,11 +123,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="64dp"
-        android:layout_marginBottom="64dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        android:layout_marginBottom="64dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>
