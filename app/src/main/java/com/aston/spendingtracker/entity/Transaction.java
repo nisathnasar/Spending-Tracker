@@ -39,6 +39,7 @@ public class Transaction {
         transactionID = TRANSACTIONCOUNT;
         TRANSACTIONCOUNT++;
 
+        category = "";
     }
 
     public Transaction(){
