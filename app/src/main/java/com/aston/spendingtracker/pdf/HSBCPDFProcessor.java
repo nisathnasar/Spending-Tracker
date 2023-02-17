@@ -2,21 +2,35 @@ package com.aston.spendingtracker.pdf;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.aston.spendingtracker.AnalyticsFragment;
+import com.aston.spendingtracker.MainActivity;
+import com.aston.spendingtracker.Party;
+import com.aston.spendingtracker.TransactionFragment;
 import com.aston.spendingtracker.entity.Transaction;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.multipdf.Splitter;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -45,6 +59,9 @@ public class HSBCPDFProcessor implements PDFProcessor{
     DatabaseReference mrootRef;
     DatabaseReference dbRefContainsDateCommencing, dbRefTransaction;
 
+    boolean partyExists = false;
+
+
     public HSBCPDFProcessor(Context context, Uri pathURI) {
 
         numOfPagesToExtractFrom = 1;
@@ -62,24 +79,41 @@ public class HSBCPDFProcessor implements PDFProcessor{
 
 
 
-            ParcelFileDescriptor parcelFileDescriptor = thisContext.getContentResolver().openFileDescriptor(pathURI, "r");
-            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-            InputStream fileStream = new FileInputStream(fileDescriptor);
-            PDDocument document = PDDocument.load(fileStream);
+        ParcelFileDescriptor parcelFileDescriptor = thisContext.getContentResolver().openFileDescriptor(pathURI, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        InputStream fileStream = new FileInputStream(fileDescriptor);
+        PDDocument document = PDDocument.load(fileStream);
 
 //        PDDocument document = PDDocument.load(assetManager.open("sample_stmt.pdf"));
 //        PyObject obj = pyobj.callAttr("extract_text");
 //        String result = obj.toString();
-//        FileWriter fw = new FileWriter(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/Created.csv");
+
+        //File path = thisContext.getFilesDir();
+
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        System.out.println(path);
+        try{
+            FileOutputStream writer = new FileOutputStream(new File(path, "someFileName.csv"));
+
+            writer.write("date, type, balance".getBytes());
+            writer.close();
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+//        FileWriter fw = new FileWriter(thisContext.getFilesDir() + "/Created.csv");
 //        FileWriter fw = new FileWriter(root.getAbsolutePath() + "/Created.csv");
+
 //        Log.d("MainActivity.java", root.getAbsolutePath() + "/Created.csv");
 //        write header
 //        fw.write("Date, Type, Details, Pay Out, Pay In, Balance\n");
 
-            activateSequence(document, numOfPagesToExtractFrom);
-            parcelFileDescriptor.close();
-            fileStream.close();
-            document.close();
+        activateSequence(document, numOfPagesToExtractFrom);
+        parcelFileDescriptor.close();
+        fileStream.close();
+        document.close();
 
 
     }
@@ -169,12 +203,13 @@ public class HSBCPDFProcessor implements PDFProcessor{
 
             rows = processLines(rows);
 
+
             addToDataBase(rows);
         }
 
-
         document.close();
 
+        document.close();
     }
 
 
@@ -409,6 +444,8 @@ public class HSBCPDFProcessor implements PDFProcessor{
         return rows;
     }
 
+    String partyUID = "";
+
     private void addToDataBase(List<String> rows) throws ParseException {
 
         for (String str : rows) {
@@ -422,6 +459,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
             String[] dateElements = words[0].trim().split("-");
             String reconstructedDate = dateElements[2] + "-" + Transaction.formatMonth(dateElements[1].trim()) + "-" + dateElements[0];
 
+
             Transaction transaction = new Transaction(
                     //new Timestamp(Transaction.getDateObjectFromString(words[0].trim()).getTime()),
                     //words[0].trim(),
@@ -430,7 +468,11 @@ public class HSBCPDFProcessor implements PDFProcessor{
                     words[2].trim(),
                     words[3].trim(),
                     words[4].trim(),
-                    words[5].trim());
+                    words[5].trim(),
+                    partyUID);
+
+            //extract party
+            //extractParty(transaction);
 
             dbRefTransaction
                     .child(reconstructedDate)
@@ -445,6 +487,123 @@ public class HSBCPDFProcessor implements PDFProcessor{
         //add datcommencing to database to prevent future duplicate entries
 
 
+    }
+
+    /**
+     * Get list of all parties (both senders and recievers) from database.
+     * If description is a new user, then add as a new user.
+     *
+     * should be called before items are added to database, because we need to check
+     */
+    public void extractParty(Transaction t){
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mPartyRef = mRootRef.child("Party");
+
+
+        //try different kind of listener
+        mPartyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                System.out.println("valueEventListener is being run ....................... for " + t.getPaymentDetails());
+
+                System.out.println(snapshot.toString());
+
+                String sanitisedPaymentDetails = Party.SanitiseName(t.getPaymentDetails());
+                if(snapshot.hasChild(sanitisedPaymentDetails)){
+                    System.out.println("from inside snapshot.haschild, party exists ......................... " + t.getPaymentDetails());
+
+                    //snapshot.child(sanitisedPaymentDetails).getValue(Party.class).addTransaction(t);
+
+                }
+                else{
+
+                    Party p = new Party(t.getPaymentDetails());
+                    //p.addTransaction(t);
+                    mPartyRef.child(p.getName()).setValue(p);
+                    mPartyRef.push();
+
+                    //System.out.println("Party added: " + p.getName() + ", " + p.getListOfTransactions().toString());
+                }
+
+                System.out.println(snapshot.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // ...
+            }
+        });
+
+/*
+        if(!isPartyExists(t)){
+            Party p = new Party(t.getPaymentDetails());
+            p.addTransaction(t);
+
+            mPartyRef.child(p.getName()).setValue(p);
+
+
+            System.out.println("Party added: " + p.getName() + ", " + p.getListOfTransactions().toString());
+        }
+        else{
+            //find the party and add transaction
+            System.out.println("Party exists: " + t.getPaymentDetails() + ", " + t);
+
+            mPartyRef.child(t.getPaymentDetails()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        Party p = dataSnapshot.getValue(Party.class);
+
+                        p.addTransaction(t);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+        }
+*/
+    }
+
+    public boolean isPartyExists(Transaction transaction){
+
+        partyExists = false;
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mPartyRef = mRootRef.child("Party");
+
+        //try different kind of listener
+        mPartyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.hasChild(Party.SanitiseName(transaction.getPaymentDetails()))){
+                    System.out.println("from inside snapshot.haschild, party exists ......................... " + transaction.getPaymentDetails());
+                    partyExists = true;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // ...
+            }
+        });
+
+
+        if(partyExists){
+            System.out.println(transaction.getPaymentDetails()  + ": exists in db");
+        }
+        else{
+            System.out.println(transaction.getPaymentDetails()  + ": does not exist in db");
+        }
+
+        return partyExists;
     }
 
 }

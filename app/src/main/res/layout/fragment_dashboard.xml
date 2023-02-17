@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DashboardFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="40dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Balance overview:"
+                android:textSize="15sp"
+                android:layout_margin="15dp"/>
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart1"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:id="@+id/btn_more_analytics"
+                android:layout_marginHorizontal="10dp"
+                android:text="View More Analytics"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Most Recent Transactions:"
+                android:textSize="15sp"
+                android:layout_margin="15dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="280dp"
+                android:id="@+id/recyclerview"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingBottom="0dp"
+                android:layout_marginBottom="0dp"
+                >
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginHorizontal="10dp"
+                android:id="@+id/btn_all_transactions"
+                android:text="View All Transactions"/>
+
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+</FrameLayout>

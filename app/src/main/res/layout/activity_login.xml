@@ -12,59 +12,77 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".authorization.LoginActivity">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textStyle="bold"
-        android:id="@+id/app_name"
-        android:textSize="24sp"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign In"
-        android:textStyle="bold"
         android:id="@+id/page_title"
-        android:textSize="24sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/app_name"
+        android:text="Sign In"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/email_login_et"
-        android:layout_width="0dp"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
-        android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
-        android:selectAllOnFocus="true"
-        android:text="nisath.nasar@gmail.com"
+        android:id="@+id/text_input_email_layout"
         app:layout_constraintTop_toBottomOf="@+id/page_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-         />
+        app:layout_constraintEnd_toStartOf="@+id/login_button"
+        >
 
-    <EditText
-        android:id="@+id/password_login_et"
-        android:layout_width="0dp"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/email_login_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+
+            android:hint="@string/prompt_email"
+            android:inputType="textEmailAddress"
+            android:minHeight="48dp"
+            android:selectAllOnFocus="true"
+
+            android:text="nisath.nasar@gmail.com"
+            />
+
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="@string/prompt_password"
-        android:imeActionLabel="@string/action_sign_in_short"
-        android:imeOptions="actionDone"
-        android:inputType="textPassword"
-        android:selectAllOnFocus="true"
-        android:text="87654321"
+        android:id="@+id/text_input_password_layout"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_email_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email_login_et" />
+        app:layout_constraintEnd_toStartOf="@+id/login_button"
+
+        >
+
+        <EditText
+            android:id="@+id/password_login_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/prompt_password"
+            android:imeActionLabel="@string/action_sign_in_short"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:minHeight="48dp"
+            android:selectAllOnFocus="true"
+
+            android:text="87654321"
+             />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <Button
         android:id="@+id/login_button"
@@ -78,7 +96,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_login_et"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_password_layout"
         app:layout_constraintVertical_bias="0.2" />
 
     <Button

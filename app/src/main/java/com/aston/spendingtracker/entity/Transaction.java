@@ -1,6 +1,7 @@
 package com.aston.spendingtracker.entity;
 
 import java.sql.Timestamp;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -20,46 +21,25 @@ public class Transaction {
     private String painIn;
     private String balance;
     private float dateInMilliseconds;
+    private String partyID;
+    private String category;
+
     private static int TRANSACTIONCOUNT;
 
-    public int getTransactionID(){
-        return transactionID;
-    }
 
-    public String getDateOfTransaction() {
-        return dateOfTransaction;
-    }
 
-    public String getPaymentType() {
-        return paymentType;
-    }
-
-    public String getPaymentDetails() {
-        return paymentDetails;
-    }
-
-    public String getPaidOut() {
-        return paidOut;
-    }
-
-    public String getPainIn() {
-        return painIn;
-    }
-
-    public String getBalance() {
-        return balance;
-    }
-
-    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance) throws ParseException {
+    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance, String partyID) throws ParseException {
         this.dateOfTransaction = dateOfTransaction;
         this.paymentType = paymentType;
         this.paymentDetails = paymentDetails;
         this.paidOut = paidOut;
         this.painIn = painIn;
         this.balance = balance;
+        this.partyID = partyID;
         transactionID = TRANSACTIONCOUNT;
         TRANSACTIONCOUNT++;
 
+        category = "";
     }
 
     public Transaction(){
@@ -100,10 +80,10 @@ public class Transaction {
 
         String[] elements;
         if(dateOfTransaction.contains("-")){
-            System.out.println("str contains dash: " + dateOfTransaction);
+            //System.out.println("str contains dash: " + dateOfTransaction);
             elements = dateOfTransaction.split("-");
         } else{
-            System.out.println("str contains space: " + dateOfTransaction);
+            //System.out.println("str contains space: " + dateOfTransaction);
             elements = dateOfTransaction.split(" ");
         }
 
@@ -118,8 +98,6 @@ public class Transaction {
     }
 
     public void setDateInMilliseconds(float str){
-        System.out.println("attempt to set date in milliseconds :" + str);
-
         dateInMilliseconds = str;
 
     }
@@ -133,9 +111,12 @@ public class Transaction {
         int mMonth = calendar.get(Calendar.MONTH);
         int mDay = calendar.get(Calendar.DAY_OF_MONTH);
 
+        Format f = new SimpleDateFormat("dd MMM yy");
+        String strDate = f.format(calendar.getTime());
+
         String str = mDay + " " + mMonth + " " + mYear;
 
-        return str;
+        return strDate;
         //return Transaction.parseDBMonth(str, " ");
     }
 
@@ -213,43 +194,63 @@ public class Transaction {
         String result="";
         switch (month) {
             case 1:
-                result = "jan";
+                result = "January";
                 break;
             case 2:
-                result = "feb";
+                result = "February";
                 break;
             case 3:
-                result = "mar";
+                result = "March";
                 break;
             case 4:
-                result = "apr";
+                result = "April";
                 break;
             case 5:
-                result = "may";
+                result = "May";
                 break;
             case 6:
-                result = "jun";
+                result = "June";
                 break;
             case 7:
-                result = "jul";
+                result = "July";
                 break;
             case 8:
-                result = "aug";
+                result = "August";
                 break;
             case 9:
-                result = "sep";
+                result = "September";
                 break;
             case 10:
-                result = "oct";
+                result = "October";
                 break;
             case 11:
-                result = "nov";
+                result = "November";
                 break;
             case 12:
-                result = "dec";
+                result = "December";
                 break;
         }
         dateOfTransaction = dateElements[0] + " " + result + " " + dateElements[2];
+    }
+
+    /**
+     * TODO: implement a method to get current year.
+     */
+    public void parseDBYear() {
+        String parsedDBDate = dateOfTransaction;
+        String[] dateElements = parsedDBDate.trim().split(" ");
+        //dateElements = parsedDBDate.trim().split("-");
+        int year = Integer.parseInt(dateElements[2].trim());
+        String result="";
+
+        if(year>=0 && year<=23){
+            result="20"+year;
+        }else{
+            result="19"+year;
+        }
+
+        dateOfTransaction = dateElements[0] + " " + dateElements[1] + " " + result;
+
     }
 
 
@@ -326,4 +327,48 @@ public class Transaction {
     public void setBalance(String balance) {
         this.balance = balance;
     }
+
+    public int getTransactionID(){
+        return transactionID;
+    }
+
+    public String getDateOfTransaction() {
+        return dateOfTransaction;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public String getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public String getPaidOut() {
+        return paidOut;
+    }
+
+    public String getPainIn() {
+        return painIn;
+    }
+
+    public String getBalance() {
+        return balance;
+    }
+
+    public String getPartyID() {
+        return partyID;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    public void setPartyID(String partyID) {
+        this.partyID = partyID;
+    }
+
 }
