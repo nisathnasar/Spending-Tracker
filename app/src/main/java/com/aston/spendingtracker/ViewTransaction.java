@@ -219,10 +219,10 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         YAxis leftAxis = chart.getAxisLeft();
         //leftAxis.setTypeface(tfLight);
         //leftAxis.setLabelCount(8, false);
-        leftAxis.setSpaceTop(15f);
+        //leftAxis.setSpaceTop(15f);
         leftAxis.setValueFormatter(new MoneyValueFormatter());
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        leftAxis.setSpaceTop(15f);
+        leftAxis.setSpaceTop(5f);
         leftAxis.setTextColor(Color.WHITE);
         //leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
@@ -269,6 +269,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
             public void onClick(View view) {
 
                 AddToCategoryFragment frg = new AddToCategoryFragment();
+                frg.setDetail(detail);
                 frg.show(getFragmentManager(), "idk");
 
             }
@@ -298,6 +299,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 final ArrayList<String> xAxisLabel = new ArrayList<>();
 
 
+                float maxY = Float.MIN_VALUE;
 
                 int i = 0;
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
@@ -311,6 +313,10 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                                 x = transaction.getDateInMilliseconds();
                                 y = Float.valueOf(transaction.getPaidOut().trim());
+
+                                if(y>maxY){
+                                    maxY = y;
+                                }
 
                                 System.out.println("x: " + xFormatter.getFormattedValue(x) + "    |    y: " + y);
                                 values.add(new BarEntry(i, y, getResources().getDrawable(R.drawable.star)));
@@ -359,6 +365,12 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                             return xAxisLabel.get((int) value);
                         }
                     });
+
+                    YAxis yAxis = chart.getAxisLeft();
+                    //yAxis.setAxisMaximum(maxY);
+
+                    chart.setVisibleYRangeMaximum(maxY, YAxis.AxisDependency.LEFT);
+
 
 
                     ArrayList<IBarDataSet> dataSets = new ArrayList<>();
