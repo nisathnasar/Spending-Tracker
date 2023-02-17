@@ -169,14 +169,26 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
 
 
                 if(transactionList.size()==0){
-                    getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
-                    //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
-                    //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
+
+                    try{
+                        getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+                        getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+                    }
+                    catch (Exception e){
+
+                    }
+
+
 
                 } else{
-                    getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
-                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
+                    try{
+                        getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
+                        getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
+                    }
+                    catch(Exception e){
+
+                    }
+
                 }
 
                 mAdapter.notifyDataSetChanged();
