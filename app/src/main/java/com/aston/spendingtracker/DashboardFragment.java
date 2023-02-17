@@ -51,6 +51,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -386,7 +387,8 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                         x = transaction.getDateInMilliseconds();
                         y = Float.valueOf(transaction.getBalance().trim());
 
-                        values.add(new Entry(x, y, ((MainActivity)getActivity()).getResources().getDrawable(R.drawable.star)));
+                        //values.add(new Entry(x, y, ((MainActivity)getActivity()).getResources().getDrawable(R.drawable.star)));
+                        values.add(new Entry(x, y, requireActivity().getResources().getDrawable(R.drawable.star)));
 
 //                        values.add(new Entry(i, y));
 
