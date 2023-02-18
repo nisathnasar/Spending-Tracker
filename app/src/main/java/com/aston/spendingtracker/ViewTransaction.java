@@ -116,7 +116,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     transactionTextView.setTextColor(Color.parseColor("#d98b8b"));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
-                    transactionTextView.setBackgroundColor(Color.parseColor("#5c859c"));
+                    //transactionTextView.setBackgroundColor(Color.parseColor("#5c859c"));
                     break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
@@ -215,7 +215,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         xAxis.setDrawGridLines(false);
         //xAxis.setGranularity(1f); // only intervals of 1 day
         xAxis.setLabelCount(7);
-        xAxis.setTextColor(Color.WHITE);
+
 
         ValueFormatter xAxisFormatter = new MyXAxisValueFormatter();
         //xAxis.setValueFormatter(xAxisFormatter);
@@ -232,7 +232,10 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         leftAxis.setValueFormatter(new MoneyValueFormatter());
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(5f);
-        leftAxis.setTextColor(Color.WHITE);
+
+
+
+
         //leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
         YAxis rightAxis = chart.getAxisRight();
@@ -254,7 +257,24 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
-        l.setTextColor(Color.WHITE);
+
+
+        //int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                leftAxis.setTextColor(Color.WHITE);
+                xAxis.setTextColor(Color.WHITE);
+                l.setTextColor(Color.WHITE);
+            case Configuration.UI_MODE_NIGHT_NO:
+                leftAxis.setTextColor(Color.BLACK);
+                xAxis.setTextColor(Color.BLACK);
+                l.setTextColor(Color.BLACK);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
+        }
+
 
 //        XYMarkerView mv = new XYMarkerView(this, new MyXAxisValueFormatter());
         /*
