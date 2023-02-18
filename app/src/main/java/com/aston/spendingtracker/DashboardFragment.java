@@ -364,7 +364,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
 
-        mTransactionRef.addValueEventListener(new ValueEventListener() {
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -387,8 +387,14 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                         x = transaction.getDateInMilliseconds();
                         y = Float.valueOf(transaction.getBalance().trim());
 
-                        //values.add(new Entry(x, y, ((MainActivity)getActivity()).getResources().getDrawable(R.drawable.star)));
-                        values.add(new Entry(x, y, requireActivity().getResources().getDrawable(R.drawable.star)));
+                        try{
+                            //values.add(new Entry(x, y, ((MainActivity)getActivity()).getResources().getDrawable(R.drawable.star)));
+                            values.add(new Entry(x, y, requireActivity().getResources().getDrawable(R.drawable.star)));
+                        }
+                        catch (Exception e){
+                            System.out.println(e);
+                        }
+
 
 //                        values.add(new Entry(i, y));
 

@@ -56,6 +56,9 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
     private String detail;
 
+    ArrayList<String> categoriesList = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -264,16 +267,96 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
 
         Button btnCategory = findViewById(R.id.btn_add_to_category);
+
+        if(!partyCategoryTextView.getText().equals("")){
+            btnCategory.setText("Change Category");
+        }
+
+
+
         btnCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 AddToCategoryFragment frg = new AddToCategoryFragment();
                 frg.setDetail(detail);
+                frg.setCategoriesList(categoriesList);
                 frg.show(getFragmentManager(), "idk");
 
             }
         });
+
+
+
+
+
+
+
+        //if a list of categories does not exist in database, create them:
+
+        mRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.hasChild("Categories")){
+                    ArrayList<String> categories = new ArrayList<>();
+                    categories.add("Entertainment");
+                    categories.add("Food and Drink");
+                    categories.add("Income Source");
+                    categories.add("Leisure");
+                    categories.add("Essential Shopping");
+                    categories.add("Utility");
+                    categories.add("Other");
+
+
+                    for(Integer i =0; i<categories.size(); i++){
+
+                        mRootRef.child("Categories").child(i.toString()).setValue(new Category(categories.get(i)));
+                    }
+                }
+                else{
+                    System.out.println("Categories exist");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //now retrieve the list of categories from the database and store in an arraylist
+
+
+
+        DatabaseReference mCategoriesRef = mRootRef.child("Categories");
+        mCategoriesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+
+                    Category category = dataSnapshot.getValue(Category.class);
+
+                    categoriesList.add(category.getCategory());
+                    System.out.println("executed " + category.getCategory());
+
+                }
+
+
+
+
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
+
 
 
 
