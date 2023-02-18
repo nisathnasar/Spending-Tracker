@@ -134,7 +134,13 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         transactionTypeTextView.setText(transactionTypeString);
 
         String partyCategory = intent.getStringExtra("category");
-        partyCategoryTextView.setText(partyCategory);
+        if(partyCategory.isEmpty()){
+            partyCategoryTextView.setVisibility(GONE);
+        }
+        else{
+            partyCategoryTextView.setText(partyCategory);
+        }
+
 
 
         mRecyclerView = findViewById(R.id.recyclerviewfiltered);
@@ -282,6 +288,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 frg.setDetail(detail);
                 frg.setCategoriesList(categoriesList);
                 frg.show(getFragmentManager(), "idk");
+
 
             }
         });
@@ -543,5 +550,40 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     @Override
     public void onNothingSelected() {
 
+    }
+
+    public void refreshCategoryField(){
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+
+                        String category = transaction.getCategory();
+
+                        if(transaction.getPaymentDetails().equals(detail) && !category.isEmpty()){
+
+                            TextView catTV = findViewById(R.id.category_tv);
+                            catTV.setVisibility(View.VISIBLE);
+                            catTV.setText(category);
+
+                            break;
+                        }
+
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

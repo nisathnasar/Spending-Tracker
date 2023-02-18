@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
 
         registerButton = findViewById(R.id.register_button);
         loginButton = findViewById(R.id.login_button);
-        signInUpGoogleButton = findViewById(R.id.sign_in_up_google);
+
         emailEditText = findViewById(R.id.email_login_et);
         passwordEditText = findViewById(R.id.password_login_et);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -77,58 +77,6 @@ public class LoginActivity extends AppCompatActivity {
         oneTapClient = Identity.getSignInClient(this);
 
         String defWebClientID = "539281120180-7439ug3dbm14kuvgulirs8h4ch7r9plb.apps.googleusercontent.com";
-
-        //sign in or up with google
-        {
-            signInRequest = BeginSignInRequest.builder()
-                    .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
-                            .setSupported(true)
-                            .build())
-                    .setGoogleIdTokenRequestOptions(BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                            .setSupported(true)
-                            // Your server's client ID, not your Android client ID.
-                            .setServerClientId(defWebClientID)
-                            // Only show accounts previously used to sign in.
-                            .setFilterByAuthorizedAccounts(true)
-                            .build())
-                    // Automatically sign in when exactly one credential is retrieved.
-                    .setAutoSelectEnabled(true)
-                    .build();
-
-
-            signUpRequest = BeginSignInRequest.builder()
-                    .setGoogleIdTokenRequestOptions(BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                            .setSupported(true)
-                            // Your server's client ID, not your Android client ID.
-                            .setServerClientId(defWebClientID)
-                            // Show all accounts on the device.
-                            .setFilterByAuthorizedAccounts(false)
-                            .build())
-                    .build();
-
-            oneTapClient.beginSignIn(signUpRequest)
-                    .addOnSuccessListener(this, new OnSuccessListener<BeginSignInResult>() {
-                        @Override
-                        public void onSuccess(BeginSignInResult result) {
-                            try {
-                                startIntentSenderForResult(
-                                        result.getPendingIntent().getIntentSender(), REQ_ONE_TAP,
-                                        null, 0, 0, 0);
-                            } catch (IntentSender.SendIntentException e) {
-                                Log.e(TAG, "Couldn't start One Tap UI: " + e.getLocalizedMessage());
-                            }
-                        }
-                    })
-                    .addOnFailureListener(this, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // No saved credentials found. Launch the One Tap sign-up flow, or
-                            // do nothing and continue presenting the signed-out UI.
-                            Log.d(TAG, e.getLocalizedMessage());
-                        }
-                    });
-        }
-
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -147,12 +95,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        signInUpGoogleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                oneTapClientSequence();
-            }
-        });
+
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,11 +135,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     //Toast.makeText(LoginActivity.this, "signed in.", Toast.LENGTH_LONG).show();
-                    loadingProgressBar.setVisibility(View.GONE);
+                    loadingProgressBar.setVisibility(View.INVISIBLE);
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }else{
                     Toast.makeText(LoginActivity.this, "Failed to Login, please check your email and password.", Toast.LENGTH_LONG).show();
-                    loadingProgressBar.setVisibility(View.GONE);
+                    loadingProgressBar.setVisibility(View.INVISIBLE);
                 }
             }
         });
