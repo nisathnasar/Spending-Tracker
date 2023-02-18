@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.ToIntBiFunction;
 
 public class AddToCategoryFragment extends DialogFragment {
@@ -34,29 +37,51 @@ public class AddToCategoryFragment extends DialogFragment {
     int selectedItem = -1;
 
     String detail;
+    String categoryStr;
+
+    ArrayList<String> categoriesList;
 
     public void setDetail(String detail){
         this.detail = detail;
     }
 
+    public void setCategoriesList(ArrayList<String> categoriesList){
+        this.categoriesList = categoriesList;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+
         //selectedItems = new ArrayList();  // Where we track the selected items
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
+
         // Set the dialog title
-        builder.setTitle("Select a category")
-                // Specify the list array, the items to be selected by default (null for none),
-                // and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(R.array.categories, 0, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //selectedItems.add(which);
-                                selectedItem = which;
+        builder.setTitle("Select a category");
 
+        final EditText input = new EditText(getActivity());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        input.setHint("Type new category (Select Other)");
+        input.setMaxLines(1);
+        builder.setView(input);
 
-                            }
+        CharSequence[] categoryListCharSeq = categoriesList.toArray(new CharSequence[categoriesList.size()]);
 
-                        })
+        // Specify the list array, the items to be selected by default (null for none),
+        // and the listener through which to receive callbacks when items are selected
+//        builder.setSingleChoiceItems(R.array.categories, 0, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(categoryListCharSeq, 0, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //selectedItems.add(which);
+                            selectedItem = which;
+
+                        }
+
+                    })
                 // Set the action buttons
                 .setPositiveButton("apply", new DialogInterface.OnClickListener() {
                     @Override
@@ -68,7 +93,21 @@ public class AddToCategoryFragment extends DialogFragment {
                             selectedItem = 0;
                         }
 
-                        String categoryStr = getResources().getStringArray(R.array.categories)[selectedItem];
+                        categoryStr = getResources().getStringArray(R.array.categories)[selectedItem];
+
+                        System.out.println(categoryStr + " ---------- " + input.getText().toString());
+
+                        boolean newItem = false;
+
+                        if(categoryStr.equalsIgnoreCase("other")){
+                            categoryStr = input.getText().toString();
+                            newItem = true;
+
+                            if(categoryStr.isEmpty()){
+                                categoryStr = "Unspecified";
+                                newItem = false;
+                            }
+                        }
 
                         Toast.makeText(getActivity(), categoryStr, Toast.LENGTH_SHORT).show();
 
@@ -115,6 +154,13 @@ public class AddToCategoryFragment extends DialogFragment {
                                 }
                             });
 
+
+                            //add new category to database
+
+                            if(newItem){
+                                DatabaseReference mCategoriesRef = mRootRef.child("Categories");
+                                mCategoriesRef.child(UUID.randomUUID().toString()).setValue(new Category(categoryStr));
+                            }
 
 
                         }

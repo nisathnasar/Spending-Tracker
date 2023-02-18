@@ -18,12 +18,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="40dp"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
+                    android:layout_marginTop="20dp"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
                     style="@style/word_title"
@@ -138,6 +140,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
+                    android:layout_marginTop="20dp"
                     style="@style/word_title"
                     android:textSize="20sp"
                     android:id="@+id/history_tv"
@@ -148,7 +151,7 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="500dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
                     android:id="@+id/frame_layout">
@@ -164,10 +167,12 @@
                 </FrameLayout>
 
 
-                <Button
-                    android:layout_width="match_parent"
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/btn_add_to_category"
+                    android:paddingStart="40dp"
+                    android:paddingEnd="40dp"
                     android:text="Add to Category"/>
             </LinearLayout>
 
