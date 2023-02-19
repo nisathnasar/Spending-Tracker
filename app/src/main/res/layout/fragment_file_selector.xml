@@ -37,7 +37,7 @@
                     android:layout_margin="10dp"
                     android:text="You can upload your bank statement in this page. \nPlease note:\n
         1. Never upload same statement more than once. \n
-        2. Only one can be uploaded at a time as of this app version. \n
+        2. Select only one statement to upload at a time.\n
         3. The current version only supports HSBC bank statements.
         \n\nSteps: \n
         1. Click 'Browse' \n
