@@ -16,69 +16,213 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="30dp"
-                android:text="Overview of all your transactions:"
-                android:layout_gravity="center"
-                style="@style/word_title"
-                android:textSize="15sp"/>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".AnalyticsFragment">
-
-
-                <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                >
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    >
-
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/chart1"
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="500dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp"
+                        android:text="Spending by Category"
+                        android:layout_gravity="center_horizontal"
+                        android:textAlignment="center"
 
+                        style="@style/word_title"
+                        android:textSize="15sp"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="40dp"
+                        tools:context=".AnalyticsFragment">
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            >
+
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/pie_chart"
+                                android:layout_width="match_parent"
+                                android:layout_height="550dp"
+
+                                />
+
+                        </RelativeLayout>
+
+                    </FrameLayout>
+
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+
+                        android:checked="false"
+                        android:id="@+id/labels_toggle"
+                        android:text="Show labels on the chart"
                         />
 
-                </RelativeLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="15dp"
+                        android:checked="false"
+                        android:id="@+id/percentage_toggle_spending_by_category"
+                        android:text="Show percentage values"
+                        />
 
-            </FrameLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <TextView
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="30dp"
-                android:text="Other Analytics:"
-                android:layout_gravity="center"
-                style="@style/word_title"
-                android:textSize="15sp"/>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".AnalyticsFragment">
-
-
-                <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                >
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    >
-
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/chart2"
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="500dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp"
+                        android:text="Income by Category"
+                        android:layout_gravity="center_horizontal"
+                        android:textAlignment="center"
 
+                        style="@style/word_title"
+                        android:textSize="15sp"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="40dp"
+                        tools:context=".AnalyticsFragment">
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            >
+
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/pie_chart_income_sources"
+                                android:layout_width="match_parent"
+                                android:layout_height="550dp"
+
+                                />
+
+                        </RelativeLayout>
+
+                    </FrameLayout>
+
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+
+                        android:checked="false"
+                        android:id="@+id/labels_toggle_income_sources"
+                        android:text="Show labels on the chart"
                         />
 
-                </RelativeLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="15dp"
+                        android:checked="false"
+                        android:id="@+id/percentage_toggle_income_sources"
+                        android:text="Show percentage values"
+                        />
 
-            </FrameLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="15dp"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="30dp"
+                        android:text="Overview of all your transactions:"
+                        android:layout_gravity="center"
+                        style="@style/word_title"
+                        android:textSize="15sp"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="50dp"
+                        tools:context=".AnalyticsFragment">
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            >
+
+                            <com.github.mikephil.charting.charts.LineChart
+                                android:id="@+id/chart1"
+                                android:layout_width="match_parent"
+                                android:layout_height="500dp"
+
+                                />
+
+                        </RelativeLayout>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+
+
 
 
         </LinearLayout>
@@ -88,56 +232,6 @@
 
     </ScrollView>
 </LinearLayout>
-
-        <!--
-                <SeekBar
-                    android:id="@+id/seekBar2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_margin="8dp"
-                    android:layout_toLeftOf="@+id/tvYMax"
-                    android:layout_marginRight="5dp"
-                    android:max="200"
-                    android:paddingBottom="12dp" />
-
-                <SeekBar
-                    android:id="@+id/seekBar1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/seekBar2"
-                    android:layout_margin="8dp"
-                    android:layout_marginBottom="35dp"
-                  droid:layout_toLeftOf="@+id/tvXMax"
-                    android:layout_marginRight="5dp"
-                    android:max="1500"
-                    android:paddingBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvXMax"
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/seekBar1"
-                    android:layout_alignParentRight="true"
-                    android:text="-"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginRight="10dp"
-                    android:gravity="right"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/tvYMax"
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/seekBar2"
-                    android:layout_alignParentRight="true"
-                    android:text="-"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginRight="10dp"
-                    android:gravity="right"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-        -->
 
 
 

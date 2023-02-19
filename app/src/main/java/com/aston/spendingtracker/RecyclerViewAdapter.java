@@ -48,7 +48,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         //String mCurrent = mWordList.get(position);
         //holder.detailsView.setText(mCurrent);
         String paidOut = mTransactionList.get(position).getPaidOut().trim();
-        String paidIn = mTransactionList.get(position).getPainIn().trim();
+        String paidIn = mTransactionList.get(position).getPaidIn().trim();
         String mtransaction;
 
         int nightModeFlags = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;

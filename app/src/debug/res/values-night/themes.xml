@@ -6,10 +6,14 @@
         <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_dark_onPrimaryContainer</item>
         <item name="colorSecondary">@color/md_theme_dark_secondary</item>
+
         <item name="colorOnSecondary">@color/md_theme_dark_onSecondary</item>
+
         <item name="colorSecondaryContainer">@color/md_theme_dark_secondaryContainer</item>
+
         <item name="colorOnSecondaryContainer">@color/md_theme_dark_onSecondaryContainer</item>
         <item name="colorTertiary">@color/md_theme_dark_tertiary</item>
+
         <item name="colorOnTertiary">@color/md_theme_dark_onTertiary</item>
         <item name="colorTertiaryContainer">@color/md_theme_dark_tertiaryContainer</item>
         <item name="colorOnTertiaryContainer">@color/md_theme_dark_onTertiaryContainer</item>
@@ -27,5 +31,6 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
+        <item name="android:statusBarColor">@color/md_theme_dark_surfaceVariant</item>
     </style>
 </resources>

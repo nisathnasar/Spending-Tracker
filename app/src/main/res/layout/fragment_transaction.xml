@@ -22,14 +22,15 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:inputType="textFilter"
             android:hint="Search"
             android:imeOptions="actionSearch"
+
             android:id="@+id/filter_et"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
-
 
 
     <TextView

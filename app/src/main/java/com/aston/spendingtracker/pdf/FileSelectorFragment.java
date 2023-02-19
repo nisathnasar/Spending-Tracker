@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aston.spendingtracker.R;
@@ -51,7 +52,7 @@ public class FileSelectorFragment extends Fragment implements AdapterView.OnItem
     private static final int MY_RESULT_CODE_FILECHOOSER = 2000;
 
     private Button buttonBrowse;
-    private EditText editTextPath;
+    private TextView editTextPath;
     private Button buttonSubmitFile;
     private String selectedBank;
 
@@ -96,7 +97,7 @@ public class FileSelectorFragment extends Fragment implements AdapterView.OnItem
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_file_selector, container, false);
-        this.editTextPath = (EditText) rootView.findViewById(R.id.editText_path);
+        this.editTextPath = (TextView) rootView.findViewById(R.id.editText_path);
         this.buttonBrowse = (Button) rootView.findViewById(R.id.button_browse);
 
 

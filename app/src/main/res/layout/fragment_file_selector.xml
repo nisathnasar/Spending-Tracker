@@ -3,68 +3,106 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="20dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginEnd="20dp"
+
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     tools:context=".pdf.FileSelectorFragment"
     >
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:weightSum="1">
-    <EditText
-        android:id="@+id/editText_path"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:ems="10"
-        android:inputType="textUri" />
-
-    <Button
-        android:id="@+id/button_browse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:text="Browse" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:weightSum="1">
-        <TextView
+        android:layout_height="wrap_content">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select your bank:"
-            android:layout_weight="0.5"
-            android:textSize="15sp"/>
-
-        <Spinner
-            android:id="@+id/bank_group_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:layout_weight="0.5"
-            />
-    </LinearLayout>
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
 
 
-    <Button
-        android:id="@+id/button_submit_file"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                >
 
-        android:text="@string/strip_text"
-        />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ensure to press strip text after selecting file."/>
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="You can upload your bank statement in this page. \nPlease note:\n
+        1. Never upload same statement more than once. \n
+        2. Select only one statement to upload at a time.\n
+        3. The current version only supports HSBC bank statements.
+        \n\nSteps: \n
+        1. Click 'Browse' \n
+        2. Find your statement in your storage. \n
+        3. Click 'StripText and Submit File'"
+                    />
+            </com.google.android.material.card.MaterialCardView>
+
+
+
+
+            <TextView
+                android:id="@+id/editText_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:layout_gravity="center_horizontal"
+                android:text="No File Selected"
+                android:inputType="textUri" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_browse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Browse" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:weightSum="1">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select your bank:"
+                    android:layout_weight="0.5"
+                    android:textSize="15sp"/>
+
+                <Spinner
+                    android:id="@+id/bank_group_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:layout_weight="0.5"
+                    />
+            </LinearLayout>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_submit_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/strip_text"
+                />
+
+        </LinearLayout>
+    </ScrollView>
+
+
 
 
 </LinearLayout>

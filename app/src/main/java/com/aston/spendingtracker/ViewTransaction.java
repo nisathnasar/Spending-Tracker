@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.TreeMap;
@@ -116,7 +117,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     transactionTextView.setTextColor(Color.parseColor("#d98b8b"));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
-                    transactionTextView.setBackgroundColor(Color.parseColor("#5c859c"));
+                    //transactionTextView.setBackgroundColor(Color.parseColor("#5c859c"));
                     break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
@@ -134,7 +135,13 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         transactionTypeTextView.setText(transactionTypeString);
 
         String partyCategory = intent.getStringExtra("category");
-        partyCategoryTextView.setText(partyCategory);
+        if(partyCategory.isEmpty()){
+            partyCategoryTextView.setVisibility(GONE);
+        }
+        else{
+            partyCategoryTextView.setText(partyCategory);
+        }
+
 
 
         mRecyclerView = findViewById(R.id.recyclerviewfiltered);
@@ -169,6 +176,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                     }
                 }
+                Collections.reverse(transactionList);
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -209,7 +217,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         xAxis.setDrawGridLines(false);
         //xAxis.setGranularity(1f); // only intervals of 1 day
         xAxis.setLabelCount(7);
-        xAxis.setTextColor(Color.WHITE);
+
 
         ValueFormatter xAxisFormatter = new MyXAxisValueFormatter();
         //xAxis.setValueFormatter(xAxisFormatter);
@@ -226,11 +234,15 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         leftAxis.setValueFormatter(new MoneyValueFormatter());
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(5f);
-        leftAxis.setTextColor(Color.WHITE);
+
+
+
+
         //leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setDrawGridLines(false);
+        rightAxis.setEnabled(false);
 
         //rightAxis.setTypeface(tfLight);
         //rightAxis.setLabelCount(8, false);
@@ -248,7 +260,25 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
-        l.setTextColor(Color.WHITE);
+
+
+        //int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                leftAxis.setTextColor(Color.WHITE);
+                xAxis.setTextColor(Color.WHITE);
+                l.setTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                leftAxis.setTextColor(Color.BLACK);
+                xAxis.setTextColor(Color.BLACK);
+                l.setTextColor(Color.BLACK);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
+        }
+
 
 //        XYMarkerView mv = new XYMarkerView(this, new MyXAxisValueFormatter());
         /*
@@ -283,6 +313,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 frg.setCategoriesList(categoriesList);
                 frg.show(getFragmentManager(), "idk");
 
+
             }
         });
 
@@ -300,10 +331,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 if (!snapshot.hasChild("Categories")){
                     ArrayList<String> categories = new ArrayList<>();
                     categories.add("Entertainment");
-                    categories.add("Food and Drink");
-                    categories.add("Income Source");
-                    categories.add("Leisure");
-                    categories.add("Essential Shopping");
                     categories.add("Utility");
                     categories.add("Other");
 
@@ -464,6 +491,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     //data.setValueTypeface(tfLight);
                     data.setBarWidth(0.9f);
                     data.setValueTextColor(Color.WHITE);
+                    data.setValueFormatter(new MoneyValueFormatter());
 
                     chart.setData(data);
 
@@ -543,5 +571,40 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     @Override
     public void onNothingSelected() {
 
+    }
+
+    public void refreshCategoryField(){
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+
+                        String category = transaction.getCategory();
+
+                        if(transaction.getPaymentDetails().equals(detail) && !category.isEmpty()){
+
+                            TextView catTV = findViewById(R.id.category_tv);
+                            catTV.setVisibility(View.VISIBLE);
+                            catTV.setText(category);
+
+                            break;
+                        }
+
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

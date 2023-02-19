@@ -70,9 +70,10 @@ public class AddToCategoryFragment extends DialogFragment {
 
         CharSequence[] categoryListCharSeq = categoriesList.toArray(new CharSequence[categoriesList.size()]);
 
+
+
         // Specify the list array, the items to be selected by default (null for none),
         // and the listener through which to receive callbacks when items are selected
-//        builder.setSingleChoiceItems(R.array.categories, 0, new DialogInterface.OnClickListener() {
         builder.setSingleChoiceItems(categoryListCharSeq, 0, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -93,7 +94,13 @@ public class AddToCategoryFragment extends DialogFragment {
                             selectedItem = 0;
                         }
 
-                        categoryStr = getResources().getStringArray(R.array.categories)[selectedItem];
+                        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+                        DatabaseReference mCategoriesRef = mRootRef.child("Categories");
+
+                        categoryStr = categoriesList.get(selectedItem);
+
+                        //categoryStr = getResources().getStringArray(R.array.categories)[selectedItem];
 
                         System.out.println(categoryStr + " ---------- " + input.getText().toString());
 
@@ -114,8 +121,7 @@ public class AddToCategoryFragment extends DialogFragment {
                         //check if the externally passed information is null or empty because Android recreates fragments sometimes, i.e. during a crash and will not contain the arguments.
                         if(detail != null || !detail.isEmpty()){
 
-                            DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
 
                             mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -158,7 +164,7 @@ public class AddToCategoryFragment extends DialogFragment {
                             //add new category to database
 
                             if(newItem){
-                                DatabaseReference mCategoriesRef = mRootRef.child("Categories");
+                                //DatabaseReference mCategoriesRef = mRootRef.child("Categories");
                                 mCategoriesRef.child(UUID.randomUUID().toString()).setValue(new Category(categoryStr));
                             }
 

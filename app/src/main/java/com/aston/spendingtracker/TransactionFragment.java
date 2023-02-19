@@ -1,15 +1,11 @@
 package com.aston.spendingtracker;
 
-import static androidx.fragment.app.FragmentManager.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,10 +14,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,13 +24,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -124,7 +112,11 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
 
         mAdapter.setClickListener(this::onClick); // Bind the listener
 
@@ -258,7 +250,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
         i.putExtra("category", transactionList.get(position).getCategory());
         i.putExtra("balance", transactionList.get(position).getBalance());
         i.putExtra("paidOut", transactionList.get(position).getPaidOut());
-        i.putExtra("paidIn", transactionList.get(position).getPainIn());
+        i.putExtra("paidIn", transactionList.get(position).getPaidIn());
 
         startActivity(i);
 
