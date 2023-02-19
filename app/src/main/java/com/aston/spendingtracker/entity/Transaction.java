@@ -1,11 +1,8 @@
 package com.aston.spendingtracker.entity;
 
-import java.sql.Timestamp;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -18,7 +15,7 @@ public class Transaction {
     private String paymentType;
     private String paymentDetails;
     private String paidOut;
-    private String painIn;
+    private String paidIn;
     private String balance;
     private float dateInMilliseconds;
     private String partyID;
@@ -28,12 +25,12 @@ public class Transaction {
 
 
 
-    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String painIn, String balance, String partyID) throws ParseException {
+    public Transaction(String dateOfTransaction, String paymentType, String paymentDetails, String paidOut, String paidIn, String balance, String partyID) throws ParseException {
         this.dateOfTransaction = dateOfTransaction;
         this.paymentType = paymentType;
         this.paymentDetails = paymentDetails;
         this.paidOut = paidOut;
-        this.painIn = painIn;
+        this.paidIn = paidIn;
         this.balance = balance;
         this.partyID = partyID;
         transactionID = TRANSACTIONCOUNT;
@@ -127,7 +124,7 @@ public class Transaction {
                 ", paymentType='" + paymentType + '\'' +
                 ", paymentDetails='" + paymentDetails + '\'' +
                 ", paidOut='" + paidOut + '\'' +
-                ", painIn='" + painIn + '\'' +
+                ", painIn='" + paidIn + '\'' +
                 ", balance='" + balance + '\'' +
                 '}';
     }
@@ -320,8 +317,8 @@ public class Transaction {
         this.paidOut = paidOut;
     }
 
-    public void setPainIn(String painIn) {
-        this.painIn = painIn;
+    public void setPaidIn(String paidIn) {
+        this.paidIn = paidIn;
     }
 
     public void setBalance(String balance) {
@@ -348,8 +345,8 @@ public class Transaction {
         return paidOut;
     }
 
-    public String getPainIn() {
-        return painIn;
+    public String getPaidIn() {
+        return paidIn;
     }
 
     public String getBalance() {

@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.TreeMap;
@@ -175,6 +176,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                     }
                 }
+                Collections.reverse(transactionList);
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -240,6 +242,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setDrawGridLines(false);
+        rightAxis.setEnabled(false);
 
         //rightAxis.setTypeface(tfLight);
         //rightAxis.setLabelCount(8, false);
@@ -266,6 +269,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 leftAxis.setTextColor(Color.WHITE);
                 xAxis.setTextColor(Color.WHITE);
                 l.setTextColor(Color.WHITE);
+                break;
             case Configuration.UI_MODE_NIGHT_NO:
                 leftAxis.setTextColor(Color.BLACK);
                 xAxis.setTextColor(Color.BLACK);
@@ -327,10 +331,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 if (!snapshot.hasChild("Categories")){
                     ArrayList<String> categories = new ArrayList<>();
                     categories.add("Entertainment");
-                    categories.add("Food and Drink");
-                    categories.add("Income Source");
-                    categories.add("Leisure");
-                    categories.add("Essential Shopping");
                     categories.add("Utility");
                     categories.add("Other");
 
@@ -491,6 +491,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     //data.setValueTypeface(tfLight);
                     data.setBarWidth(0.9f);
                     data.setValueTextColor(Color.WHITE);
+                    data.setValueFormatter(new MoneyValueFormatter());
 
                     chart.setData(data);
 
