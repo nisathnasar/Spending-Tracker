@@ -1,7 +1,7 @@
 package com.aston.spendingtracker;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.drawable.Drawable;
@@ -11,36 +11,37 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.TextView;
 
 import com.aston.spendingtracker.entity.Transaction;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
-import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,11 +49,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Objects;
-import java.util.TreeMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -74,6 +73,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
     private RecyclerViewAdapter mAdapter;
 
     private LineChart chart;
+    private BarChart summaryBarChart;
 
     LinkedList<Transaction> transactionList = new LinkedList<>();
 
@@ -174,13 +174,19 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         mRecyclerView = getView().findViewById(R.id.recyclerview);
 
 
+
+
+
         // Create an adapter and supply the data to be displayed.
         mAdapter = new MostRecentRVAdapter(getActivity(), transactionList);
 
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+//        linearLayoutManager.setReverseLayout(true);
+//        linearLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
 
         //mRecyclerView.setLayoutFrozen(true);
 
@@ -238,6 +244,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                 }
 */
 
+                Collections.reverse(transactionList);
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -248,80 +255,341 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         });
 
 
+        displayLineGraph();
 
-        if(transactionList.size()==0){
-            //getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-            //getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
 
-            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
-            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
+        displayBarChart();
 
+
+        TextView balTV = getView().findViewById(R.id.tv_summary);
+        Chip balanceChip = getView().findViewById(R.id.balance_chip);
+
+        mTransactionRef.orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        System.out.println(transaction.getDateOfTransaction());
+
+                        transaction.parseDBDate();
+                        transaction.parseDBMonth();
+                        transaction.parseDBYear();
+
+                        String balanceSummaryTitleString = "Balance as of " + transaction.getDateOfTransaction() + ":";
+                        balTV.setText(balanceSummaryTitleString);
+                        String balanceString = "£"+transaction.getBalance();
+                        balanceChip.setText(balanceString);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
+    }
+
+    private void displayBarChart(){
+
+        // bar chart code:
+
+        summaryBarChart = getView().findViewById(R.id.summaryBarChart);
+        //summaryBarChart.setOnChartValueSelectedListener(this);
+
+        summaryBarChart.setDrawBarShadow(false);
+        summaryBarChart.setDrawValueAboveBar(true);
+
+        summaryBarChart.getDescription().setEnabled(false);
+
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        summaryBarChart.setMaxVisibleValueCount(100);
+
+        // scaling can now only be done on x- and y-axis separately
+        summaryBarChart.setPinchZoom(false);
+
+        summaryBarChart.setDrawGridBackground(false);
+        summaryBarChart.setTouchEnabled(false);
+        summaryBarChart.setExtraBottomOffset(20);
+        //summaryBarChart.setExtraTopOffset(20);
+
+        // chart.setDrawYLabels(false);
+
+
+        //IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
+
+
+        XAxis xAxis = summaryBarChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        //xAxis.setTypeface(tfLight);
+        xAxis.setDrawGridLines(false);
+        //xAxis.setGranularity(1f); // only intervals of 1 day
+        xAxis.setLabelCount(7);
+
+
+        ValueFormatter xAxisFormatter = new SummaryXFormatter();
+        xAxis.setValueFormatter(xAxisFormatter);
+
+
+
+
+        //IAxisValueFormatter custom = new MyAxisValueFormatter();
+
+        YAxis leftAxis = summaryBarChart.getAxisLeft();
+        //leftAxis.setTypeface(tfLight);
+        //leftAxis.setLabelCount(8, false);
+        //leftAxis.setSpaceTop(15f);
+        leftAxis.setValueFormatter(new MoneyValueFormatter());
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setSpaceTop(5f);
+
+        leftAxis.setEnabled(false);
+
+
+
+
+
+        //leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        YAxis rightAxis = summaryBarChart.getAxisRight();
+        rightAxis.setDrawGridLines(false);
+
+        rightAxis.setEnabled(false);
+
+        //rightAxis.setTypeface(tfLight);
+        //rightAxis.setLabelCount(8, false);
+
+        //rightAxis.setValueFormatter(custom);
+
+        //rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        Legend l = summaryBarChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+        l.setEnabled(false);
+
+
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                leftAxis.setTextColor(Color.WHITE);
+                xAxis.setTextColor(Color.WHITE);
+                l.setTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                leftAxis.setTextColor(Color.BLACK);
+                xAxis.setTextColor(Color.BLACK);
+                l.setTextColor(Color.BLACK);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
         }
 
 
+//        XYMarkerView mv = new XYMarkerView(this, new MyXAxisValueFormatter());
+        /*
+        XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
+        mv.setChartView(chart); // For bounds control
+        chart.setMarker(mv); // Set the marker to the chart
+*/
+        // setting data
+//        seekBarY.setProgress(50);
+//        seekBarX.setProgress(12);
+
+
+        setDataForSummaryBarChart();
+    }
+
+    private void setDataForSummaryBarChart(){
+
+        ArrayList<BarEntry> values = new ArrayList<>();
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                final ArrayList<String> xAxisLabel = new ArrayList<>();
+
+                Float income = 0f;
+                Float spending = 0f;
+
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                    for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        String paidOut = transaction.getPaidOut();
+                        if(!paidOut.isEmpty()){
+                            spending += Float.valueOf(paidOut);
+                        } else{
+                            String paidIn = transaction.getPaidIn();
+                            System.out.println("paidin  -----: " + paidIn);
+                            income += Float.valueOf(paidIn);
+                        }
+                    }
+                }
+
+//                values.add(new BarEntry(1, income, getResources().getDrawable(R.drawable.star)));
+//                values.add(new BarEntry(2, spending, getResources().getDrawable(R.drawable.star)));
+
+                Float[] yValArray = new Float[2];
+                yValArray[0] = income;
+                yValArray[1] = spending;
+
+
+                for(int i = 0; i < 2; i++){
+                    values.add(new BarEntry(i, yValArray[i], getResources().getDrawable(R.drawable.star)));
+                }
+
+                SummaryXFormatter xFormatter = new SummaryXFormatter();
+                xAxisLabel.add(xFormatter.getFormattedValue(1));
+                xAxisLabel.add(xFormatter.getFormattedValue(2));
+
+                System.out.println(values);
+
+                BarDataSet set1;
+
+
+
+                if (summaryBarChart.getData() != null &&
+                        summaryBarChart.getData().getDataSetCount() > 0) {
+                    set1 = (BarDataSet) summaryBarChart.getData().getDataSetByIndex(0);
+
+                    set1.setValues(values);
+                    summaryBarChart.getData().notifyDataChanged();
+                    summaryBarChart.notifyDataSetChanged();
+
+                } else {
+                    set1 = new BarDataSet(values, "Spending");
+
+                    set1.setDrawIcons(false);
+
+                    XAxis xAxis = summaryBarChart.getXAxis();
+
+//                    xAxis.setAxisMinimum(0 + 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
+//                    xAxis.setAxisMaximum(values.size() - 1.0f + 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
+                    xAxis.setLabelCount(xAxisLabel.size(), true); //draw x labels for 13 vertical grid lines
+
+                    xAxis.setGranularityEnabled(true);
+                    xAxis.setGranularity(1.0f);
+                    xAxis.setLabelCount(2);
+
+                    xAxis.setTextSize(15);
+
+
+//                    xAxis.setValueFormatter(new ValueFormatter() {
+//                        @Override
+//                        public String getFormattedValue(float value) {
+//                            return xAxisLabel.get((int) value);
+//                        }
+//                    });
+
+
+                    YAxis yAxis = summaryBarChart.getAxisLeft();
+                    //yAxis.setAxisMaximum(maxY);
+
+                    //chart.setVisibleYRangeMaximum(maxY, YAxis.AxisDependency.LEFT);
+
+
+
+                    ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+                    dataSets.add(set1);
+
+                    BarData data = new BarData(dataSets);
+                    data.setValueTextSize(15f);
+                    data.setDrawValues(true);
+                    //data.setValueTypeface(tfLight);
+                    data.setBarWidth(0.9f);
+                    data.setValueTextColor(Color.WHITE);
+
+                    data.setValueFormatter(new MoneyValueFormatter());
+
+                    set1.setColors(new int[] {Color.parseColor("#006C4A"),
+                            Color.parseColor("#6c0d00")});
+
+                    summaryBarChart.setData(data);
+
+                }
+
+                summaryBarChart.invalidate();
+                summaryBarChart.refreshDrawableState();
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void displayLineGraph(){
         //chart population:
-        //tvX = getView().findViewById(R.id.tvXMax);
-        //tvY = getView().findViewById(R.id.tvYMax);
 
-        //seekBarX = getView().findViewById(R.id.seekBar1);
-        //seekBarX.setOnSeekBarChangeListener(this);
+       // // Chart Style // //
+        chart = getView().findViewById(R.id.chart1);
 
-        //seekBarY = getView().findViewById(R.id.seekBar2);
-//        seekBarY.setMax(180);
-        //seekBarY.setMax(1763);
-        //seekBarY.setOnSeekBarChangeListener(this);
+        // background color
+        chart.setBackgroundColor(Color.WHITE);
 
-        {   // // Chart Style // //
-            chart = getView().findViewById(R.id.chart1);
+        // disable description text
+        chart.getDescription().setEnabled(false);
 
-            // background color
-            chart.setBackgroundColor(Color.WHITE);
+        // enable touch gestures
+        chart.setTouchEnabled(true);
 
-            // disable description text
-            chart.getDescription().setEnabled(false);
+        // set listeners
+        chart.setOnChartValueSelectedListener(this);
+        chart.setDrawGridBackground(false);
 
-            // enable touch gestures
-            chart.setTouchEnabled(true);
+        // enable scaling and dragging
+        chart.setDragEnabled(true);
+        //chart.setScaleEnabled(true);//-----------------
+        chart.setScaleXEnabled(true);
+        chart.setScaleYEnabled(true);
 
-            // set listeners
-            chart.setOnChartValueSelectedListener(this);
-            chart.setDrawGridBackground(false);
+        // force pinch zoom along both axis
+        chart.setPinchZoom(true);
 
-            // enable scaling and dragging
-            chart.setDragEnabled(true);
-            //chart.setScaleEnabled(true);//-----------------
-            chart.setScaleXEnabled(true);
-            chart.setScaleYEnabled(true);
-
-            // force pinch zoom along both axis
-            chart.setPinchZoom(true);
-        }
 
         XAxis xAxis;
-        {   // // X-Axis Style // //
-            xAxis = chart.getXAxis();
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+       // // X-Axis Style // //
+        xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setValueFormatter(new SummaryXFormatter());
 
-
-            xAxis.setValueFormatter(new MyXAxisValueFormatter());
-
-        }
 
         YAxis yAxis;
-        {   // // Y-Axis Style // //
-            yAxis = chart.getAxisLeft();
+        // // Y-Axis Style // //
+        yAxis = chart.getAxisLeft();
 
-            // disable dual axis (only use LEFT axis)
-            chart.getAxisRight().setEnabled(false);
+        // disable dual axis (only use LEFT axis)
+        chart.getAxisRight().setEnabled(false);
 
-        }
 
 
         {
-
             yAxis.setDrawLimitLinesBehindData(true);
             xAxis.setDrawLimitLinesBehindData(true);
-
         }
 
         setDataFromDB();
@@ -334,16 +602,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
         // draw legend entries as lines
         l.setForm(Legend.LegendForm.LINE);
-
-
-        //ListView transactionListView = getView().findViewById(R.id.transaction_list_view);
-
-
-        //transactionListView.setAdapter(new MostRecentRVAdapter(getActivity(), transactionList));
-
-
     }
-
 
 
 

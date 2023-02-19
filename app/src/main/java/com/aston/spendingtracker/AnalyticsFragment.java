@@ -1,5 +1,7 @@
 package com.aston.spendingtracker;
 
+import static com.github.mikephil.charting.utils.ColorTemplate.rgb;
+
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -12,35 +14,24 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.renderscript.Sampler;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.aston.spendingtracker.entity.Transaction;
 import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -49,20 +40,14 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IFillFormatter;
-import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.listener.ChartTouchListener;
-import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.EntryXComparator;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Utils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -71,16 +56,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import android.widget.SeekBar.OnSeekBarChangeListener;
-
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,7 +76,14 @@ public class AnalyticsFragment extends Fragment implements
     private TextView tvX, tvY;
     LinkedList<Transaction> transactionList = new LinkedList<>();
 
-    private PieChart pieChart;
+    private PieChart pieChartSpendingByCategory, pieChartIncomeSources;
+
+
+    public static final int[] DARK_COLOURS_FOR_WHITE_TEXT = {
+            rgb("#ad3e07"), rgb("#807306"), rgb("#056341"), rgb("#053963"), rgb("#4a0563"), rgb("#630544"), rgb("#23454a")
+    };
+
+
 
     private static final int MAX_X_VALUE = 7;
     private static final int MAX_Y_VALUE = 50;
@@ -160,54 +148,134 @@ public class AnalyticsFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
 
-        //getActivity().setTitle("LineChartActivity1");
+        displayLineChartOverview();
 
-        displayLineChart();
+        displayPieChartSpendingByCategory();
 
+        displayPieChartIncomeSources();
+
+
+        MaterialSwitch labelSwitch = getView().findViewById(R.id.labels_toggle);
+
+        labelSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    pieChartSpendingByCategory.setDrawEntryLabels(true);
+                    pieChartSpendingByCategory.invalidate();
+                    pieChartSpendingByCategory.refreshDrawableState();
+                }else{
+                    pieChartSpendingByCategory.setDrawEntryLabels(false);
+                    pieChartSpendingByCategory.invalidate();
+                    pieChartSpendingByCategory.refreshDrawableState();
+                }
+            }
+        });
+
+        MaterialSwitch percentageSwitchPieChartSpendingByCategory = getView().findViewById(R.id.percentage_toggle_spending_by_category);
+
+        percentageSwitchPieChartSpendingByCategory.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    pieChartSpendingByCategory.setUsePercentValues(true);
+                    setPieChartDataSpendingByCategory(new PercentageValueFormatter());
+
+                }else{
+                    pieChartSpendingByCategory.setUsePercentValues(false);
+                    setPieChartDataSpendingByCategory(new MoneyValueFormatter());
+
+                }
+                pieChartIncomeSources.invalidate();
+                pieChartIncomeSources.refreshDrawableState();
+            }
+        });
+
+
+
+
+        MaterialSwitch labelSwitchPieChartIncomeSource = getView().findViewById(R.id.labels_toggle_income_sources);
+
+        labelSwitchPieChartIncomeSource.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    pieChartIncomeSources.setDrawEntryLabels(true);
+                }else{
+                    pieChartIncomeSources.setDrawEntryLabels(false);
+
+                }
+                pieChartIncomeSources.invalidate();
+                pieChartIncomeSources.refreshDrawableState();
+            }
+        });
+
+        MaterialSwitch percentageSwitchPieChartIncomeSource = getView().findViewById(R.id.percentage_toggle_income_sources);
+
+        percentageSwitchPieChartIncomeSource.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    pieChartIncomeSources.setUsePercentValues(true);
+                    setPieChartDataIncomeSources(new PercentageValueFormatter());
+
+                }else{
+                    pieChartIncomeSources.setUsePercentValues(false);
+                    setPieChartDataIncomeSources(new MoneyValueFormatter());
+
+                }
+                pieChartIncomeSources.invalidate();
+                pieChartIncomeSources.refreshDrawableState();
+            }
+        });
+
+
+    }
+
+    private void displayPieChartIncomeSources(){
 
         //piechart
 
-        pieChart = getView().findViewById(R.id.pie_chart);
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setExtraOffsets(5, 0, 5, 0);
-
-        pieChart.setDragDecelerationFrictionCoef(0.95f);
+        pieChartIncomeSources = getView().findViewById(R.id.pie_chart_income_sources);
+        pieChartIncomeSources.setUsePercentValues(false);
+        pieChartIncomeSources.getDescription().setEnabled(false);
+        pieChartIncomeSources.setExtraOffsets(5, 0, 5, 0);
+        pieChartIncomeSources.setDragDecelerationFrictionCoef(0.95f);
 
         //pieChart.setCenterTextTypeface(tfLight);
 //        pieChart.setCenterText(generateCenterSpannableText());
 
-        pieChart.setDrawHoleEnabled(true);
+        pieChartIncomeSources.setDrawHoleEnabled(true);
         //pieChart.setHoleColor(Color.WHITE);
 
-        pieChart.setHoleColor(R.color.md_theme_dark_background);
-        pieChart.setTransparentCircleColor(R.color.md_theme_dark_background);
-        pieChart.setTransparentCircleAlpha(110);
+        pieChartIncomeSources.setHoleColor(R.color.md_theme_dark_background);
+        pieChartIncomeSources.setTransparentCircleColor(R.color.md_theme_dark_background);
+        pieChartIncomeSources.setTransparentCircleAlpha(110);
 
-        pieChart.setHoleRadius(35f);
-        pieChart.setTransparentCircleRadius(40f);
+        pieChartIncomeSources.setHoleRadius(35f);
+        pieChartIncomeSources.setTransparentCircleRadius(40f);
 
-        pieChart.setDrawCenterText(true);
+        pieChartIncomeSources.setDrawCenterText(true);
 
-        pieChart.setRotationAngle(0);
+        pieChartIncomeSources.setRotationAngle(0);
         // enable rotation of the chart by touch
-        pieChart.setRotationEnabled(true);
-        pieChart.setHighlightPerTapEnabled(true);
+        pieChartIncomeSources.setRotationEnabled(true);
+        pieChartIncomeSources.setHighlightPerTapEnabled(true);
 
-        pieChart.setDrawEntryLabels(false);
+        pieChartIncomeSources.setDrawEntryLabels(false);
 
 
         // pieChart.setUnit(" €");
         // chart.setDrawUnitsInChart(true);
 
         // add a selection listener
-        pieChart.setOnChartValueSelectedListener(this);
+        pieChartIncomeSources.setOnChartValueSelectedListener(this);
 
 
-        pieChart.animateY(1400, Easing.EaseInOutQuad);
+        pieChartIncomeSources.animateY(1400, Easing.EaseInOutQuad);
         // chart.spin(2000, 0, 360);
 
-        Legend l = pieChart.getLegend();
+        Legend l = pieChartIncomeSources.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         l.setOrientation(Legend.LegendOrientation.VERTICAL);
@@ -221,6 +289,7 @@ public class AnalyticsFragment extends Fragment implements
         switch (nightModeFlags) {
             case Configuration.UI_MODE_NIGHT_YES:
                 l.setTextColor(Color.WHITE);
+                break;
             case Configuration.UI_MODE_NIGHT_NO:
                 l.setTextColor(Color.BLACK);
                 break;
@@ -233,52 +302,19 @@ public class AnalyticsFragment extends Fragment implements
 
 
         // entry label styling
-        pieChart.setEntryLabelColor(Color.WHITE);
+        pieChartIncomeSources.setEntryLabelColor(Color.WHITE);
         //pieChart.setEntryLabelTypeface(tfRegular);
-        pieChart.setEntryLabelTextSize(12f);
-
-        setPieChartData();
+        pieChartIncomeSources.setEntryLabelTextSize(12f);
 
 
-        MaterialSwitch labelSwitch = getView().findViewById(R.id.labels_toggle);
 
-        labelSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    pieChart.setDrawEntryLabels(true);
-                    pieChart.invalidate();
-                    pieChart.refreshDrawableState();
-                }else{
-                    pieChart.setDrawEntryLabels(false);
-                    pieChart.invalidate();
-                    pieChart.refreshDrawableState();
-                }
-            }
-        });
+        setPieChartDataIncomeSources(new MoneyValueFormatter());
+
 
     }
 
-    private SpannableString generateCenterSpannableText(String val) {
-        SpannableString s = new SpannableString("£"+val);
-        s.setSpan(new RelativeSizeSpan(1.7f), 0, s.length(), 0);
-        s.setSpan(new StyleSpan(Typeface.NORMAL), 0, s.length(), 0);
-        s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
+    private void setPieChartDataIncomeSources(ValueFormatter valueFormatter){
 
-
-//        SpannableString s = new SpannableString("Spending \nby category");
-//        s.setSpan(new RelativeSizeSpan(1.7f), 0, 9, 0);
-//        s.setSpan(new StyleSpan(Typeface.NORMAL), 9, s.length() - 9, 0);
-//        s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length() - 13, 0);
-//        s.setSpan(new ForegroundColorSpan(Color.GRAY), 9, s.length() - 9, 0);
-//        s.setSpan(new RelativeSizeSpan(.8f), 9, s.length() - 9, 0);
-//        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 9, s.length(), 0);
-//        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 9, s.length(), 0);
-        return s;
-    }
-
-
-    private void setPieChartData() {
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -288,11 +324,10 @@ public class AnalyticsFragment extends Fragment implements
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                double totalSpending = 0;
+
 
                 Map<String, ArrayList<Transaction>> transactionCatMap = new HashMap<>();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-
 
                     for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
                         Transaction transaction = dataSnapshot2.getValue(Transaction.class);
@@ -320,21 +355,268 @@ public class AnalyticsFragment extends Fragment implements
                     }
                 }
 
-                Map<String, Double> catSpendingMap = new HashMap<>();
-
+                Map<String, Double> catIncomeMap = new HashMap<>();
+                double totalIncome = 0;
                 for(String key : transactionCatMap.keySet()){
-
+                    double totalIncomeByCat = 0;
                     for(Transaction t: transactionCatMap.get(key)){
-                        String paidOutStr = t.getPaidOut();
+                        String paidInStr = t.getPaidIn();
 
-                        if(!paidOutStr.isEmpty()){
-                            totalSpending += Double.parseDouble(t.getPaidOut());
+                        if(!paidInStr.isEmpty()){
+                            double paidIn = Double.parseDouble(t.getPaidIn());
+                            totalIncome += paidIn;
+                            totalIncomeByCat += paidIn;
                         }
 
                     }
 
-                    if(totalSpending != 0){
-                        catSpendingMap.put(key, totalSpending);
+                    if(totalIncomeByCat != 0){
+                        catIncomeMap.put(key, totalIncomeByCat);
+                    }
+
+                }
+
+
+                for(String key : catIncomeMap.keySet()){
+                    System.out.println(key + " " + catIncomeMap.get(key));
+                    double val = catIncomeMap.get(key);
+                    float val2 = (float) val;
+                    entries.add(new PieEntry( val2, key, getResources().getDrawable(R.drawable.star)));
+
+                    System.out.println("-----------for key: " + key + ", double is: " + val + " , float is: " +  val2);
+                }
+
+
+                PieDataSet dataSet = new PieDataSet(entries, "");
+
+                dataSet.setDrawIcons(false);
+
+                dataSet.setSliceSpace(3f);
+                dataSet.setIconsOffset(new MPPointF(0, 40));
+                dataSet.setSelectionShift(5f);
+
+                // add a lot of colors
+
+                ArrayList<Integer> colors = new ArrayList<>();
+
+//                    for (int c : ColorTemplate.VORDIPLOM_COLORS)
+//                        colors.add(c);
+
+//                    for (int c : ColorTemplate.JOYFUL_COLORS)
+//                        colors.add(c);
+//
+//                    for (int c : ColorTemplate.COLORFUL_COLORS)
+//                        colors.add(c);
+//
+
+                for(int c : DARK_COLOURS_FOR_WHITE_TEXT)
+                    colors.add(c);
+
+                for (int c : ColorTemplate.LIBERTY_COLORS)
+                    colors.add(c);
+
+                for (int c : ColorTemplate.PASTEL_COLORS)
+                    colors.add(c);
+
+                colors.add(ColorTemplate.getHoloBlue());
+
+                dataSet.setColors(colors);
+                dataSet.setSelectionShift(12f);
+
+
+
+
+                PieData data = new PieData(dataSet);
+                data.setValueFormatter(valueFormatter);
+                data.setValueTextSize(11f);
+                data.setValueTextColor(Color.WHITE);
+                //data.setValueTypeface(tfLight);
+
+                DecimalFormat df = new DecimalFormat("0.00");
+                pieChartIncomeSources.setCenterText(generateCenterSpannableText(df.format(totalIncome)));
+
+                pieChartIncomeSources.setData(data);
+
+
+                // undo all highlights
+                pieChartIncomeSources.highlightValues(null);
+
+                pieChartIncomeSources.invalidate();
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private SpannableString generateCenterSpannableText(String val) {
+        SpannableString s = new SpannableString("£"+val);
+        s.setSpan(new RelativeSizeSpan(1.7f), 0, s.length(), 0);
+        s.setSpan(new StyleSpan(Typeface.NORMAL), 0, s.length(), 0);
+        s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
+
+
+//        SpannableString s = new SpannableString("Spending \nby category");
+//        s.setSpan(new RelativeSizeSpan(1.7f), 0, 9, 0);
+//        s.setSpan(new StyleSpan(Typeface.NORMAL), 9, s.length() - 9, 0);
+//        s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length() - 13, 0);
+//        s.setSpan(new ForegroundColorSpan(Color.GRAY), 9, s.length() - 9, 0);
+//        s.setSpan(new RelativeSizeSpan(.8f), 9, s.length() - 9, 0);
+//        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 9, s.length(), 0);
+//        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 9, s.length(), 0);
+        return s;
+    }
+
+
+    private void displayPieChartSpendingByCategory(){
+
+        //piechart
+
+        pieChartSpendingByCategory = getView().findViewById(R.id.pie_chart);
+        pieChartSpendingByCategory.setUsePercentValues(false);
+        pieChartSpendingByCategory.getDescription().setEnabled(false);
+
+
+        pieChartSpendingByCategory.setExtraOffsets(5, 0, 5, 0);
+
+        pieChartSpendingByCategory.setDragDecelerationFrictionCoef(0.95f);
+
+        //pieChart.setCenterTextTypeface(tfLight);
+//        pieChart.setCenterText(generateCenterSpannableText());
+
+        pieChartSpendingByCategory.setDrawHoleEnabled(true);
+        //pieChart.setHoleColor(Color.WHITE);
+
+        pieChartSpendingByCategory.setHoleColor(R.color.md_theme_dark_background);
+        pieChartSpendingByCategory.setTransparentCircleColor(R.color.md_theme_dark_background);
+        pieChartSpendingByCategory.setTransparentCircleAlpha(110);
+
+        pieChartSpendingByCategory.setHoleRadius(35f);
+        pieChartSpendingByCategory.setTransparentCircleRadius(40f);
+
+        pieChartSpendingByCategory.setDrawCenterText(true);
+
+        pieChartSpendingByCategory.setRotationAngle(0);
+        // enable rotation of the chart by touch
+        pieChartSpendingByCategory.setRotationEnabled(true);
+        pieChartSpendingByCategory.setHighlightPerTapEnabled(true);
+
+        pieChartSpendingByCategory.setDrawEntryLabels(false);
+
+
+        // pieChart.setUnit(" €");
+        // chart.setDrawUnitsInChart(true);
+
+        // add a selection listener
+        pieChartSpendingByCategory.setOnChartValueSelectedListener(this);
+
+
+        pieChartSpendingByCategory.animateY(1400, Easing.EaseInOutQuad);
+        // chart.spin(2000, 0, 360);
+
+        Legend l = pieChartSpendingByCategory.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(0f);
+        l.setYOffset(20f);
+
+        int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                l.setTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                l.setTextColor(Color.BLACK);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
+        }
+
+        l.setTextSize(12f);
+
+
+
+        // entry label styling
+        pieChartSpendingByCategory.setEntryLabelColor(Color.WHITE);
+        //pieChart.setEntryLabelTypeface(tfRegular);
+        pieChartSpendingByCategory.setEntryLabelTextSize(12f);
+
+
+
+        setPieChartDataSpendingByCategory(new MoneyValueFormatter());
+
+    }
+
+
+    private void setPieChartDataSpendingByCategory(ValueFormatter valueFormatter) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                ArrayList<Transaction> listOfTransactionsWithoutCategory = new ArrayList<>();
+
+
+                Map<String, ArrayList<Transaction>> transactionCatMap = new HashMap<>();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                    for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+
+                        String category = transaction.getCategory();
+
+
+                        if(!category.isEmpty()){
+
+                            if(transactionCatMap.containsKey(category)){
+                                ArrayList<Transaction> transactions = transactionCatMap.get(category);
+                                transactions.add(transaction);
+                                transactionCatMap.put(category, transactions);
+                            }else{
+                                ArrayList<Transaction> newListOfTransactionByCat = new ArrayList<>();
+                                newListOfTransactionByCat.add(transaction);
+                                transactionCatMap.put(category, newListOfTransactionByCat);
+                            }
+                        }
+                        else{
+
+                            listOfTransactionsWithoutCategory.add(transaction);
+                            transactionCatMap.put("other", listOfTransactionsWithoutCategory);
+                        }
+
+                    }
+                }
+
+                Map<String, Double> catSpendingMap = new HashMap<>();
+                double totalSpending = 0;
+                for(String key : transactionCatMap.keySet()){
+                    double totalSpendingByCat = 0;
+                    for(Transaction t: transactionCatMap.get(key)){
+                        String paidOutStr = t.getPaidOut();
+
+                        if(!paidOutStr.isEmpty()){
+                            double paidOut = Double.parseDouble(t.getPaidOut());
+                            totalSpending += paidOut;
+                            totalSpendingByCat += paidOut;
+                        }
+
+                    }
+
+                    if(totalSpendingByCat != 0){
+                        catSpendingMap.put(key, totalSpendingByCat);
                     }
 
                 }
@@ -343,9 +625,7 @@ public class AnalyticsFragment extends Fragment implements
                 for(String key : catSpendingMap.keySet()){
                     System.out.println(key + " " + catSpendingMap.get(key));
                     double val = catSpendingMap.get(key);
-                    entries.add(new PieEntry((float) (val),
-                            key,
-                            getResources().getDrawable(R.drawable.star)));
+                    entries.add(new PieEntry((float) (val), key, getResources().getDrawable(R.drawable.star)));
 
                 }
 
@@ -371,9 +651,12 @@ public class AnalyticsFragment extends Fragment implements
 //                    for (int c : ColorTemplate.COLORFUL_COLORS)
 //                        colors.add(c);
 //
+                    for(int c : DARK_COLOURS_FOR_WHITE_TEXT)
+                        colors.add(c);
+
                     for (int c : ColorTemplate.LIBERTY_COLORS)
                         colors.add(c);
-//
+
                     for (int c : ColorTemplate.PASTEL_COLORS)
                         colors.add(c);
 
@@ -386,21 +669,22 @@ public class AnalyticsFragment extends Fragment implements
 
 
                     PieData data = new PieData(dataSet);
-                    data.setValueFormatter(new MoneyValueFormatter());
+                    data.setValueFormatter(valueFormatter);
                     data.setValueTextSize(11f);
                     data.setValueTextColor(Color.WHITE);
+
                     //data.setValueTypeface(tfLight);
                     DecimalFormat df = new DecimalFormat("0.00");
 
-                    pieChart.setCenterText(generateCenterSpannableText(df.format(totalSpending)));
+                    pieChartSpendingByCategory.setCenterText(generateCenterSpannableText(df.format(totalSpending)));
 
-                    pieChart.setData(data);
+                    pieChartSpendingByCategory.setData(data);
 
 
                     // undo all highlights
-                    pieChart.highlightValues(null);
+                    pieChartSpendingByCategory.highlightValues(null);
 
-                    pieChart.invalidate();
+                    pieChartSpendingByCategory.invalidate();
                 }
 
             }
@@ -415,10 +699,7 @@ public class AnalyticsFragment extends Fragment implements
     }
 
 
-
-
-
-    private void displayLineChart(){
+    private void displayLineChartOverview(){
 
         {   // // Chart Style // //
             chart = getView().findViewById(R.id.chart1);
@@ -435,6 +716,20 @@ public class AnalyticsFragment extends Fragment implements
             // set listeners
             chart.setOnChartValueSelectedListener(this);
             chart.setDrawGridBackground(false);
+
+            int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+            switch (nightModeFlags) {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    chart.setBackgroundColor(Color.parseColor("#191C1A"));
+                    break;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    chart.setBackgroundColor(Color.WHITE);
+                    break;
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                    break;
+            }
+
 
             // create marker to display box when values are selected
             //MyMarkerView mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
@@ -460,9 +755,12 @@ public class AnalyticsFragment extends Fragment implements
 
 
             xAxis.setValueFormatter(new MyXAxisValueFormatter());
-
+            xAxis.setDrawGridLines(false);
             // vertical grid lines
             //xAxis.enableGridDashedLine(10f, 10f, 0f);
+
+
+
         }
 
         YAxis yAxis;
@@ -472,6 +770,7 @@ public class AnalyticsFragment extends Fragment implements
             // disable dual axis (only use LEFT axis)
             chart.getAxisRight().setEnabled(false);
 
+            yAxis.setDrawGridLines(false);
             // horizontal grid lines
             //yAxis.enableGridDashedLine(10f, 10f, 0f);
 
@@ -480,9 +779,23 @@ public class AnalyticsFragment extends Fragment implements
 //            yAxis.setAxisMinimum(0f);
         }
 
+        int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                xAxis.setTextColor(Color.WHITE);
+                yAxis.setTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                xAxis.setTextColor(Color.BLACK);
+                yAxis.setTextColor(Color.BLACK);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
+        }
 
         //setData(45, 180);
-        setDataFromDB();
+        setDataForLineChart();
 
         // draw points over time
         chart.animateX(1500);
@@ -496,7 +809,8 @@ public class AnalyticsFragment extends Fragment implements
 
     }
 
-    private void setDataFromDB() {
+
+    private void setDataForLineChart() {
 
         ArrayList<Entry> values = new ArrayList<>();
 
@@ -566,18 +880,34 @@ public class AnalyticsFragment extends Fragment implements
                     set1.setDrawIcons(false);
 
                     // draw dashed line
-                    set1.enableDashedLine(10f, 5f, 0f);
+                    //set1.enableDashedLine(10f, 5f, 0f);
 
                     // black lines and points
-                    set1.setColor(Color.BLACK);
-                    set1.setCircleColor(Color.BLACK);
+
+
+                    int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+                    switch (nightModeFlags) {
+                        case Configuration.UI_MODE_NIGHT_YES:
+                            set1.setColor(Color.WHITE);
+                            set1.setCircleColor(Color.WHITE);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_NO:
+                            set1.setColor(Color.BLACK);
+                            set1.setCircleColor(Color.BLACK);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                            break;
+                    }
 
                     // line thickness and point size
-                    set1.setLineWidth(1f);
-                    set1.setCircleRadius(3f);
+                    set1.setLineWidth(2f);
+                    set1.setCircleRadius(5f);
+
+                    ((LineDataSet) set1).setCircleColors(ColorTemplate.VORDIPLOM_COLORS);
 
                     // draw points as solid circles
-                    set1.setDrawCircleHole(false);
+                    set1.setDrawCircleHole(true);
 
                     // customize legend entry
                     set1.setFormLineWidth(1f);
@@ -604,8 +934,8 @@ public class AnalyticsFragment extends Fragment implements
                     // set color of filled area
                     if (Utils.getSDKInt() >= 18) {
                         // drawables only supported on api level 18 and above
-                        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.fade_red);
-                        set1.setFillDrawable(drawable);
+//                        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.fade_red);
+//                        set1.setFillDrawable(drawable);
                     } else {
                         set1.setFillColor(Color.BLACK);
                     }
@@ -650,8 +980,6 @@ public class AnalyticsFragment extends Fragment implements
     }
 
 
-
-
     @Override
     public void onValueSelected(Entry e, Highlight h) {
 
@@ -660,5 +988,12 @@ public class AnalyticsFragment extends Fragment implements
     @Override
     public void onNothingSelected() {
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        pieChartSpendingByCategory.animateY(1000, Easing.EaseInOutQuad);
     }
 }
