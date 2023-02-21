@@ -17,6 +17,17 @@ class TransactionFragment
 class ViewTransaction
 class MyXAxisValueFormatter
 
+class DashboardFragment
+class AddToCategoryFragment
+class MostRecentRVAdapter
+class MoneyValueFormatter
+class ValueFormatter
+class PercentageValueFormatter
+class ViewTransaction
+class SummaryXFormatter
+class Category
+
+
 RegisterUser ..> MainActivity : calls
 LoginActivity ..> MainActivity : calls
 RegisterUser *-- User
@@ -32,6 +43,21 @@ HSBCPDFProcessor *-- HSBCRegex
 TransactionFragment *-- RecyclerViewAdapter
 TransactionFragment *-- ViewTransaction
 PDFProcessor *-- HSBCPDFProcessor
+
+PagerAdapter *-- DashboardFragment
+DashboardFragment *-- SummaryXFormatter
+DashboardFragment *-- MostRecentRVAdapter
+TransactionFragment *-- ViewTransaction
+ViewTransaction *-- AddToCategoryFragment
+Transaction *-- Category
+
+AnalyticsFragment *-- MoneyValueFormatter
+AnalyticsFragment *-- PercentageValueFormatter
+
+ValueFormatter <|-- MoneyValueFormatter
+ValueFormatter <|-- PercentageValueFormatter
+ValueFormatter <|-- MyXAxisValueFormatter
+
 
 
 
