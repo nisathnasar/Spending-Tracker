@@ -16,6 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabMode="scrollable"
+        app:tabGravity="center"
+        app:tabIndicatorAnimationMode="elastic"
+
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,24 +27,28 @@
             android:id="@+id/DashboardItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@drawable/dashboard_icon"
             android:text="Dashboard" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/TransactionsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@drawable/reorder_icon"
             android:text="Transactions" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/AnalyticsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@drawable/bar_chart_icon"
             android:text="Analytics" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/UploadItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@drawable/description_icon"
             android:text="Upload" />
     </com.google.android.material.tabs.TabLayout>
 

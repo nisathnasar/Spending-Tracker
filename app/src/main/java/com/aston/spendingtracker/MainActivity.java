@@ -1,5 +1,6 @@
 package com.aston.spendingtracker;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -75,12 +76,16 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
             if(position == 0){
                 tab.setText("Dashboard");
+                tab.setIcon(R.drawable.dashboard_icon);
             } else if (position == 1){
                 tab.setText("List");
+                tab.setIcon(R.drawable.reorder_icon);
             } else if (position == 2){
                 tab.setText("Analytics");
+                tab.setIcon(R.drawable.bar_chart_icon);
             } else if (position == 3){
                 tab.setText("Upload");
+                tab.setIcon(R.drawable.description_icon);
             }
             else{
                 tab.setText("Tab " + (position+1));
@@ -88,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         }).attach();
 
-        pager.setUserInputEnabled(false);
+        //pager.setUserInputEnabled(false);
 
         if(!Python.isStarted()){
             Python.start(new AndroidPlatform(this));
