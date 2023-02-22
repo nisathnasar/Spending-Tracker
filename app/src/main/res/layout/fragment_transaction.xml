@@ -26,7 +26,6 @@
             android:inputType="textFilter"
             android:hint="Search"
             android:imeOptions="actionSearch"
-
             android:id="@+id/filter_et"
             />
 
@@ -58,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/recyclerview"
-            android:paddingBottom="10dp"
+
             >
 
         </androidx.recyclerview.widget.RecyclerView>

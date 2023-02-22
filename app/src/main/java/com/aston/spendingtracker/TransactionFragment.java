@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -103,6 +104,8 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
 
         mRecyclerView = getView().findViewById(R.id.recyclerview);
 
+        getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
+        getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
 
         TreeMap<Timestamp, Transaction> transactionsMap = new TreeMap<>();
 
@@ -160,28 +163,37 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
                 mRootRef.child("MaximumBalance").setValue(maximumBal);
 
 
-                if(transactionList.size()==0){
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        // yourMethod();
 
-                    try{
-                        getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-                        getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+                        if(transactionList.size()==0){
+
+                            try{
+                                getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+                                getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+                            }
+                            catch (Exception e){
+
+                            }
+
+
+
+                        } else{
+                            try{
+                                getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
+                            }
+                            catch(Exception e){
+
+                            }
+
+                        }
                     }
-                    catch (Exception e){
-
-                    }
+                }, 3000);
 
 
-
-                } else{
-                    try{
-                        getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
-                        getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
-                    }
-                    catch(Exception e){
-
-                    }
-
-                }
 
                 mAdapter.notifyDataSetChanged();
             }
@@ -213,13 +225,13 @@ public class TransactionFragment extends Fragment implements ItemClickListener{
             }
         });
 
-        if(transactionList.size()==0){
-            getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-            getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
-            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
-            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
-
-        }
+//        if(transactionList.size()==0){
+//            getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
+//            getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
+//            //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
+//            //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
+//
+//        }
     }
 
     private void filter(String text){

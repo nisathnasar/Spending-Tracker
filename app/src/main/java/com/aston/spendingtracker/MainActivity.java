@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DashboardFragment()).commit();
 
+        navBarView.setSelectedItemId(R.id.menu_dashboard);
 
         navBarView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
