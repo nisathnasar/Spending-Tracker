@@ -1,27 +1,35 @@
 package com.aston.spendingtracker;
 
 import android.app.Activity;
+//import android.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+
+//import android.app.Fragment;
+
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.aston.spendingtracker.authorization.LoginActivity;
+import com.aston.spendingtracker.pdf.FileSelectorFragment;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -30,7 +38,7 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener,
+public class MainActivity extends AppCompatActivity implements
         OnChartValueSelectedListener, FragmentChangeListener {
 
     // Request code for selecting a PDF document.
@@ -48,6 +56,16 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     PagerAdapter adapter;
     TabLayout mTabLayout;
     TabItem transactionItem, analyticsItem, uploadItem;
+    BottomNavigationView navBarView;
+
+    Fragment fr1 ;
+    Fragment fr2 ;
+    Fragment fr3;
+    Fragment fr4 ;
+
+    Fragment active = fr1;
+    //FragmentManager fm = getFragmentManager();
+
 
     public static final int DASHBOARD_POSITION = 0;
     public static final int TRANSACTION_LIST_POSITION = 1;
@@ -65,33 +83,37 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         pager = findViewById(R.id.viewPager);
         mTabLayout = findViewById(R.id.tab_layout);
-        //transactionItem = findViewById(R.id.AnalyticsItem);
-        //uploadItem = findViewById(R.id.UploadItem);
+        mTabLayout.setVisibility(View.GONE);
 
-        adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle() , mTabLayout.getTabCount());
-        pager.setAdapter(adapter);
-
+        navBarView = findViewById(R.id.bottom_navigation);
+        navBarView.setVisibility(View.VISIBLE);
 
 
-        new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
-            if(position == 0){
-                tab.setText("Dashboard");
-                tab.setIcon(R.drawable.dashboard_icon);
-            } else if (position == 1){
-                tab.setText("List");
-                tab.setIcon(R.drawable.reorder_icon);
-            } else if (position == 2){
-                tab.setText("Analytics");
-                tab.setIcon(R.drawable.bar_chart_icon);
-            } else if (position == 3){
-                tab.setText("Upload");
-                tab.setIcon(R.drawable.description_icon);
-            }
-            else{
-                tab.setText("Tab " + (position+1));
-            }
+//        adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle() , mTabLayout.getTabCount());
+//        pager.setAdapter(adapter);
 
-        }).attach();
+
+
+
+//        new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
+//            if(position == 0){
+//                tab.setText("Dashboard");
+//                tab.setIcon(R.drawable.dashboard_icon);
+//            } else if (position == 1){
+//                tab.setText("List");
+//                tab.setIcon(R.drawable.reorder_icon);
+//            } else if (position == 2){
+//                tab.setText("Analytics");
+//                tab.setIcon(R.drawable.bar_chart_icon);
+//            } else if (position == 3){
+//                tab.setText("Upload");
+//                tab.setIcon(R.drawable.description_icon);
+//            }
+//            else{
+//                tab.setText("Tab " + (position+1));
+//            }
+//
+//        }).attach();
 
         //pager.setUserInputEnabled(false);
 
@@ -99,11 +121,68 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
             Python.start(new AndroidPlatform(this));
         }
 
-//        Python py = Python.getInstance();
-//        pyobj = py.getModule("listoftransactions");
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DashboardFragment()).commit();
+
+
+        navBarView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()) {
+                    case R.id.menu_dashboard:
+//                      pager.setCurrentItem(0);
+
+//                        replacefragment(new DashboardFragment());
+
+                        Fragment frg1 = new DashboardFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg1).commit();
+                        break;
+                    case R.id.menu_list:
+//                        pager.setCurrentItem(1);
+//                        replacefragment(new TransactionFragment());
+
+                        Fragment frg2 = new TransactionFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg2).commit();
+
+                        break;
+                    case R.id.menu_analytics:
+//                        pager.setCurrentItem(2);
+//                        replacefragment(new AnalyticsFragment());
+
+                        Fragment frg3 = new AnalyticsFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg3).commit();
+
+                        break;
+                    case R.id.menu_upload:
+//                        pager.setCurrentItem(3);
+//                        replacefragment(new FileSelectorFragment());
+
+                        Fragment frg4 = new FileSelectorFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg4).commit();
+                        break;
+                }
+                return true;
+
+            }
+        });
+
+        pager.setUserInputEnabled(false);
 
 
     }
+
+    private void replacefragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        //fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+
+
+
 
     @Override
     protected void onPause()
@@ -204,33 +283,9 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menufile, menu);
 
-//        MenuItem searchItem = menu.findItem(R.id.action_search);
-//        SearchView searchView = (SearchView) searchItem.getActionView();
-//
-//        searchView.setOnSearchClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
-
         return true;
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {
