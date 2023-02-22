@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_dashboard"
+        android:enabled="true"
+        android:icon="@drawable/dashboard_icon"
+        android:title="Dashboard"/>
+    <item
+        android:id="@+id/menu_list"
+        android:enabled="true"
+        android:icon="@drawable/reorder_icon"
+        android:title="List"/>
+    <item
+        android:id="@+id/menu_analytics"
+        android:enabled="true"
+        android:icon="@drawable/bar_chart_icon"
+        android:title="Analytics"/>
+    <item
+        android:id="@+id/menu_upload"
+        android:enabled="true"
+        android:icon="@drawable/description_icon"
+        android:title="Upload"/>
+
+</menu>

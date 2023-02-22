@@ -41,6 +41,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -137,6 +138,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 //        childFragTrans.addToBackStack("B");
 //        childFragTrans.commit();
 
+        BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottom_navigation);
 
         Button viewAllAnalyticsBtn = getView().findViewById(R.id.btn_more_analytics);
         viewAllAnalyticsBtn.setOnClickListener(new View.OnClickListener() {
@@ -144,8 +146,14 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             public void onClick(View view) {
 
                 try{
-                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
-                    mParent.onChange(2);
+
+
+
+                    bottomNavigationView.setSelectedItemId(R.id.menu_analytics);
+
+
+//                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
+//                    mParent.onChange(2);
                 }
                 catch(ClassCastException e){
                     System.out.println(e);
@@ -160,8 +168,11 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             @Override
             public void onClick(View view) {
                 try{
-                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
-                    mParent.onChange(1);
+
+                    bottomNavigationView.setSelectedItemId(R.id.menu_list);
+
+//                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
+//                    mParent.onChange(1);
                 }
                 catch(ClassCastException e){
                     System.out.println(e);
@@ -253,9 +264,6 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                 System.out.println("db data retrieval fail: " + error);
             }
         });
-
-
-        displayLineGraph();
 
 
         displayBarChart();
@@ -542,231 +550,6 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         });
     }
 
-    private void displayLineGraph(){
-        //chart population:
-
-       // // Chart Style // //
-        chart = getView().findViewById(R.id.chart1);
-
-        // background color
-        chart.setBackgroundColor(Color.WHITE);
-
-        // disable description text
-        chart.getDescription().setEnabled(false);
-
-        // enable touch gestures
-        chart.setTouchEnabled(true);
-
-        // set listeners
-        chart.setOnChartValueSelectedListener(this);
-        chart.setDrawGridBackground(false);
-
-        // enable scaling and dragging
-        chart.setDragEnabled(true);
-        //chart.setScaleEnabled(true);//-----------------
-        chart.setScaleXEnabled(true);
-        chart.setScaleYEnabled(true);
-
-        // force pinch zoom along both axis
-        chart.setPinchZoom(true);
-
-
-        XAxis xAxis;
-       // // X-Axis Style // //
-        xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setValueFormatter(new SummaryXFormatter());
-
-
-        YAxis yAxis;
-        // // Y-Axis Style // //
-        yAxis = chart.getAxisLeft();
-
-        // disable dual axis (only use LEFT axis)
-        chart.getAxisRight().setEnabled(false);
-
-
-
-        {
-            yAxis.setDrawLimitLinesBehindData(true);
-            xAxis.setDrawLimitLinesBehindData(true);
-        }
-
-        setDataFromDB();
-
-        // draw points over time
-        chart.animateX(1500);
-
-        // get the legend (only possible after setting data)
-        Legend l = chart.getLegend();
-
-        // draw legend entries as lines
-        l.setForm(Legend.LegendForm.LINE);
-    }
-
-
-
-    private void setDataFromDB() {
-
-        ArrayList<Entry> values = new ArrayList<>();
-
-//        for (int i = 0; i < count; i++) {
-//
-//            float val = (float) (Math.random() * range) - 30;
-//            values.add(new Entry(i, val, getResources().getDrawable(R.drawable.star)));
-//
-//        }
-
-
-
-        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
-
-
-        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //transactionList.clear(); //------------------
-                //values.clear();
-
-                float i = 0;
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-
-                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
-                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
-                        //System.out.println(transaction);
-                        transaction.parseDBDate();
-                        transaction.parseDBMonth();
-//                        transactionList.add(transaction);
-
-                        float x;
-                        float y;
-//
-                        x = transaction.getDateInMilliseconds();
-                        y = Float.valueOf(transaction.getBalance().trim());
-
-                        try{
-                            //values.add(new Entry(x, y, ((MainActivity)getActivity()).getResources().getDrawable(R.drawable.star)));
-                            values.add(new Entry(x, y, requireActivity().getResources().getDrawable(R.drawable.star)));
-                        }
-                        catch (Exception e){
-                            System.out.println(e);
-                        }
-
-
-//                        values.add(new Entry(i, y));
-
-                        //Collections.sort(values, new EntryXComparator());
-
-                        i++;
-                        //System.out.println("x = " + x + "   , y = " + y + "    : parsed: " + Transaction.getParsedDateInMilliseconds(x));
-
-
-                    }
-
-                }
-
-
-
-
-                LineDataSet set1;
-
-                if (chart.getData() != null &&
-                        chart.getData().getDataSetCount() > 0) {
-                    set1 = (LineDataSet) chart.getData().getDataSetByIndex(0);
-
-                    set1.setValues(values);
-                    set1.notifyDataSetChanged();
-                    chart.getData().notifyDataChanged();
-                    chart.notifyDataSetChanged();
-                } else {
-                    // create a dataset and give it a type
-                    set1 = new LineDataSet(values, "DataSet 1");
-
-                    set1.setDrawIcons(false);
-
-                    // draw dashed line
-                    set1.enableDashedLine(10f, 5f, 0f);
-
-                    // black lines and points
-                    set1.setColor(Color.BLACK);
-                    set1.setCircleColor(Color.BLACK);
-
-                    // line thickness and point size
-                    set1.setLineWidth(1f);
-                    set1.setCircleRadius(3f);
-
-                    // draw points as solid circles
-                    set1.setDrawCircleHole(false);
-
-                    // customize legend entry
-                    set1.setFormLineWidth(1f);
-                    set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
-                    set1.setFormSize(15.f);
-
-                    // text size of values
-                    set1.setValueTextSize(9f);
-
-                    // draw selection line as dashed
-                    set1.enableDashedHighlightLine(10f, 5f, 0f);
-
-                    // set the filled area
-                    set1.setDrawFilled(true);
-                    set1.setFillFormatter(new IFillFormatter() {
-                        @Override
-                        public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-                            return chart.getAxisLeft().getAxisMinimum();
-                        }
-                    });
-
-                    // set color of filled area
-                    if (Utils.getSDKInt() >= 18) {
-                        // drawables only supported on api level 18 and above
-                        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.fade_red);
-                        set1.setFillDrawable(drawable);
-                    } else {
-                        set1.setFillColor(Color.BLACK);
-                    }
-
-                    ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-                    dataSets.add(set1); // add the data sets
-
-                    // create a data object with the data sets
-                    LineData data = new LineData(dataSets);
-
-                    // set data
-                    chart.setData( data);
-                }
-
-
-
-
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("db data retrieval fail: " + error);
-            }
-        });
-
-
-
-
-//        for(Entry val : values){
-//            System.out.println(val);
-//        }
-
-
-        for(int i  = 0; i < 100; i++){
-            i += i*2;
-            //values.add(new Entry(i, i, getResources().getDrawable(R.drawable.star)));
-        }
-
-
-
-    }
 
 
     @Override

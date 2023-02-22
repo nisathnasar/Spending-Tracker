@@ -1,17 +1,16 @@
 package com.aston.spendingtracker;
 
+import static android.view.View.GONE;
 import static com.github.mikephil.charting.utils.ColorTemplate.rgb;
 
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.text.SpannableString;
@@ -27,11 +26,15 @@ import android.widget.TextView;
 
 import com.aston.spendingtracker.entity.Transaction;
 import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -43,6 +46,7 @@ import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
@@ -54,11 +58,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -71,8 +82,9 @@ import java.util.Map;
 public class AnalyticsFragment extends Fragment implements
         OnChartValueSelectedListener {
 
-    private LineChart chart;
+    private LineChart lineChart;
     private SeekBar seekBarX, seekBarY;
+    private BarChart weeklyBarChart;
     private TextView tvX, tvY;
     LinkedList<Transaction> transactionList = new LinkedList<>();
 
@@ -147,6 +159,7 @@ public class AnalyticsFragment extends Fragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        displayWeeklyOutgoing();
 
         displayLineChartOverview();
 
@@ -154,7 +167,11 @@ public class AnalyticsFragment extends Fragment implements
 
         displayPieChartIncomeSources();
 
+        implementSwitches();
 
+    }
+
+    private void implementSwitches(){
         MaterialSwitch labelSwitch = getView().findViewById(R.id.labels_toggle);
 
         labelSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -228,6 +245,397 @@ public class AnalyticsFragment extends Fragment implements
                 pieChartIncomeSources.refreshDrawableState();
             }
         });
+
+    }
+
+    private void displayWeeklyOutgoing(){
+
+        // bar chart code:
+
+        weeklyBarChart = getView().findViewById(R.id.weekly_bar_chart);
+        weeklyBarChart.setOnChartValueSelectedListener(this);
+
+        weeklyBarChart.setDrawBarShadow(false);
+        weeklyBarChart.setDrawValueAboveBar(true);
+
+        weeklyBarChart.getDescription().setEnabled(false);
+
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        weeklyBarChart.setMaxVisibleValueCount(100);
+
+        // scaling can now only be done on x- and y-axis separately
+        weeklyBarChart.setPinchZoom(false);
+
+        weeklyBarChart.setDrawGridBackground(false);
+        // chart.setDrawYLabels(false);
+
+        //weeklyBarChart.setBackgroundColor(Color.BLACK);
+
+        //IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
+
+
+        XAxis xAxis = weeklyBarChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        //xAxis.setTypeface(tfLight);
+        xAxis.setDrawGridLines(false);
+        //xAxis.setGranularity(1f); // only intervals of 1 day
+        xAxis.setLabelCount(7);
+
+
+        ValueFormatter xAxisFormatter = new MyXAxisValueFormatter();
+        //xAxis.setValueFormatter(xAxisFormatter);
+
+
+
+
+        //IAxisValueFormatter custom = new MyAxisValueFormatter();
+
+        YAxis leftAxis = weeklyBarChart.getAxisLeft();
+        //leftAxis.setTypeface(tfLight);
+        //leftAxis.setLabelCount(8, false);
+        //leftAxis.setSpaceTop(15f);
+        leftAxis.setValueFormatter(new MoneyValueFormatter());
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setSpaceTop(5f);
+
+        leftAxis.setEnabled(false);
+
+
+
+        //leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        YAxis rightAxis = weeklyBarChart.getAxisRight();
+        rightAxis.setDrawGridLines(false);
+        rightAxis.setEnabled(false);
+
+        //rightAxis.setTypeface(tfLight);
+        //rightAxis.setLabelCount(8, false);
+
+        //rightAxis.setValueFormatter(custom);
+
+        //rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        Legend l = weeklyBarChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+        l.setEnabled(false);
+
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                leftAxis.setTextColor(Color.WHITE);
+                xAxis.setTextColor(Color.WHITE);
+                l.setTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                leftAxis.setTextColor(Color.BLACK);
+                xAxis.setTextColor(Color.BLACK);
+                l.setTextColor(Color.BLACK);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
+        }
+
+
+//        XYMarkerView mv = new XYMarkerView(this, new MyXAxisValueFormatter());
+        /*
+        XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
+        mv.setChartView(chart); // For bounds control
+        chart.setMarker(mv); // Set the marker to the chart
+*/
+
+
+        setWeeklyBarChart();
+
+    }
+
+    String lastDateString;
+    Transaction lastDateTransactionObj;
+    Date lastDateObj;
+    String lastDateDayOfTheWeek;
+    String nearestPrevMonday;
+    Calendar calendar;
+
+    private void setWeeklyBarChart(){
+
+        ArrayList<BarEntry> values = new ArrayList<>();
+
+        ArrayList<Transaction> allTransactions = new ArrayList<>();
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+        mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                    for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        transaction.parseDBDate();
+                        transaction.parseDBMonth();
+                        transaction.parseDBYear();
+
+                        allTransactions.add(transaction);
+
+//                        lastDate = transaction.getDateOfTransaction();
+//                        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
+//
+//                        Date firstDateObj;
+//                        try {
+//                            firstDateObj = sdf.parse(lastDate);
+//                            sdf.applyPattern("EEEE");
+//
+//                            lastDateDayOfTheWeek = sdf.format(firstDateObj);
+//
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+                    }
+                }
+
+                Collections.reverse(allTransactions);
+                //System.out.println(allTransactions);
+
+                lastDateTransactionObj = allTransactions.get(0);
+
+
+                MyXAxisValueFormatter xFormatter = new MyXAxisValueFormatter();
+
+                //initialize x Axis Labels (labels for 13 vertical grid lines)
+                final ArrayList<String> xAxisLabel = new ArrayList<>();
+
+
+                float maxY = Float.MIN_VALUE;
+
+                DateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
+                try {
+                    lastDateObj = formatter.parse(lastDateTransactionObj.getDateOfTransaction());
+                    calendar = Calendar.getInstance();
+                    calendar.setTime(lastDateObj);
+
+                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                    int daysToSubtract = dayOfWeek - Calendar.MONDAY;
+
+                    if(daysToSubtract < 0){
+                        daysToSubtract += 7;
+                    }
+
+                    calendar.add(Calendar.DAY_OF_MONTH, -daysToSubtract);
+
+                    Date lastWeekStartDate = calendar.getTime();
+
+                    ArrayList<Transaction> lastWeekTransactions = new ArrayList<>();
+
+                    for(Transaction transaction : allTransactions){
+                        Date thisDate = formatter.parse(transaction.getDateOfTransaction());
+
+                        if(thisDate.after(lastWeekStartDate) || thisDate.equals(lastWeekStartDate)){
+                            lastWeekTransactions.add(transaction);
+                        } else{
+                            break;
+                        }
+
+                    }
+
+                    for(Transaction transaction : lastWeekTransactions){
+                        System.out.println(transaction.getDateOfTransaction() + " : " +transaction);
+                    }
+
+                    HashMap<String, ArrayList<Transaction>> dateTransactionMap = new HashMap<>();
+
+
+                    for(int i = 0; i < 7; i++){
+                        calendar.add(Calendar.DATE, i);
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
+                        String iterDate = sdf.format(calendar.getTime());
+
+                        dateTransactionMap.put(iterDate, new ArrayList<>());
+                    }
+
+                    for(Transaction transaction : lastWeekTransactions){
+
+                        if(dateTransactionMap.containsKey(transaction.getDateOfTransaction())){
+                            ArrayList<Transaction> existingList = dateTransactionMap.get(transaction.getDateOfTransaction());
+                            existingList.add(transaction);
+                            dateTransactionMap.put(transaction.getDateOfTransaction(), existingList);
+
+                        }
+                        else{
+                            ArrayList<Transaction> newList = new ArrayList<>();
+                            newList.add(transaction);
+                            dateTransactionMap.put(transaction.getDateOfTransaction(), newList);
+                        }
+
+                    }
+
+                    ArrayList<String> weekDaysLabelList = new ArrayList<>();
+                    weekDaysLabelList.add("M");
+                    weekDaysLabelList.add("T");
+                    weekDaysLabelList.add("W");
+                    weekDaysLabelList.add("T");
+                    weekDaysLabelList.add("F");
+                    weekDaysLabelList.add("S");
+                    weekDaysLabelList.add("S");
+
+                    int i = 0;
+
+                    HashMap<Float, Float> dateTotalMap = new HashMap<>();
+                    for(String dateStr : dateTransactionMap.keySet()){
+                        float totalForTheDate = 0;
+
+                        for(Transaction transaction : dateTransactionMap.get(dateStr)){
+                            if(!transaction.getPaidOut().isEmpty()){
+                                totalForTheDate += Float.parseFloat(transaction.getPaidOut());
+                            }
+
+
+                        }
+
+                        int sizeOfArrList = dateTransactionMap.get(dateStr).size();
+
+                        if(sizeOfArrList!=0){
+                            dateTotalMap.put(dateTransactionMap.get(dateStr).get(0).getDateInMilliseconds(), totalForTheDate);
+                        }
+                        else{
+                            //dateTotalMap.put(dateTransactionMap.get(dateStr).get(0).getDateInMilliseconds(), totalForTheDate);
+                        }
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
+                        Date d = sdf.parse(dateStr);
+                        //d.getTime()
+//                        float x = dateTransactionMap.get(dateStr).get(0).getDateInMilliseconds();
+                        float x = d.getTime();
+                        float y = totalForTheDate;
+
+                        System.out.println("x: " + x + "y: " + y);
+
+                        values.add(new BarEntry(i, y, getResources().getDrawable(R.drawable.star)));
+
+//                        xAxisLabel.add(xFormatter.getFormattedValue(x));
+                        xAxisLabel.add(weekDaysLabelList.get(i));
+                        i++;
+                    }
+
+
+                    for(Transaction transaction : lastWeekTransactions){
+                        float x = transaction.getDateInMilliseconds();
+                        float y;
+
+                        if(!transaction.getPaidIn().isEmpty()){
+                        }
+                        else{
+                            y = Float.valueOf(transaction.getPaidOut());
+                        }
+
+
+//                        values.add(new BarEntry(x, y, getResources().getDrawable(R.drawable.star)));
+//                        xAxisLabel.add(xFormatter.getFormattedValue(x));
+                    }
+
+
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+
+
+
+
+
+                //xAxisLabel.add(""); //empty label for the last vertical grid line on Y-Right Axis
+
+                BarDataSet set1;
+
+                if(values.size() < 2){
+                    weeklyBarChart.setVisibility(GONE);
+                }
+                else if (weeklyBarChart.getData() != null &&
+                        weeklyBarChart.getData().getDataSetCount() > 0) {
+                    set1 = (BarDataSet) weeklyBarChart.getData().getDataSetByIndex(0);
+                    set1.setValues(values);
+                    weeklyBarChart.getData().notifyDataChanged();
+                    weeklyBarChart.notifyDataSetChanged();
+
+                } else {
+                    set1 = new BarDataSet(values, "Spending");
+
+                    set1.setDrawIcons(false);
+
+                    XAxis xAxis = weeklyBarChart.getXAxis();
+
+                    //xAxis.setAxisMinimum(0 + 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
+                    //xAxis.setAxisMaximum(values.size() - 1.0f + 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
+                    //xAxis.setLabelCount(xAxisLabel.size(), true); //draw x labels for 13 vertical grid lines
+
+                    xAxis.setGranularityEnabled(true);
+                    xAxis.setGranularity(1.0f);
+                    xAxis.setLabelCount(7);
+
+
+                    xAxis.setValueFormatter(new ValueFormatter() {
+                        @Override
+                        public String getFormattedValue(float value) {
+                            return xAxisLabel.get((int) value);
+                        }
+                    });
+
+                    //xAxis.setValueFormatter(new MyXAxisValueFormatter());
+
+                    YAxis yAxis = weeklyBarChart.getAxisLeft();
+
+                    //yAxis.setAxisMaximum(maxY);
+
+                    //weeklyBarChart.setVisibleYRangeMaximum(maxY, YAxis.AxisDependency.LEFT);
+
+                    weeklyBarChart.animateY(500);
+
+
+                    ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+                    dataSets.add(set1);
+
+                    BarData data = new BarData(dataSets);
+
+                    data.setValueTextSize(10f);
+                    //data.setValueTypeface(tfLight);
+                    //data.setBarWidth(0.9f);
+                    data.setValueTextColor(Color.WHITE);
+                    data.setValueFormatter(new MoneyValueFormatter());
+
+
+                    weeklyBarChart.setData(data);
+
+                }
+
+                weeklyBarChart.invalidate();
+                weeklyBarChart.refreshDrawableState();
+
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
 
 
     }
@@ -702,29 +1110,29 @@ public class AnalyticsFragment extends Fragment implements
     private void displayLineChartOverview(){
 
         {   // // Chart Style // //
-            chart = getView().findViewById(R.id.chart1);
+            lineChart = getView().findViewById(R.id.chart1);
 
             // background color
-            chart.setBackgroundColor(Color.WHITE);
+            lineChart.setBackgroundColor(Color.WHITE);
 
             // disable description text
-            chart.getDescription().setEnabled(false);
+            lineChart.getDescription().setEnabled(false);
 
             // enable touch gestures
-            chart.setTouchEnabled(true);
+            lineChart.setTouchEnabled(true);
 
             // set listeners
-            chart.setOnChartValueSelectedListener(this);
-            chart.setDrawGridBackground(false);
+            lineChart.setOnChartValueSelectedListener(this);
+            lineChart.setDrawGridBackground(false);
 
             int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
             switch (nightModeFlags) {
                 case Configuration.UI_MODE_NIGHT_YES:
-                    chart.setBackgroundColor(Color.parseColor("#191C1A"));
+                    lineChart.setBackgroundColor(Color.parseColor("#191C1A"));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
-                    chart.setBackgroundColor(Color.WHITE);
+                    lineChart.setBackgroundColor(Color.WHITE);
                     break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
@@ -739,18 +1147,18 @@ public class AnalyticsFragment extends Fragment implements
             //chart.setMarker(mv);
 
             // enable scaling and dragging
-            chart.setDragEnabled(true);
+            lineChart.setDragEnabled(true);
             //chart.setScaleEnabled(true);//-----------------
-            chart.setScaleXEnabled(true);
-            chart.setScaleYEnabled(true);
+            lineChart.setScaleXEnabled(true);
+            lineChart.setScaleYEnabled(true);
 
             // force pinch zoom along both axis
-            chart.setPinchZoom(true);
+            lineChart.setPinchZoom(true);
         }
 
         XAxis xAxis;
         {   // // X-Axis Style // //
-            xAxis = chart.getXAxis();
+            xAxis = lineChart.getXAxis();
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
 
@@ -759,16 +1167,17 @@ public class AnalyticsFragment extends Fragment implements
             // vertical grid lines
             //xAxis.enableGridDashedLine(10f, 10f, 0f);
 
+            xAxis.setLabelCount(4);
 
 
         }
 
         YAxis yAxis;
         {   // // Y-Axis Style // //
-            yAxis = chart.getAxisLeft();
+            yAxis = lineChart.getAxisLeft();
 
             // disable dual axis (only use LEFT axis)
-            chart.getAxisRight().setEnabled(false);
+            lineChart.getAxisRight().setEnabled(false);
 
             yAxis.setDrawGridLines(false);
             // horizontal grid lines
@@ -798,10 +1207,10 @@ public class AnalyticsFragment extends Fragment implements
         setDataForLineChart();
 
         // draw points over time
-        chart.animateX(1500);
+        lineChart.animateX(1500);
 
         // get the legend (only possible after setting data)
-        Legend l = chart.getLegend();
+        Legend l = lineChart.getLegend();
 
         // draw legend entries as lines
         l.setForm(Legend.LegendForm.LINE);
@@ -865,14 +1274,14 @@ public class AnalyticsFragment extends Fragment implements
 
                 LineDataSet set1;
 
-                if (chart.getData() != null &&
-                        chart.getData().getDataSetCount() > 0) {
-                    set1 = (LineDataSet) chart.getData().getDataSetByIndex(0);
+                if (lineChart.getData() != null &&
+                        lineChart.getData().getDataSetCount() > 0) {
+                    set1 = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
 
                     set1.setValues(values);
                     set1.notifyDataSetChanged();
-                    chart.getData().notifyDataChanged();
-                    chart.notifyDataSetChanged();
+                    lineChart.getData().notifyDataChanged();
+                    lineChart.notifyDataSetChanged();
                 } else {
                     // create a dataset and give it a type
                     set1 = new LineDataSet(values, "DataSet 1");
@@ -927,7 +1336,7 @@ public class AnalyticsFragment extends Fragment implements
                     set1.setFillFormatter(new IFillFormatter() {
                         @Override
                         public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-                            return chart.getAxisLeft().getAxisMinimum();
+                            return lineChart.getAxisLeft().getAxisMinimum();
                         }
                     });
 
@@ -947,7 +1356,7 @@ public class AnalyticsFragment extends Fragment implements
                     LineData data = new LineData(dataSets);
 
                     // set data
-                    chart.setData( data);
+                    lineChart.setData( data);
                 }
 
 
@@ -994,6 +1403,12 @@ public class AnalyticsFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
-        pieChartSpendingByCategory.animateY(1000, Easing.EaseInOutQuad);
+        pieChartSpendingByCategory.animateY(500, Easing.EaseInOutQuad);
+
+        pieChartIncomeSources.animateY(500, Easing.EaseInOutQuad);
+        weeklyBarChart.animateY(500);
+
+        lineChart.animateY(500, Easing.EaseInOutQuad);
+
     }
 }
