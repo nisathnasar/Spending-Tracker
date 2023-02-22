@@ -286,13 +286,13 @@ public class FileSelectorFragment extends Fragment implements AdapterView.OnItem
                     buttonSubmitFile.setEnabled(false);
                 }
                 else{
-                    Toast.makeText(getActivity(), "PDF Processing failed, try again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Something went wrong, please upload appropriate statements.", Toast.LENGTH_SHORT).show();
                 }
 
             }
             catch (IOException | ParseException ex){
 
-                Toast.makeText(getActivity(), "PDF Processing failed, try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Something went wrong, please upload appropriate statements.", Toast.LENGTH_SHORT).show();
 
             }
         }

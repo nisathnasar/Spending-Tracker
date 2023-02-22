@@ -16,6 +16,12 @@
             -->
 
         <item
+            android:id="@+id/action_settings"
+            android:icon="@drawable/settings_icon"
+            app:showAsAction="ifRoom"
+            android:title="Settings"/>
+
+        <item
             android:id="@+id/action_logout"
             android:icon="@drawable/ic_baseline_logout_24"
             android:title="Log out"
