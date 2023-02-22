@@ -680,7 +680,7 @@ public class AnalyticsFragment extends Fragment implements
         pieChartIncomeSources.setOnChartValueSelectedListener(this);
 
 
-        pieChartIncomeSources.animateY(1400, Easing.EaseInOutQuad);
+        //pieChartIncomeSources.animateY(1400, Easing.EaseInOutQuad);
         // chart.spin(2000, 0, 360);
 
         Legend l = pieChartIncomeSources.getLegend();
@@ -880,7 +880,6 @@ public class AnalyticsFragment extends Fragment implements
         return s;
     }
 
-
     private void displayPieChartSpendingByCategory(){
 
         //piechart
@@ -924,7 +923,7 @@ public class AnalyticsFragment extends Fragment implements
         pieChartSpendingByCategory.setOnChartValueSelectedListener(this);
 
 
-        pieChartSpendingByCategory.animateY(1400, Easing.EaseInOutQuad);
+        //pieChartSpendingByCategory.animateY(1400, Easing.EaseInOutQuad);
         // chart.spin(2000, 0, 360);
 
         Legend l = pieChartSpendingByCategory.getLegend();
@@ -963,7 +962,6 @@ public class AnalyticsFragment extends Fragment implements
         setPieChartDataSpendingByCategory(new MoneyValueFormatter());
 
     }
-
 
     private void setPieChartDataSpendingByCategory(ValueFormatter valueFormatter) {
         ArrayList<PieEntry> entries = new ArrayList<>();
@@ -1106,7 +1104,6 @@ public class AnalyticsFragment extends Fragment implements
 
     }
 
-
     private void displayLineChartOverview(){
 
         {   // // Chart Style // //
@@ -1217,7 +1214,6 @@ public class AnalyticsFragment extends Fragment implements
         //l.setForm(Legend.LegendForm.CIRCLE);
 
     }
-
 
     private void setDataForLineChart() {
 
@@ -1387,7 +1383,6 @@ public class AnalyticsFragment extends Fragment implements
 
 
     }
-
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {
