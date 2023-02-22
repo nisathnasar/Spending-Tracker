@@ -195,6 +195,15 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+
+
+        linearLayoutManager = new LinearLayoutManager(getContext()) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+
 //        linearLayoutManager.setReverseLayout(true);
 //        linearLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
