@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.aston.spendingtracker.entity.Transaction;
+import com.aston.spendingtracker.entity.User;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -41,6 +42,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
@@ -146,11 +148,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             public void onClick(View view) {
 
                 try{
-
-
-
                     bottomNavigationView.setSelectedItemId(R.id.menu_analytics);
-
 
 //                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
 //                    mParent.onChange(2);
@@ -182,11 +180,42 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
 
 
+
+        DatabaseReference mUser = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+
+        mUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                User user = snapshot.getValue(User.class);
+                String firstNameLowerCase = user.firstName;
+                String formattedName = firstNameLowerCase.substring(0,1).toUpperCase() + firstNameLowerCase.substring(1);
+
+                String res = "Welcome back " + formattedName + "!";
+                TextView welcomeMsgDashboardTV = getActivity().findViewById(R.id.welcome_mgs_dashboard_tv);
+                welcomeMsgDashboardTV.setText(res);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        //User user = dataSnapshotTask.getResult().getValue(User.class);
+
+        //String displayName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
+        //String displayName = user.firstName;
+
+//        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+
+
+
         mRecyclerView = getView().findViewById(R.id.recyclerview);
-
-
-
-
 
         // Create an adapter and supply the data to be displayed.
         mAdapter = new MostRecentRVAdapter(getActivity(), transactionList);
