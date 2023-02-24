@@ -8,13 +8,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.aston.spendingtracker.AnalyticsFragment;
-import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.Party;
-import com.aston.spendingtracker.TransactionFragment;
 import com.aston.spendingtracker.entity.Transaction;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,7 +25,6 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;

@@ -1,17 +1,11 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.fragments;
 
-import static android.icu.lang.UProperty.INT_START;
-
-import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +19,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.aston.spendingtracker.MostRecentRVAdapter;
+import com.aston.spendingtracker.R;
+import com.aston.spendingtracker.RecyclerViewAdapter;
+import com.aston.spendingtracker.axisformatters.MoneyValueFormatter;
+import com.aston.spendingtracker.axisformatters.SummaryXFormatter;
 import com.aston.spendingtracker.entity.Transaction;
 import com.aston.spendingtracker.entity.User;
 import com.github.mikephil.charting.charts.BarChart;
@@ -35,20 +34,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.Utils;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

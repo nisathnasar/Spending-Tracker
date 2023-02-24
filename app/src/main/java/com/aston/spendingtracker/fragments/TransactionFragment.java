@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.aston.spendingtracker.ItemClickListener;
+import com.aston.spendingtracker.R;
+import com.aston.spendingtracker.RecyclerViewAdapter;
+import com.aston.spendingtracker.ViewTransaction;
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -34,7 +38,7 @@ import java.util.TreeMap;
  * Use the {@link TransactionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TransactionFragment extends Fragment implements ItemClickListener{
+public class TransactionFragment extends Fragment implements ItemClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

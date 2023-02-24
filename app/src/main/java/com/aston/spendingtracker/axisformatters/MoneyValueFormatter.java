@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.axisformatters;
 
 import com.aston.spendingtracker.entity.Transaction;
 import com.github.mikephil.charting.formatter.ValueFormatter;

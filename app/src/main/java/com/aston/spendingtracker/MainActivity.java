@@ -19,7 +19,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
         import com.aston.spendingtracker.authorization.LoginActivity;
-import com.aston.spendingtracker.pdf.FileSelectorFragment;
+import com.aston.spendingtracker.fragments.AnalyticsFragment;
+import com.aston.spendingtracker.fragments.DashboardFragment;
+import com.aston.spendingtracker.fragments.TransactionFragment;
+import com.aston.spendingtracker.fragments.FileSelectorFragment;
         import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;

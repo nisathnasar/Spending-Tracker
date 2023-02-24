@@ -1,4 +1,4 @@
-package com.aston.spendingtracker.pdf;
+package com.aston.spendingtracker.fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,13 +21,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aston.spendingtracker.DashboardFragment;
 import com.aston.spendingtracker.R;
+import com.aston.spendingtracker.pdf.FileUtils;
+import com.aston.spendingtracker.pdf.HSBCPDFProcessor;
+import com.aston.spendingtracker.pdf.PDFProcessor;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;

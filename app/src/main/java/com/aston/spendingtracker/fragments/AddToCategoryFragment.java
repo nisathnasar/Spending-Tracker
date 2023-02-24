@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.fragments;
 
 
 import android.app.AlertDialog;
@@ -9,13 +9,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.aston.spendingtracker.Category;
+import com.aston.spendingtracker.R;
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,6 +61,15 @@ public class AddToCategoryFragment extends DialogFragment {
         //selectedItems = new ArrayList();  // Where we track the selected items
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
 
+
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        View view = inflater.inflate(R.layout.custom_dialog, null);
+
+        builder.setView(view);
+
+
         // Set the dialog title
         builder.setTitle("Select a category");
 
@@ -63,26 +77,64 @@ public class AddToCategoryFragment extends DialogFragment {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);
+
         input.setLayoutParams(lp);
         input.setHint("Type new category (Select Other)");
         input.setMaxLines(1);
-        builder.setView(input);
+
+
+        ScrollView myScroll = new ScrollView(getActivity());
+
+        //myScroll.addView(input);
+
+        //builder.setView(input);
+
+        RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
+
+        for(String category : categoriesList){
+            RadioButton rb = new RadioButton(getActivity());
+            rb.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
+            rb.setText(category);
+            rb.setTextSize(16);
+            rb.setPadding(20,40,20,50);
+            radioGroup.addView(rb);
+        }
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int radioButtonID = group.getCheckedRadioButtonId();
+                View radioButton = group.findViewById(radioButtonID);
+                selectedItem = group.indexOfChild(radioButton);
+
+                if(selectedItem == categoriesList.size()-1){
+                    view.findViewById(R.id.et_other_text_input).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.et_other_text_input).requestFocus();
+                }
+                else{
+                    view.findViewById(R.id.et_other_text_input).setVisibility(View.GONE);
+                }
+
+            }
+        });
+
 
         CharSequence[] categoryListCharSeq = categoriesList.toArray(new CharSequence[categoriesList.size()]);
 
 
-
         // Specify the list array, the items to be selected by default (null for none),
         // and the listener through which to receive callbacks when items are selected
-        builder.setSingleChoiceItems(categoryListCharSeq, 0, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //selectedItems.add(which);
-                            selectedItem = which;
-
-                        }
-
-                    })
+        builder
+//                .setSingleChoiceItems(categoryListCharSeq, 0, new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            //selectedItems.add(which);
+//                            selectedItem = which;
+//
+//                        }
+//
+//                    })
                 // Set the action buttons
                 .setPositiveButton("apply", new DialogInterface.OnClickListener() {
                     @Override
@@ -102,12 +154,15 @@ public class AddToCategoryFragment extends DialogFragment {
 
                         //categoryStr = getResources().getStringArray(R.array.categories)[selectedItem];
 
+
+
                         System.out.println(categoryStr + " ---------- " + input.getText().toString());
 
                         boolean newItem = false;
 
                         if(categoryStr.equalsIgnoreCase("other")){
-                            categoryStr = input.getText().toString();
+                            EditText et = view.findViewById(R.id.et_other_text_input);
+                            categoryStr = et.getText().toString();
                             newItem = true;
 
                             if(categoryStr.isEmpty()){
@@ -187,6 +242,8 @@ public class AddToCategoryFragment extends DialogFragment {
 
         return builder.create();
     }
+
+
 
 
 }

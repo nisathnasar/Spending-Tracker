@@ -123,12 +123,6 @@
                         />
                 </LinearLayout>
 
-
-
-
-
-
-
                 <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/unitBarChart"
                     android:layout_width="match_parent"

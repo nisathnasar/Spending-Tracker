@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.fragments;
 
 import static android.view.View.GONE;
 import static com.github.mikephil.charting.utils.ColorTemplate.rgb;
@@ -24,6 +24,10 @@ import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.aston.spendingtracker.R;
+import com.aston.spendingtracker.axisformatters.MoneyValueFormatter;
+import com.aston.spendingtracker.axisformatters.MyXAxisValueFormatter;
+import com.aston.spendingtracker.axisformatters.PercentageValueFormatter;
 import com.aston.spendingtracker.entity.Transaction;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
@@ -58,7 +62,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
