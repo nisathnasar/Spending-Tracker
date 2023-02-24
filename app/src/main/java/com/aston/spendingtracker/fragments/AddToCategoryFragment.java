@@ -161,7 +161,8 @@ public class AddToCategoryFragment extends DialogFragment {
                         boolean newItem = false;
 
                         if(categoryStr.equalsIgnoreCase("other")){
-                            categoryStr = input.getText().toString();
+                            EditText et = view.findViewById(R.id.et_other_text_input);
+                            categoryStr = et.getText().toString();
                             newItem = true;
 
                             if(categoryStr.isEmpty()){
