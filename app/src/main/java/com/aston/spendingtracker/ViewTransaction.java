@@ -3,9 +3,8 @@ package com.aston.spendingtracker;
 import static android.view.View.GONE;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.aston.spendingtracker.axisformatters.MoneyValueFormatter;
+import com.aston.spendingtracker.axisformatters.MyXAxisValueFormatter;
 import com.aston.spendingtracker.entity.Transaction;
+import com.aston.spendingtracker.fragments.AddToCategoryFragment;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -26,7 +28,6 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
@@ -38,14 +39,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.TreeMap;
 
 public class ViewTransaction extends AppCompatActivity implements OnChartValueSelectedListener {
 
@@ -373,12 +371,18 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                     Category category = dataSnapshot.getValue(Category.class);
 
-                    categoriesList.add(category.getCategory());
-                    System.out.println("executed " + category.getCategory());
+                    //TODO: set caps for every first character
+                    //do not add 'other'
+                    if(!category.getCategory().toLowerCase().equals("other")){
+                        categoriesList.add(category.getCategory());
+                        System.out.println("executed " + category.getCategory());
+                    }
+
 
                 }
 
-
+                //add other
+                categoriesList.add("other");
 
 
             }
@@ -573,6 +577,8 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     }
 
 
+
+
     @Override
     public void onValueSelected(Entry e, Highlight h) {
 
@@ -581,6 +587,22 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     @Override
     public void onNothingSelected() {
 
+    }
+
+
+
+    //pass extra message back up to parent activity to prevent locking tabs
+    @Nullable
+    @Override
+    public Intent getParentActivityIntent() {
+
+        //boolean mSubt=getIntent().getBooleanExtra("snapShotExists",true);
+
+        Intent intent=new Intent(this,MainActivity.class);
+        intent.putExtra("snapShotExists", true);
+        return intent;
+
+        //return super.getParentActivityIntent();
     }
 
     public void refreshCategoryField(){

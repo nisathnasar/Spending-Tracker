@@ -86,7 +86,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="40dp"
-                        tools:context=".AnalyticsFragment">
+                        tools:context=".fragments.AnalyticsFragment">
 
 
                         <RelativeLayout
@@ -163,7 +163,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="40dp"
-                        tools:context=".AnalyticsFragment">
+                        tools:context=".fragments.AnalyticsFragment">
 
 
                         <RelativeLayout
@@ -237,7 +237,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="50dp"
-                        tools:context=".AnalyticsFragment">
+                        tools:context=".fragments.AnalyticsFragment">
 
 
                         <RelativeLayout

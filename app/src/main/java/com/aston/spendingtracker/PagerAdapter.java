@@ -2,13 +2,14 @@ package com.aston.spendingtracker;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.aston.spendingtracker.pdf.FileSelectorFragment;
+import com.aston.spendingtracker.fragments.AnalyticsFragment;
+import com.aston.spendingtracker.fragments.DashboardFragment;
+import com.aston.spendingtracker.fragments.TransactionFragment;
+import com.aston.spendingtracker.fragments.FileSelectorFragment;
 
 public class PagerAdapter extends FragmentStateAdapter {
 

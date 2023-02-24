@@ -9,7 +9,7 @@
 
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    tools:context=".pdf.FileSelectorFragment"
+    tools:context=".fragments.FileSelectorFragment"
     >
 
     <ScrollView
