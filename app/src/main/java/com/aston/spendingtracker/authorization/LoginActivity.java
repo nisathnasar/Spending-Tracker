@@ -32,6 +32,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -135,8 +140,43 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     //Toast.makeText(LoginActivity.this, "signed in.", Toast.LENGTH_LONG).show();
-                    loadingProgressBar.setVisibility(View.INVISIBLE);
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+                    mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            boolean snapShotExists = false;
+
+                            if(!snapshot.exists()){
+                                System.out.println("snapshot does not exist -------------------------------------------");
+                            }
+                            else{
+                                System.out.println("snapshot exists ++++++++++++++++++++++++++++++++++++++++++++");
+                                snapShotExists = true;
+                            }
+
+                            loadingProgressBar.setVisibility(View.INVISIBLE);
+
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+
+                            i.putExtra("snapShotExists", snapShotExists);
+
+                            startActivity(i);
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+
+//                    loadingProgressBar.setVisibility(View.INVISIBLE);
+//                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }else{
                     Toast.makeText(LoginActivity.this, "Failed to Login, please check your email and password.", Toast.LENGTH_LONG).show();
                     loadingProgressBar.setVisibility(View.INVISIBLE);

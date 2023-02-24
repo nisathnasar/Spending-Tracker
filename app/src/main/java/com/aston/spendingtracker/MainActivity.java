@@ -72,10 +72,25 @@ public class MainActivity extends AppCompatActivity implements
 //            Python.start(new AndroidPlatform(this));
 //        }
 
+        Intent intent = getIntent();
+        boolean isSnapShotExists = intent.getBooleanExtra("snapShotExists", false);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DashboardFragment()).commit();
+        if(isSnapShotExists){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DashboardFragment()).commit();
+            navBarView.setSelectedItemId(R.id.menu_dashboard);
+        } else{
 
-        navBarView.setSelectedItemId(R.id.menu_dashboard);
+            navBarView.getMenu().getItem(0).setEnabled(false);
+            navBarView.getMenu().getItem(1).setEnabled(false);
+            navBarView.getMenu().getItem(2).setEnabled(false);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FileSelectorFragment()).commit();
+            navBarView.setSelectedItemId(R.id.menu_upload);
+
+        }
+
+
+
+        //navBarView.setSelectedItemId(R.id.menu_dashboard);
 
         navBarView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -86,50 +101,33 @@ public class MainActivity extends AppCompatActivity implements
 
                         replaceFragment(new DashboardFragment());
 
-//                        Fragment frg1 = new DashboardFragment();
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg1).commit();
                         break;
                     case R.id.menu_list:
 
                         replaceFragment(new TransactionFragment());
-
-//                        Fragment frg2 = new TransactionFragment();
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg2).commit();
 
                         break;
                     case R.id.menu_analytics:
 
                         replaceFragment(new AnalyticsFragment());
 
-//                        Fragment frg3 = new AnalyticsFragment();
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg3).commit();
-
                         break;
                     case R.id.menu_upload:
 
                         replaceFragment(new FileSelectorFragment());
-
-//                        Fragment frg4 = new FileSelectorFragment();
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frg4).commit();
                         break;
                 }
                 return true;
-
             }
         });
-
-
     }
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        //fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
-
-
 
 
 
@@ -138,25 +136,11 @@ public class MainActivity extends AppCompatActivity implements
     {
         super.onPause();
 
-//        if(transactionDataVisible){
-//            // save RecyclerView state
-//            mBundleRecyclerViewState = new Bundle();
-//            Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-//            mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
-//        }
-
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-//        if(transactionDataVisible){
-//            // save RecyclerView state
-//            mBundleRecyclerViewState = new Bundle();
-//            Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-//            mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
-//
-//        }
 
     }
 
@@ -169,11 +153,6 @@ public class MainActivity extends AppCompatActivity implements
             signOut();
         }
 
-        // restore RecyclerView state
-//        if (mBundleRecyclerViewState != null && mRecyclerView != null) {
-//            Parcelable listState = mBundleRecyclerViewState.getParcelable(KEY_RECYCLER_STATE);
-//            Objects.requireNonNull(mRecyclerView.getLayoutManager()).onRestoreInstanceState(listState);
-//        }
     }
 
     @Override

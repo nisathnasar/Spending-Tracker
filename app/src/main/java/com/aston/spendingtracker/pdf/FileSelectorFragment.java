@@ -26,7 +26,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aston.spendingtracker.DashboardFragment;
 import com.aston.spendingtracker.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -284,6 +286,13 @@ public class FileSelectorFragment extends Fragment implements AdapterView.OnItem
 
                     Toast.makeText(getActivity(), "Submitted", Toast.LENGTH_SHORT).show();
                     buttonSubmitFile.setEnabled(false);
+
+                    BottomNavigationView navBarView = getActivity().findViewById(R.id.bottom_navigation);
+
+                    navBarView.getMenu().getItem(0).setEnabled(true);
+                    navBarView.getMenu().getItem(1).setEnabled(true);
+                    navBarView.getMenu().getItem(2).setEnabled(true);
+
                 }
                 else{
                     Toast.makeText(getActivity(), "Something went wrong, please upload appropriate statements.", Toast.LENGTH_SHORT).show();

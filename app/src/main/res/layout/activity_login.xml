@@ -48,7 +48,7 @@
             android:minHeight="48dp"
             android:selectAllOnFocus="true"
 
-            android:text="nisath.nasar@gmail.com"
+            android:text="test@spending.com"
             />
 
 
@@ -75,7 +75,7 @@
             android:minHeight="48dp"
             android:selectAllOnFocus="true"
 
-            android:text="87654321"
+            android:text="somepassword"
             />
 
     </com.google.android.material.textfield.TextInputLayout>

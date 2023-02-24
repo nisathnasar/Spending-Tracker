@@ -1,5 +1,7 @@
 package com.aston.spendingtracker;
 
+import static android.icu.lang.UProperty.INT_START;
+
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -14,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +65,7 @@ import java.util.LinkedList;
  * Use the {@link DashboardFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DashboardFragment extends Fragment implements OnChartValueSelectedListener {
+public class DashboardFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -81,6 +85,9 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
     LinkedList<Transaction> transactionList = new LinkedList<>();
 
     EditText filterET;
+
+    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -111,16 +118,11 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_dashboard, container, false);
     }
@@ -129,60 +131,23 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        Fragment childFragment = new DashboardFragment();
-//        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-//        transaction.replace(R.id.transaction_list_frame, childFragment).commit();
-
-//        FragmentManager childFragMan = getChildFragmentManager();
-//        FragmentTransaction childFragTrans = childFragMan.beginTransaction();
-//        DashboardFragment fragB = new DashboardFragment ();
-//        childFragTrans.add(R.id.transaction_list_frame, fragB);
-//        childFragTrans.addToBackStack("B");
-//        childFragTrans.commit();
-
-        BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottom_navigation);
-
-        Button viewAllAnalyticsBtn = getView().findViewById(R.id.btn_more_analytics);
-        viewAllAnalyticsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                try{
-                    bottomNavigationView.setSelectedItemId(R.id.menu_analytics);
-
-//                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
-//                    mParent.onChange(2);
-                }
-                catch(ClassCastException e){
-                    System.out.println(e);
-                }
-
-
-            }
-        });
-
-        Button viewAllTransactionsBtn = getView().findViewById(R.id.btn_all_transactions);
-        viewAllTransactionsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try{
-
-                    bottomNavigationView.setSelectedItemId(R.id.menu_list);
-
-//                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
-//                    mParent.onChange(1);
-                }
-                catch(ClassCastException e){
-                    System.out.println(e);
-                }
-            }
-        });
 
 
 
+        setButtonListeners();
 
+        setWelcomeMessage();
+
+        populateTransactionHistory();
+
+        displayBarChart();
+
+        setBalanceSummary();
+
+    }
+
+    private void setWelcomeMessage(){
         DatabaseReference mUser = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-
 
         mUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -202,113 +167,12 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
             }
         });
+    }
 
-
-        //User user = dataSnapshotTask.getResult().getValue(User.class);
-
-        //String displayName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-
-        //String displayName = user.firstName;
-
-//        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
-
-
-
-
-        mRecyclerView = getView().findViewById(R.id.recyclerview);
-
-        // Create an adapter and supply the data to be displayed.
-        mAdapter = new MostRecentRVAdapter(getActivity(), transactionList);
-
-        // Connect the adapter with the RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
-        // Give the RecyclerView a default layout manager.
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-
-
-        linearLayoutManager = new LinearLayoutManager(getContext()) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-
-//        linearLayoutManager.setReverseLayout(true);
-//        linearLayoutManager.setStackFromEnd(true);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-
-        //mRecyclerView.setLayoutFrozen(true);
-
-        //mAdapter.setClickListener(this::onClick); // Bind the listener
-
-
-        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
-
-
-
-        mTransactionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                float maximumBal = 0;
-
-                transactionList.clear(); //------------------
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
-                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
-                        //System.out.println(transaction);
-                        transaction.parseDBDate();
-                        transaction.parseDBMonth();
-                        transaction.parseDBYear();
-                        transactionList.add(transaction);
-
-                        if(maximumBal < Float.valueOf(transaction.getBalance())){
-                            maximumBal = Float.valueOf(transaction.getBalance());
-                        }
-
-//                        try {
-//                            Transaction.sortTransactionListByDate(transactionList);
-//                        } catch (ParseException e) {
-//                            e.printStackTrace();
-//                        }
-                    }
-
-                }
-
-                //finalMaximumBal[0] = maximumBal;
-
-                //update max bal on db:
-                mRootRef.child("MaximumBalance").setValue(maximumBal);
-
-/*
-                if(transactionList.size()==0){
-                    getView().findViewById(R.id.frame_layout).setVisibility(View.GONE);
-                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
-                    //Button welcomeMsgUploadBtn = getView().findViewById(R.id.welcome_msg_upload_bt);
-                    //welcomeMsgUploadBtn.setVisibility(View.VISIBLE);
-
-                } else{
-                    getView().findViewById(R.id.frame_layout).setVisibility(View.VISIBLE);
-                    getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.GONE);
-                }
-*/
-
-                Collections.reverse(transactionList);
-                mAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("db data retrieval fail: " + error);
-            }
-        });
-
-
-        displayBarChart();
-
+    private void setBalanceSummary(){
 
         TextView balTV = getView().findViewById(R.id.tv_summary);
-        Chip balanceChip = getView().findViewById(R.id.balance_chip);
+        TextView balanceChip = getView().findViewById(R.id.balance_chip);
 
         mTransactionRef.orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -324,7 +188,12 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
                         transaction.parseDBYear();
 
                         String balanceSummaryTitleString = "Balance as of " + transaction.getDateOfTransaction() + ":";
-                        balTV.setText(balanceSummaryTitleString);
+
+                        SpannableStringBuilder str = new SpannableStringBuilder(balanceSummaryTitleString);
+                        str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),13 , str.length()-1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        balTV.setText(str);
+
                         String balanceString = "£"+transaction.getBalance();
                         balanceChip.setText(balanceString);
                     }
@@ -337,9 +206,6 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
             }
         });
-
-
-
 
     }
 
@@ -588,18 +454,110 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         });
     }
 
+    private void setButtonListeners(){
+
+        BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottom_navigation);
+        Button viewAllAnalyticsBtn = getView().findViewById(R.id.btn_more_analytics);
+        viewAllAnalyticsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try{
+                    bottomNavigationView.setSelectedItemId(R.id.menu_analytics);
+
+//                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
+//                    mParent.onChange(2);
+                }
+                catch(ClassCastException e){
+                    System.out.println(e);
+                }
 
 
-    @Override
-    public void onValueSelected(Entry e, Highlight h) {
+            }
+        });
+
+        Button viewAllTransactionsBtn = getView().findViewById(R.id.btn_all_transactions);
+        viewAllTransactionsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try{
+
+                    bottomNavigationView.setSelectedItemId(R.id.menu_list);
+
+//                    FragmentChangeListener mParent = (FragmentChangeListener) getActivity();
+//                    mParent.onChange(1);
+                }
+                catch(ClassCastException e){
+                    System.out.println(e);
+                }
+            }
+        });
 
     }
 
-    @Override
-    public void onNothingSelected() {
+    private void populateTransactionHistory(){
+
+        mRecyclerView = getView().findViewById(R.id.recyclerview);
+
+        mRecyclerView.setClickable(false);
+
+        // Create an adapter and supply the data to be displayed.
+        mAdapter = new MostRecentRVAdapter(getActivity(), transactionList);
+
+        // Connect the adapter with the RecyclerView.
+        mRecyclerView.setAdapter(mAdapter);
+        // Give the RecyclerView a default layout manager.
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+
+
+        linearLayoutManager = new LinearLayoutManager(getContext()) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+
+        mTransactionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                float maximumBal = 0;
+
+                transactionList.clear(); //------------------
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                        Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+                        //System.out.println(transaction);
+                        transaction.parseDBDate();
+                        transaction.parseDBMonth();
+                        transaction.parseDBYear();
+                        transactionList.add(transaction);
+
+                        if(maximumBal < Float.valueOf(transaction.getBalance())){
+                            maximumBal = Float.valueOf(transaction.getBalance());
+                        }
+
+                    }
+
+                }
+
+                //update max bal on db:
+                mRootRef.child("MaximumBalance").setValue(maximumBal);
+
+
+                Collections.reverse(transactionList);
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("db data retrieval fail: " + error);
+            }
+        });
 
     }
-
 
 
 }
