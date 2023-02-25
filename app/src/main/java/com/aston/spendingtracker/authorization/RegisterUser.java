@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
+import com.aston.spendingtracker.TutorialActivity;
 import com.aston.spendingtracker.entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -125,7 +126,7 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
                                             if(task.isSuccessful()){
                                                 Toast.makeText(RegisterUser.this, "User has been registered successfully!", Toast.LENGTH_LONG).show();
                                                 progressBar.setVisibility(View.GONE);
-                                                startActivity(new Intent(RegisterUser.this, MainActivity.class));
+                                                startActivity(new Intent(RegisterUser.this, TutorialActivity.class));
                                             }
                                             else{
                                                 Toast.makeText(RegisterUser.this, "Failed to register! Try again!", Toast.LENGTH_LONG).show();
