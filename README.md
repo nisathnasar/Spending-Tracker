@@ -2,7 +2,7 @@
 
 ## About
 
-Spending tracker is an original enables individuals to track their finances using data from Bank Statements. The initial releases will only take in HSBC statements.
+Spending tracker is an original app that enables individuals to track their finances using data from Bank Statements. The initial releases will only take in HSBC statements.
 
 ## Feature set:
 
