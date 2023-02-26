@@ -86,14 +86,36 @@ public class Page5Fragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                boolean snapShotExists = false;
+                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
-                Intent i = new Intent((TutorialActivity)getActivity(), MainActivity.class);
+                mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                i.putExtra("snapShotExists", snapShotExists);
+                        boolean snapShotExists = false;
 
-                startActivity(i);
+                        if(!snapshot.exists()){
 
+                        }
+                        else{
+                            snapShotExists = true;
+                        }
+
+
+                        Intent i = new Intent((TutorialActivity)getActivity(), MainActivity.class);
+
+                        i.putExtra("snapShotExists", snapShotExists);
+
+                        startActivity(i);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
             }
         });
