@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -32,17 +34,23 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public class ViewTransaction extends AppCompatActivity implements OnChartValueSelectedListener {
@@ -53,7 +61,27 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     private RecyclerViewAdapter mAdapter;
     private BarChart chart;
 
+    private int nightModeFlags;
+    
+    private TextView title_tv;
+    private TextView transactionTextView;
+    private TextView balanceTextView;
+    private TextView balanceBeforeTextView;
+    private TextView transactionTypeTextView;
+    private TextView dateOfTransactionTextView;
+
+    private ChipGroup catChipGroup;
+    private Chip partyCategoryTextView;
+    
+    private Button editCatBtn;
+    private Button clearCatBtn;
+    private Button deleteCatBtn;
+
     private String detail;
+    private String partyCategory;
+    View rootLayout;
+
+    DatabaseReference mRootRef, mTransactionRef;
 
     ArrayList<String> categoriesList = new ArrayList<>();
 
@@ -63,16 +91,46 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_transaction);
 
-        TextView title_tv = findViewById(R.id.title_tv);
-        TextView transactionTextView = findViewById(R.id.transaction_tv);
-        TextView balanceTextView = findViewById(R.id.balance_tv);
-        TextView balanceBeforeTextView = findViewById(R.id.balance_before_tv);
-        TextView transactionTypeTextView = findViewById(R.id.type_tv);
-        TextView dateOfTransactionTextView = findViewById(R.id.date_of_transaction_tv);
-        TextView partyCategoryTextView = findViewById(R.id.category_tv);
+        rootLayout = findViewById(R.id.constraint_layout);
+        
+        title_tv = findViewById(R.id.title_tv);
+        transactionTextView = findViewById(R.id.transaction_tv);
+        balanceTextView = findViewById(R.id.balance_tv);
+        balanceBeforeTextView = findViewById(R.id.balance_before_tv);
+        transactionTypeTextView = findViewById(R.id.type_tv);
+        dateOfTransactionTextView = findViewById(R.id.date_of_transaction_tv);
+        partyCategoryTextView = findViewById(R.id.category_tv);
 
-        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        catChipGroup = findViewById(R.id.cat_chip_group);
 
+        editCatBtn = findViewById(R.id.edit_cat_btn);
+        editCatBtn.setVisibility(GONE);
+
+        clearCatBtn = findViewById(R.id.clear_cat_btn);
+        clearCatBtn.setVisibility(GONE);
+
+        deleteCatBtn = findViewById(R.id.delete_cat_btn);
+        deleteCatBtn.setVisibility(GONE);
+
+        nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        setFields();
+
+        setHistoryTransactions();
+
+        displayHistoryBarChart();
+
+        setData();
+
+        setButtonListeners();
+
+        createNewCategoriesInDatabaseIfNone();
+
+        retrieveListOfCategoriesFromDB();
+
+    }
+
+    private void setFields() {
         Intent intent = getIntent();
         detail = intent.getStringExtra("detail");
         title_tv.setText(detail);
@@ -132,18 +190,17 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         String transactionTypeString = "Type of transaction: " + getFullBankAbbreviation(transactionType);
         transactionTypeTextView.setText(transactionTypeString);
 
-        String partyCategory = intent.getStringExtra("category");
+        partyCategory = intent.getStringExtra("category");
         if(partyCategory.isEmpty()){
             partyCategoryTextView.setVisibility(GONE);
         }
         else{
             partyCategoryTextView.setText(partyCategory);
         }
+    }
 
-
-
+    private void setHistoryTransactions() {
         mRecyclerView = findViewById(R.id.recyclerviewfiltered);
-
 
         // Create an adapter and supply the data to be displayed.
         mAdapter = new RecyclerViewAdapter(this, transactionList);
@@ -163,8 +220,8 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+        mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        mTransactionRef = mRootRef.child("Transaction");
 
         mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -193,8 +250,264 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
             }
         });
+    }
+
+    private void retrieveListOfCategoriesFromDB() {
+        //now retrieve the list of categories from the database and store in an arraylist
+
+        DatabaseReference mCategoriesRef = mRootRef.child("Categories");
+        mCategoriesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+
+                    Category category = dataSnapshot.getValue(Category.class);
+
+                    //TODO: set caps for every first character
+                    //do not add 'other'
+                    if(!category.getCategory().toLowerCase().equals("other")){
+                        categoriesList.add(category.getCategory());
+                        System.out.println("executed " + category.getCategory());
+                    }
+
+                }
+
+                //add other
+                categoriesList.add("other");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void createNewCategoriesInDatabaseIfNone() {
+
+        //if a list of categories does not exist in database, create them:
+        mRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.hasChild("Categories")){
+                    ArrayList<String> categories = new ArrayList<>();
+                    categories.add("entertainment");
+                    categories.add("utility");
+                    categories.add("other");
 
 
+                    for(Integer i =0; i<categories.size(); i++){
+
+                        mRootRef.child("Categories").child(i.toString()).setValue(new Category(categories.get(i)));
+                    }
+                }
+                else{
+                    System.out.println("Categories exist");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void setButtonListeners(){
+
+        catChipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
+            @Override
+            public void onCheckedChanged(@NonNull ChipGroup group, @NonNull List<Integer> checkedIds) {
+
+                if(checkedIds.size()>0){
+                    editCatBtn.setVisibility(View.VISIBLE);
+
+                    if(!partyCategory.equals("other")){
+                        clearCatBtn.setVisibility(View.VISIBLE);
+                        deleteCatBtn.setVisibility(View.VISIBLE);
+                    }
+
+                }else{
+                    editCatBtn.setVisibility(View.GONE);
+                    if(!partyCategory.equals("other")){
+                        clearCatBtn.setVisibility(View.GONE);
+                        deleteCatBtn.setVisibility(View.GONE);
+                    }
+
+                }
+
+
+            }
+        });
+
+        editCatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayChangeCategoryDialog("Change category for '" + detail + "'");
+
+                String msg = "Successfully changed category, go back and return to see change. ";
+                Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        });
+
+        clearCatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ViewTransaction.this);
+                //AlertDialog.Builder builder = new AlertDialog.Builder(ViewTransaction.this);
+                builder.setTitle("Remove '" + partyCategory + "' from '" + detail + "'");
+                builder.setMessage("Are you sure you want to remove this venue from this category? \n\nImpact:\nThis will automatically add this venue to 'other' category")
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // START THE GAME!
+
+                                mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                            for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                                                Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+
+
+                                                if(transaction.getPaymentDetails().equals(detail)){
+
+                                                    transaction.setCategory("other");
+
+                                                    mTransactionRef.child(transaction.getDateOfTransaction()).child(dataSnapshot2.getKey()).setValue(transaction);
+
+                                                    String msg = "Successfully removed category '" + partyCategory + "' from this venue, go back and return to see change. ";
+                                                    Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
+                                                            .show();
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        });
+                // Create the AlertDialog object and return it
+                builder.show();
+            }
+        });
+
+        deleteCatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ViewTransaction.this);
+                //AlertDialog.Builder builder = new AlertDialog.Builder(ViewTransaction.this);
+                builder.setTitle("Warning: Completely delete '" + partyCategory +"'" );
+                builder.setMessage("Are you sure want to completely remove this category from the category listing? \n\nImpact:\nThis will automatically add venues from this category to 'other' category")
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // START THE GAME!
+
+                                //set category to other
+                                mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                            for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
+                                                Transaction transaction = dataSnapshot2.getValue(Transaction.class);
+
+
+                                                if(transaction.getPaymentDetails().equals(detail)){
+
+                                                    transaction.setCategory("other");
+
+                                                    mTransactionRef.child(transaction.getDateOfTransaction()).child(dataSnapshot2.getKey()).setValue(transaction);
+
+                                                    //mTransactionRef.updateChildren(map);
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+                                //remove category now
+
+                                mRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (!snapshot.hasChild("Categories")){
+
+                                        }
+                                        else{
+                                            System.out.println("Categories exist");
+
+                                            Iterable<DataSnapshot> categories = snapshot.child("Categories").getChildren();
+
+                                            Iterator<DataSnapshot> iterator = categories.iterator();
+                                            for (DataSnapshot category : categories) {
+                                                System.out.println(category + " -----------------------------------");
+
+                                                Category value = category.getValue(Category.class);
+
+                                                if(value.getCategory().equals(partyCategory)){
+                                                    mRootRef.child("Categories").child(category.getKey()).removeValue();
+
+                                                    String msg = "Successfully deleted category '" + partyCategory + "', go back and return to see change. ";
+                                                    Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
+                                                            .show();
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        });
+                // Create the AlertDialog object and return it
+                builder.show();
+            }
+        });
+
+    }
+    
+    private void displayChangeCategoryDialog(String title){
+
+        AddToCategoryFragment frg = new AddToCategoryFragment();
+        frg.setTitle(title);
+        frg.setDetail(detail);
+        frg.setCategoriesList(categoriesList);
+        frg.show(getFragmentManager(), "idk");
+
+    }
+
+    private void displayHistoryBarChart(){
         // bar chart code:
 
         chart = findViewById(R.id.unitBarChart);
@@ -230,9 +543,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         ValueFormatter xAxisFormatter = new MyXAxisValueFormatter();
         //xAxis.setValueFormatter(xAxisFormatter);
 
-
-
-
         //IAxisValueFormatter custom = new MyAxisValueFormatter();
 
         YAxis leftAxis = chart.getAxisLeft();
@@ -242,9 +552,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         leftAxis.setValueFormatter(new MoneyValueFormatter());
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(5f);
-
-
-
 
         //leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
@@ -268,9 +575,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
-
-
-        //int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
         switch (nightModeFlags) {
             case Configuration.UI_MODE_NIGHT_YES:
@@ -297,111 +601,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         // setting data
 //        seekBarY.setProgress(50);
 //        seekBarX.setProgress(12);
-
-
-        setData();
-
-
-
-
-        Button btnCategory = findViewById(R.id.btn_add_to_category);
-
-        if(!partyCategoryTextView.getText().equals("")){
-            btnCategory.setText("Change Category");
-        }
-
-
-
-        btnCategory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                AddToCategoryFragment frg = new AddToCategoryFragment();
-                frg.setDetail(detail);
-                frg.setCategoriesList(categoriesList);
-                frg.show(getFragmentManager(), "idk");
-
-
-            }
-        });
-
-
-
-
-
-
-
-        //if a list of categories does not exist in database, create them:
-
-        mRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.hasChild("Categories")){
-                    ArrayList<String> categories = new ArrayList<>();
-                    categories.add("Entertainment");
-                    categories.add("Utility");
-                    categories.add("Other");
-
-
-                    for(Integer i =0; i<categories.size(); i++){
-
-                        mRootRef.child("Categories").child(i.toString()).setValue(new Category(categories.get(i)));
-                    }
-                }
-                else{
-                    System.out.println("Categories exist");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        //now retrieve the list of categories from the database and store in an arraylist
-
-
-
-        DatabaseReference mCategoriesRef = mRootRef.child("Categories");
-        mCategoriesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-
-                    Category category = dataSnapshot.getValue(Category.class);
-
-                    //TODO: set caps for every first character
-                    //do not add 'other'
-                    if(!category.getCategory().toLowerCase().equals("other")){
-                        categoriesList.add(category.getCategory());
-                        System.out.println("executed " + category.getCategory());
-                    }
-
-
-                }
-
-                //add other
-                categoriesList.add("other");
-
-
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
-
-
-
-
-
-
-
     }
 
     private void setData() {
@@ -577,8 +776,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     }
 
 
-
-
     @Override
     public void onValueSelected(Entry e, Highlight h) {
 
@@ -621,9 +818,9 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                         if(transaction.getPaymentDetails().equals(detail) && !category.isEmpty()){
 
-                            TextView catTV = findViewById(R.id.category_tv);
-                            catTV.setVisibility(View.VISIBLE);
-                            catTV.setText(category);
+                            Chip partyCategoryTextView = findViewById(R.id.category_tv);
+                            partyCategoryTextView.setVisibility(View.VISIBLE);
+                            partyCategoryTextView.setText(category);
 
                             break;
                         }

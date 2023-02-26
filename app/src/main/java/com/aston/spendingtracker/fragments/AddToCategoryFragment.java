@@ -41,11 +41,15 @@ public class AddToCategoryFragment extends DialogFragment {
     Context context;
     int selectedItem = -1;
 
+    String title = "";
     String detail;
     String categoryStr;
 
     ArrayList<String> categoriesList;
 
+    public void setTitle(String title){
+        this.title = title;
+    }
     public void setDetail(String detail){
         this.detail = detail;
     }
@@ -71,7 +75,7 @@ public class AddToCategoryFragment extends DialogFragment {
 
 
         // Set the dialog title
-        builder.setTitle("Select a category");
+        builder.setTitle(title);
 
         final EditText input = new EditText(getActivity());
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(

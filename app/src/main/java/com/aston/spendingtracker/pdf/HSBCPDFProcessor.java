@@ -465,6 +465,8 @@ public class HSBCPDFProcessor implements PDFProcessor{
                     words[5].trim(),
                     partyUID);
 
+            transaction.setCategory("other");
+
             //extract party
             //extractParty(transaction);
 
