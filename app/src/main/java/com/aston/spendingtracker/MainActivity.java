@@ -1,6 +1,7 @@
 package com.aston.spendingtracker;
 
 //import android.app.FragmentManager;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -9,8 +10,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-        import androidx.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -19,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
         import com.aston.spendingtracker.authorization.LoginActivity;
+import com.aston.spendingtracker.authorization.RegisterUser;
 import com.aston.spendingtracker.fragments.AnalyticsFragment;
 import com.aston.spendingtracker.fragments.DashboardFragment;
 import com.aston.spendingtracker.fragments.TransactionFragment;
@@ -29,6 +33,11 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
         import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
 import java.io.File;
@@ -191,14 +200,13 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
 
             case R.id.action_logout:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
                 signOut();
                 return true;
+            case R.id.action_tutorial:
+
+                startActivity(new Intent(MainActivity.this, TutorialActivity.class));
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
         }
