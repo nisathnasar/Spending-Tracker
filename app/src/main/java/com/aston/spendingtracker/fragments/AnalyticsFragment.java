@@ -256,8 +256,8 @@ public class AnalyticsFragment extends Fragment implements
         // bar chart code:
 
         weeklyBarChart = getView().findViewById(R.id.weekly_bar_chart);
-        weeklyBarChart.setOnChartValueSelectedListener(this);
-
+//        weeklyBarChart.setOnChartValueSelectedListener(this);
+        weeklyBarChart.setTouchEnabled(false);
         weeklyBarChart.setDrawBarShadow(false);
         weeklyBarChart.setDrawValueAboveBar(true);
 
