@@ -25,6 +25,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     ItemClickListener clickListener;
 
+    boolean enableOnClickListener = true;
+
     public RecyclerViewAdapter(Context context, LinkedList<Transaction> transactionList){
         mInflater = LayoutInflater.from(context);
         //this.mWordList = wordList;
@@ -112,7 +114,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             dateView = itemView.findViewById(R.id.date_tv);
             linearLayoutRV = itemView.findViewById(R.id.linearLayoutRV);
             this.mAdapter = adapter;
-            itemView.findViewById(R.id.cardLayourRV).setOnClickListener(this);
+            if(enableOnClickListener){
+                itemView.findViewById(R.id.cardLayourRV).setOnClickListener(this);
+            }
+
             //itemView.setOnClickListener(this);
         }
 

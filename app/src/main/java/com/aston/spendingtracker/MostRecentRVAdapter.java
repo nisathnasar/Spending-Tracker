@@ -1,6 +1,11 @@
 package com.aston.spendingtracker;
 
 import android.content.Context;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aston.spendingtracker.entity.Transaction;
 
@@ -11,9 +16,11 @@ public class MostRecentRVAdapter extends RecyclerViewAdapter{
     private int limit = 4;
     LinkedList<Transaction> transactionList;
 
+
     public MostRecentRVAdapter(Context context, LinkedList<Transaction> transactionList) {
         super(context, transactionList);
         this.transactionList = transactionList;
+        enableOnClickListener = false;
     }
 
     @Override
@@ -26,4 +33,5 @@ public class MostRecentRVAdapter extends RecyclerViewAdapter{
             return transactionList.size();
         }
     }
+
 }
