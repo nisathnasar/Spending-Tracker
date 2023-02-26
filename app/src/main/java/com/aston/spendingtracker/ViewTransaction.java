@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -53,7 +54,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-public class ViewTransaction extends AppCompatActivity implements OnChartValueSelectedListener {
+public class ViewTransaction extends AppCompatActivity implements OnChartValueSelectedListener, AddToCategoryFragment.NoticeDialogListener{
 
     LinkedList<Transaction> transactionList = new LinkedList<>();
 
@@ -347,9 +348,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
             public void onClick(View v) {
                 displayChangeCategoryDialog("Change category for '" + detail + "'");
 
-                String msg = "Successfully changed category, go back and return to see change. ";
-                Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
-                        .show();
+
             }
         });
 
@@ -363,7 +362,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 builder.setMessage("Are you sure you want to remove this venue from this category? \n\nImpact:\nThis will automatically add this venue to 'other' category")
                         .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // START THE GAME!
 
                                 mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
@@ -372,14 +370,15 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                                             for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
                                                 Transaction transaction = dataSnapshot2.getValue(Transaction.class);
 
-
                                                 if(transaction.getPaymentDetails().equals(detail)){
 
                                                     transaction.setCategory("other");
 
                                                     mTransactionRef.child(transaction.getDateOfTransaction()).child(dataSnapshot2.getKey()).setValue(transaction);
 
-                                                    String msg = "Successfully removed category '" + partyCategory + "' from this venue, go back and return to see change. ";
+                                                    partyCategoryTextView.setText("other");
+
+                                                    String msg = "Successfully removed category '" + partyCategory + "' from this venue. ";
                                                     Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
                                                             .show();
                                                 }
@@ -415,7 +414,6 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                 builder.setMessage("Are you sure want to completely remove this category from the category listing? \n\nImpact:\nThis will automatically add venues from this category to 'other' category")
                         .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // START THE GAME!
 
                                 //set category to other
                                 mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -425,16 +423,13 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                                             for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
                                                 Transaction transaction = dataSnapshot2.getValue(Transaction.class);
 
-
                                                 if(transaction.getPaymentDetails().equals(detail)){
 
                                                     transaction.setCategory("other");
 
                                                     mTransactionRef.child(transaction.getDateOfTransaction()).child(dataSnapshot2.getKey()).setValue(transaction);
 
-                                                    //mTransactionRef.updateChildren(map);
                                                 }
-
                                             }
                                         }
                                     }
@@ -449,10 +444,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                                 mRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if (!snapshot.hasChild("Categories")){
-
-                                        }
-                                        else{
+                                        if (snapshot.hasChild("Categories")) {
                                             System.out.println("Categories exist");
 
                                             Iterable<DataSnapshot> categories = snapshot.child("Categories").getChildren();
@@ -466,7 +458,9 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                                                 if(value.getCategory().equals(partyCategory)){
                                                     mRootRef.child("Categories").child(category.getKey()).removeValue();
 
-                                                    String msg = "Successfully deleted category '" + partyCategory + "', go back and return to see change. ";
+                                                    partyCategoryTextView.setText("other");
+
+                                                    String msg = "Successfully deleted category '" + partyCategory + "'. ";
                                                     Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
                                                             .show();
                                                 }
@@ -835,5 +829,21 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
             }
         });
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog, String newCategory) {
+
+        partyCategoryTextView.setText(newCategory);
+
+        String msg = "Successfully changed category to '" + newCategory + "'. ";
+        Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
+                .show();
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
     }
 }
