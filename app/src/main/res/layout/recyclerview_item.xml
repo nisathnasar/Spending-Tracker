@@ -25,7 +25,7 @@
         app:cardElevation="5dp"
         app:cardCornerRadius="15dp"
 
-        android:focusable="true"
+
 
         android:id="@+id/cardLayourRV"
         >

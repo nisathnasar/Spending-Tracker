@@ -506,8 +506,8 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
         chart = findViewById(R.id.unitBarChart);
         chart.setOnChartValueSelectedListener(this);
-
         chart.setDrawBarShadow(false);
+
         chart.setDrawValueAboveBar(true);
 
         chart.getDescription().setEnabled(false);
@@ -667,7 +667,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                     XAxis xAxis = chart.getXAxis();
 
-                    xAxis.setAxisMinimum(0 + 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
+                    xAxis.setAxisMinimum(0 - 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
                     xAxis.setAxisMaximum(values.size() - 1.0f + 0.5f); //to center the bars inside the vertical grid lines we need + 0.5 step
                     xAxis.setLabelCount(xAxisLabel.size(), true); //draw x labels for 13 vertical grid lines
 

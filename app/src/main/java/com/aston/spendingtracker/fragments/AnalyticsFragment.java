@@ -256,8 +256,8 @@ public class AnalyticsFragment extends Fragment implements
         // bar chart code:
 
         weeklyBarChart = getView().findViewById(R.id.weekly_bar_chart);
-        weeklyBarChart.setOnChartValueSelectedListener(this);
-
+//        weeklyBarChart.setOnChartValueSelectedListener(this);
+        weeklyBarChart.setTouchEnabled(false);
         weeklyBarChart.setDrawBarShadow(false);
         weeklyBarChart.setDrawValueAboveBar(true);
 
@@ -1115,6 +1115,8 @@ public class AnalyticsFragment extends Fragment implements
             // background color
             lineChart.setBackgroundColor(Color.WHITE);
 
+            lineChart.setBackgroundColor(Color.TRANSPARENT);
+
             // disable description text
             lineChart.getDescription().setEnabled(false);
 
@@ -1124,20 +1126,6 @@ public class AnalyticsFragment extends Fragment implements
             // set listeners
             lineChart.setOnChartValueSelectedListener(this);
             lineChart.setDrawGridBackground(false);
-
-            int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
-            switch (nightModeFlags) {
-                case Configuration.UI_MODE_NIGHT_YES:
-                    lineChart.setBackgroundColor(Color.parseColor("#191C1A"));
-                    break;
-                case Configuration.UI_MODE_NIGHT_NO:
-                    lineChart.setBackgroundColor(Color.WHITE);
-                    break;
-                case Configuration.UI_MODE_NIGHT_UNDEFINED:
-                    break;
-            }
-
 
             // create marker to display box when values are selected
             //MyMarkerView mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
@@ -1215,6 +1203,8 @@ public class AnalyticsFragment extends Fragment implements
         // draw legend entries as lines
         l.setForm(Legend.LegendForm.LINE);
         //l.setForm(Legend.LegendForm.CIRCLE);
+
+        l.setEnabled(false);
 
     }
 
