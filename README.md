@@ -19,7 +19,7 @@ Spending tracker is an original app that enables individuals to track their fina
 4. Recycler views for smooth scrolling experience.
 
 
-##Analytics
+## Analytics
 1. Income and Spending graph
 2. Latest week spending
 3. Spending by category
