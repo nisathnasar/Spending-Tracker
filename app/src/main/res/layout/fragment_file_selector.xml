@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="You can upload your bank statement in this page. \n\nPlease note:\n
+                    android:text="You can upload your bank statement in this page. Please note:\n
         \n1 App only supports PDF.
         \n2 Never upload same statement more than once.
         \n3 The current version only supports HSBC.
