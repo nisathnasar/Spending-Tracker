@@ -527,7 +527,11 @@ public class AnalyticsFragment extends Fragment implements
                         values.add(new BarEntry(i, y, getResources().getDrawable(R.drawable.star)));
 
 //                        xAxisLabel.add(xFormatter.getFormattedValue(x));
-                        xAxisLabel.add(weekDaysLabelList.get(i));
+                        if(i < weekDaysLabelList.size()){
+                            xAxisLabel.add(weekDaysLabelList.get(i));
+                        }
+
+
                         i++;
                     }
 
