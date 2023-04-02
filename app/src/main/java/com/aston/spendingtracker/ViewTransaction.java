@@ -158,7 +158,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     transactionTextView.setTextColor(Color.parseColor("#82b889"));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
-                    transactionTextView.setBackgroundColor(Color.parseColor("#53b075"));
+                    transactionTextView.setTextColor(Color.parseColor("#53b075"));
                     break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
@@ -710,7 +710,21 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     data.setValueTextSize(10f);
                     //data.setValueTypeface(tfLight);
                     data.setBarWidth(0.9f);
-                    data.setValueTextColor(Color.WHITE);
+
+                    int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+                    switch (nightModeFlags) {
+                        case Configuration.UI_MODE_NIGHT_YES:
+                            data.setValueTextColor(Color.WHITE);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_NO:
+                            data.setValueTextColor(Color.BLACK);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                            break;
+                    }
+
+                    //data.setValueTextColor(Color.WHITE);
                     data.setValueFormatter(new MoneyValueFormatter());
 
                     chart.setData(data);
