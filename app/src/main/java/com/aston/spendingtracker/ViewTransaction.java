@@ -332,10 +332,11 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                 }else{
                     editCatBtn.setVisibility(View.GONE);
-                    if(!partyCategory.equals("other")){
+
+                    //if(!partyCategory.equals("other")){
                         clearCatBtn.setVisibility(View.GONE);
                         deleteCatBtn.setVisibility(View.GONE);
-                    }
+                    //}
 
                 }
 
@@ -378,9 +379,16 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                                                     partyCategoryTextView.setText("other");
 
+                                                    partyCategory = "other";
+                                                    clearCatBtn.setVisibility(View.GONE);
+                                                    deleteCatBtn.setVisibility(View.GONE);
+
                                                     String msg = "Successfully removed category '" + partyCategory + "' from this venue. ";
                                                     Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
                                                             .show();
+
+                                                    retrieveListOfCategoriesFromDB();
+
                                                 }
 
                                             }
@@ -427,6 +435,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
 
                                                     transaction.setCategory("other");
 
+
                                                     mTransactionRef.child(transaction.getDateOfTransaction()).child(dataSnapshot2.getKey()).setValue(transaction);
 
                                                 }
@@ -459,6 +468,10 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                                                     mRootRef.child("Categories").child(category.getKey()).removeValue();
 
                                                     partyCategoryTextView.setText("other");
+
+                                                    partyCategory = "other";
+                                                    clearCatBtn.setVisibility(View.GONE);
+                                                    deleteCatBtn.setVisibility(View.GONE);
 
                                                     String msg = "Successfully deleted category '" + partyCategory + "'. ";
                                                     Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)
@@ -835,6 +848,10 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     public void onDialogPositiveClick(DialogFragment dialog, String newCategory) {
 
         partyCategoryTextView.setText(newCategory);
+
+        partyCategory = newCategory;
+        clearCatBtn.setVisibility(View.VISIBLE);
+        deleteCatBtn.setVisibility(View.VISIBLE);
 
         String msg = "Successfully changed category to '" + newCategory + "'. ";
         Snackbar.make(rootLayout, msg , Snackbar.LENGTH_SHORT)

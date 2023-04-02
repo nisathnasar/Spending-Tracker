@@ -25,7 +25,7 @@
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="20dp"
                 style="@style/Widget.Material3.CardView.Elevated"
-                app:cardElevation="4dp"
+                app:cardElevation="@dimen/card_elevation_size"
                 >
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -68,7 +68,7 @@
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="20dp"
                 style="@style/Widget.Material3.CardView.Elevated"
-                app:cardElevation="4dp"
+                app:cardElevation="@dimen/card_elevation_size"
                 >
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -147,7 +147,7 @@
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="20dp"
                 style="@style/Widget.Material3.CardView.Elevated"
-                app:cardElevation="4dp"
+                app:cardElevation="@dimen/card_elevation_size"
                 >
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -227,7 +227,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="15dp"
                 style="@style/Widget.Material3.CardView.Elevated"
-                app:cardElevation="4dp"
+                app:cardElevation="@dimen/card_elevation_size"
                 >
                 <LinearLayout
                     android:layout_width="match_parent"

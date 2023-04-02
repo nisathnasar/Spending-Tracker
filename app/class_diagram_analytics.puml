@@ -1,0 +1,44 @@
+@startuml
+
+
+class AnalyticsFragment {
+    - lineChart : LineChart
+    - weeklyBarChart : BarChart
+    - pieChartSpendingByCategory : PieChart
+    - pieChartIncomeSources : PieChart
+    - implementSwitches()
+    - displayWeeklyOutgoing()
+    - setWeeklyBarChart()
+    - displayPieChartIncomeSources()
+    - setPieChartDataIncomeSources(valueFormatter : ValueFormatter)
+    - displayPieChartSpendingByCategory()
+    - setPieChartDataSpendingByCategory(valueFormatter : ValueFormatter)
+    - displayLineChartOverview()
+    - setDataForLineChart()
+
+}
+
+class ValueFormatter {
+    + getFormattedValue(value : float) : String
+}
+
+class MoneyValueFormatter {
+    + getFormattedValue(value : float) : String
+}
+
+class PercentageValueFormatter {
+    + getFormattedValue(value : float) : String
+}
+
+
+AnalyticsFragment *-- MoneyValueFormatter
+AnalyticsFragment *-- PercentageValueFormatter
+AnalyticsFragment *-- MyXAxisValueFormatter
+
+ValueFormatter <|-up- MoneyValueFormatter
+ValueFormatter <|-- PercentageValueFormatter
+ValueFormatter <|-- MyXAxisValueFormatter
+
+
+
+@enduml

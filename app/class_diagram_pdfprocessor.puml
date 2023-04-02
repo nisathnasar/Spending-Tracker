@@ -1,0 +1,61 @@
+@startuml
+
+
+
+
+
+class HSBCRegex {
+    + startsWithDate(str : String) : boolean
+    + startsWithFormattedDate(str : String) : boolean
+    + endsWithMoneyValue(str : String) : boolean
+    + endsWith2MoneyValues(str : String) : boolean
+}
+
+interface PDFProcessor {
+    processPDF()
+}
+
+
+class HSBCPDFProcessor{
+    + processPDF()
+    - activateSequence(document PDDocument, numOfPagesToExtractFrom : int)
+    + stringArrayToArrayList(strArr : String[]) : List<String>
+    + processLines(rows : List<String>) : List<String>
+    + isPaymentOut(word : String) : boolean
+    + addCommas(rows : List<String>) : List<String>
+    - addBalanceToAllLines(rows : List<String>) : List<String>
+    - addToDatabase(rows : List<String>)
+}
+
+class Transaction {
+    - transactionID : int
+    - dateOfTransaction : String
+    - paymentType : String
+    - paymentDetails : String
+    - paidOut : String
+    - paidIn : String
+    - balance : String
+    - category : String
+    - dateInMilliseconds : float
+}
+
+class Category {
+    - category : String
+    + Category(category : String)
+    + getCategory() : String
+}
+
+
+
+PDFProcessor o-- Transaction
+PDFProcessor *-- HSBCPDFProcessor
+
+
+
+HSBCPDFProcessor *-- HSBCRegex
+
+
+Transaction *-- Category
+
+
+@enduml

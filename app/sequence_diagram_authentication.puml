@@ -8,9 +8,9 @@ group
 alt register for a new account
 User -> RegisterActivity: Submit credentials
 
-RegisterActivity -> Firebase_Database : Register new user
+RegisterActivity -> Firebase_Authentication : Register new user
 
-Firebase_Database -> RegisterActivity : Response
+Firebase_Authentication -> RegisterActivity : Response
 
 alt success
 
@@ -29,9 +29,9 @@ end
 
 User -> LoginActivity: Submit login credentials
 
-LoginActivity -> Firebase_Database: Authentication Request
+LoginActivity -> Firebase_Authentication: Authentication Request
 
-Firebase_Database --> LoginActivity: Authentication Response
+Firebase_Authentication --> LoginActivity: Authentication Response
 
 group authentication response
 

@@ -115,7 +115,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
     private void activateSequence(PDDocument document, int numOfPagesToExtractFrom) throws IOException, ParseException {
 
         Splitter splitter = new Splitter();
-        List<PDDocument> splitPages = splitter.split(document);
+        List<PDDocument> splitPages = splitter.split(document); //split pages
         numOfPagesToExtractFrom = splitPages.size();
 
         //numOfPagesToExtractFrom = 2;
@@ -140,6 +140,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
                 String row = rows.get(i);
                 //System.out.println(row);
 
+                //identify when to stop reading
                 if(row.matches(".*BALANCE CARRIED FORWARD\\s[()a-zA-Z0-9_-].*$")){
                     lastIndexToKeep = i-2;
 
@@ -164,6 +165,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
                     }
                 }
 
+                //identify when to start reading
                 if(HSBCRegex.startsWithDate(row)){
                     firstDateFound = true;
                 }
@@ -181,7 +183,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
             }
 
             // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
-
+            // Doing last lines first to avoid index changes
             while(rows.size()-1 != lastIndexToKeep){
                 rows.remove(rows.size() - 1);
             }
