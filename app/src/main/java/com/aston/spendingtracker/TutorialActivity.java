@@ -12,9 +12,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class TutorialActivity extends AppCompatActivity implements FragmentChangeListener {
 
-    ViewPager2 pager;
-    TabLayout mTabLayout;
-    TutorialPagerAdapter adapter;
+    private ViewPager2 pager;
+    private TabLayout mTabLayout;
+    private TutorialPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

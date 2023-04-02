@@ -14,7 +14,7 @@ import java.util.LinkedList;
 public class MostRecentRVAdapter extends RecyclerViewAdapter{
 
     private int limit = 4;
-    LinkedList<Transaction> transactionList;
+    private LinkedList<Transaction> transactionList;
 
 
     public MostRecentRVAdapter(Context context, LinkedList<Transaction> transactionList) {
