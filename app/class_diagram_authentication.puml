@@ -1,0 +1,46 @@
+@startuml
+
+
+class MainActivity {
+    + signOut()
+    + replaceFragment()
+}
+
+class TutorialActivity {
+    - adapter : TutorialPagerAdapter
+    - pager : ViewPager2
+}
+
+class TutorialPagerAdapter
+
+class RegisterUser {
+    - auth : FirebaseAuth
+    - registerUser()
+}
+
+class LoginActivity {
+    - auth : FirebaseAuth
+    - loginUser()
+}
+
+class User {
+    + firstname : String
+    + surname : String
+    + email : String
+}
+
+
+RegisterUser ..> TutorialActivity : <<instantiate>>
+RegisterUser "1" *-- "1" User
+
+LoginActivity ..> MainActivity : <<instantiate>>
+
+TutorialActivity *-- TutorialPagerAdapter
+TutorialActivity ..> MainActivity : <<instantiate>>
+
+TutorialPagerAdapter *-- Page1Fragment
+TutorialPagerAdapter *-- Page2Fragment
+TutorialPagerAdapter *-- Page3Fragment
+TutorialPagerAdapter *-- Page4Fragment
+
+@enduml

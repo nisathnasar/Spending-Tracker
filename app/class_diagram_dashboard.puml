@@ -1,0 +1,31 @@
+@startuml
+
+
+class DashboardFragment {
+    - mRecyclerView : RecyclerView
+    - mAdapter : RecyclerViewAdapter
+    - summaryBarChart : BarChart
+    - transactionList : LinkedList<Transaction>
+    - setBalanceSummary()
+    - displayBarChart()
+    - setDataForSummaryBarChart()
+    - populationTransactionHistory()
+
+}
+
+class SummaryXFormatter {
+    + getFormattedValue(value : float)
+}
+
+class MostRecentRVAdapter {
+    - limit : int
+    - transactionList : LinkedList<Transaction>
+    + MostRecentRVAdapter(context : Context, transactionList : LinkedList<Transaction>)
+    + getItemCount() : int
+}
+
+DashboardFragment *-- SummaryXFormatter
+DashboardFragment *-- MostRecentRVAdapter
+
+
+@enduml

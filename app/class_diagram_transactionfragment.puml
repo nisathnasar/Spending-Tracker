@@ -1,0 +1,44 @@
+@startuml
+
+class TransactionFragment {
+    - mRecyclerView : RecyclerView
+    - mAdapter : RecyclerViewAdapter
+    + transactionList : LinkedList<Transaction>
+    - filter(text : String)
+
+}
+
+class ViewTransaction {
+    - mRecyclerView : RecyclerView
+    - mAdapter : RecyclerViewAdapter
+    - chart : BarChart
+    - setFields()
+    - setHistoryTransactions()
+    - retrieveListOfCategoriesFromDB()
+    - displayChangeCategoryDialog(title : String)
+    - displayHistoryBarChart()
+    - setData()
+    - getFullBankAbbreviation(abbreviation String): String
+}
+
+class RecyclerViewAdapter {
+    - mTransactionList : LinkedList<Transaction>
+    + RecyclerViewAdapter(context : Context, transactionList : LinkedList<Transaction>)
+    + onCreateViewHolder(parent : ViewGroup, viewType int) : RecyclerViewAdapter.WordViewHolder
+    + onBindViewHolder()
+    + getItemCount() : int
+    + filterList(list : LinkedList<Transaction>)
+    class WordViewHolder
+}
+
+class AddToCategoryFragment {
+
+}
+
+TransactionFragment *-up- RecyclerViewAdapter
+TransactionFragment *-- ViewTransaction
+ViewTransaction *-- AddToCategoryFragment
+
+
+
+@enduml

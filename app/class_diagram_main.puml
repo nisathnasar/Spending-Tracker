@@ -1,0 +1,13 @@
+@startuml
+
+class MainActivity {
+    + signOut()
+    + replaceFragment()
+}
+
+MainActivity ..> TransactionFragment : <<instantiate>>
+MainActivity ..> AnalyticsFragment : <<instantiate>>
+MainActivity ..> FileSelectorFragment : <<instantiate>>
+MainActivity ..> DashboardFragment : <<instantiate>>
+
+@enduml

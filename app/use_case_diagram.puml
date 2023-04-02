@@ -2,11 +2,21 @@
 'https://plantuml.com/use-case-diagram
 
 
-(Monitor Family or multiple people finance) as (mf)
 
-(View list of transactions with friendly user interface) as (frui)
 
-(Informed decision making {using understandable data and visual}) as (ifd)
+(Informed decision making) as (ifd)
+
+package SpendingTracker {
+    usecase (Monitor Family or multiple people finance) as (mf)
+    usecase (View list of transactions with friendly user interface) as (frui)
+    usecase (Monitor Finance)
+    usecase (Export as Excel File)
+    usecase (Categorise Transactions)
+    usecase (Secure database storage of data)
+    usecase (Query Transactions)
+}
+
+left to right direction
 
 User --> (Monitor Finance)
 
@@ -14,25 +24,19 @@ User --> (Monitor Finance)
 
 (Monitor Finance) --> (frui)
 
-(frui) --> (ifd)
-
 User --> (Export as Excel File)
-
-(Export as Excel File) --> (ifd)
 
 User --> (Categorise Transactions)
 
-(Categorise Transactions) --> (ifd)
-
 User --> (Query Transactions)
-
-(Query Transactions) --> (ifd)
 
 User --> (Secure database storage of data)
 
+User --> (Open account on any device with the app)
 
-
-
-
+(frui) --> (ifd)
+(Export as Excel File) --> (ifd)
+(Categorise Transactions) --> (ifd)
+(Query Transactions) --> (ifd)
 
 @enduml

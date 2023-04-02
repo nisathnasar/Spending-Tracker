@@ -11,7 +11,7 @@ class HSBCRegex
 interface PDFProcessor
 class HSBCPDFProcessor
 class AnalyticsFragment
-class PagerAdapter
+'class MainActivity
 class RecyclerViewAdapter
 class TransactionFragment
 class ViewTransaction
@@ -27,32 +27,38 @@ class ViewTransaction
 class SummaryXFormatter
 class Category
 
+LoginActivity ..> MainActivity : <<instantiate>>
 
-RegisterUser ..> MainActivity : calls
-LoginActivity ..> MainActivity : calls
+RegisterUser ..> MainActivity : <<instantiate>>
 RegisterUser *-- User
-MainActivity *-- PagerAdapter
-PagerAdapter *-- TransactionFragment
-PagerAdapter *-- AnalyticsFragment
-PagerAdapter *-- FileSelectorFragment
-AnalyticsFragment *-- MyXAxisValueFormatter
+
+MainActivity ..> TransactionFragment : <<instantiate>>
+MainActivity ..> AnalyticsFragment : <<instantiate>>
+MainActivity ..> FileSelectorFragment : <<instantiate>>
+MainActivity ..> DashboardFragment : <<instantiate>>
+
 PDFProcessor o-- Transaction
-FileSelectorFragment *-- PDFProcessor
-FileSelectorFragment *-- FileUtils
-HSBCPDFProcessor *-- HSBCRegex
-TransactionFragment *-- RecyclerViewAdapter
-TransactionFragment *-- ViewTransaction
 PDFProcessor *-- HSBCPDFProcessor
 
-PagerAdapter *-- DashboardFragment
+FileSelectorFragment *-- PDFProcessor
+FileSelectorFragment *-- FileUtils
+
+HSBCPDFProcessor *-- HSBCRegex
+
+TransactionFragment *-- RecyclerViewAdapter
+TransactionFragment *-- ViewTransaction
+
+
+ViewTransaction *-- AddToCategoryFragment
+
 DashboardFragment *-- SummaryXFormatter
 DashboardFragment *-- MostRecentRVAdapter
-TransactionFragment *-- ViewTransaction
-ViewTransaction *-- AddToCategoryFragment
+
 Transaction *-- Category
 
 AnalyticsFragment *-- MoneyValueFormatter
 AnalyticsFragment *-- PercentageValueFormatter
+AnalyticsFragment *-- MyXAxisValueFormatter
 
 ValueFormatter <|-- MoneyValueFormatter
 ValueFormatter <|-- PercentageValueFormatter

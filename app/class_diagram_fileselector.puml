@@ -1,0 +1,50 @@
+@startuml
+
+
+
+class FileSelectorFragment {
+    - uripath : Uri
+    + getPath() : String
+    + getPathURI() : Uri
+    - askPermissionAndBrowseFile()
+    - stripText()
+}
+
+
+class FileUtils {
+    - contentUri : Uri
+    + getPath(context: Context, uri, Uri) : String
+    - fileExists(filePath : String)
+
+}
+
+
+class HSBCRegex
+
+interface PDFProcessor {
+    processPDF()
+}
+
+
+class HSBCPDFProcessor
+
+'class MainActivity
+
+
+class Category
+
+
+
+HSBCPDFProcessor "many" o-- "1" Transaction
+PDFProcessor *-- HSBCPDFProcessor
+
+FileSelectorFragment *-- PDFProcessor
+FileSelectorFragment *-- FileUtils
+
+HSBCPDFProcessor *-- HSBCRegex
+
+
+Transaction *-- Category
+
+
+@enduml
