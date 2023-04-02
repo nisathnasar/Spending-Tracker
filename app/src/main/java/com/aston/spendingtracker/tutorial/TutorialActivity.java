@@ -1,12 +1,13 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.tutorial;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.view.View;
 
+import com.aston.spendingtracker.FragmentChangeListener;
+import com.aston.spendingtracker.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 

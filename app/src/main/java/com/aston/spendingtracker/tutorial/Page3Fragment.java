@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.tutorial;
 
 import android.os.Bundle;
 
@@ -12,12 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.aston.spendingtracker.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link Page4Fragment#newInstance} factory method to
+ * Use the {@link Page3Fragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Page4Fragment extends Fragment {
+public class Page3Fragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,7 +30,7 @@ public class Page4Fragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public Page4Fragment() {
+    public Page3Fragment() {
         // Required empty public constructor
     }
 
@@ -38,11 +40,11 @@ public class Page4Fragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment Page4Fragment.
+     * @return A new instance of fragment Page3Fragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Page4Fragment newInstance(String param1, String param2) {
-        Page4Fragment fragment = new Page4Fragment();
+    public static Page3Fragment newInstance(String param1, String param2) {
+        Page3Fragment fragment = new Page3Fragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,7 +65,7 @@ public class Page4Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_page4, container, false);
+        return inflater.inflate(R.layout.fragment_page3, container, false);
     }
 
     @Override
@@ -90,7 +92,6 @@ public class Page4Fragment extends Fragment {
                 pager.setCurrentItem(pager.getCurrentItem()-1);
             }
         });
-
 
     }
 }

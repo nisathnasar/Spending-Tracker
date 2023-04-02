@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.tutorial;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -6,10 +6,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.aston.spendingtracker.fragments.AnalyticsFragment;
-import com.aston.spendingtracker.fragments.DashboardFragment;
-import com.aston.spendingtracker.fragments.FileSelectorFragment;
-import com.aston.spendingtracker.fragments.TransactionFragment;
+import com.aston.spendingtracker.tutorial.Page1Fragment;
+import com.aston.spendingtracker.tutorial.Page2Fragment;
+import com.aston.spendingtracker.tutorial.Page3Fragment;
+import com.aston.spendingtracker.tutorial.Page4Fragment;
+import com.aston.spendingtracker.tutorial.Page5Fragment;
 
 public class TutorialPagerAdapter extends FragmentStateAdapter {
 

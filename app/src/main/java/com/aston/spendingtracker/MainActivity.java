@@ -1,7 +1,6 @@
 package com.aston.spendingtracker;
 
 //import android.app.FragmentManager;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -10,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -22,22 +20,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
         import com.aston.spendingtracker.authorization.LoginActivity;
-import com.aston.spendingtracker.authorization.RegisterUser;
 import com.aston.spendingtracker.fragments.AnalyticsFragment;
 import com.aston.spendingtracker.fragments.DashboardFragment;
 import com.aston.spendingtracker.fragments.TransactionFragment;
 import com.aston.spendingtracker.fragments.FileSelectorFragment;
-        import com.github.mikephil.charting.data.Entry;
+import com.aston.spendingtracker.tutorial.TutorialActivity;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
         import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
 import java.io.File;
@@ -86,11 +79,13 @@ public class MainActivity extends AppCompatActivity implements
 
         Intent intent = getIntent();
         boolean isSnapShotExists = intent.getBooleanExtra("snapShotExists", false);
+        boolean isViewTransaction = intent.getBooleanExtra("ViewTransaction", false);
 
-        if(isSnapShotExists){
+        if(isSnapShotExists && !isViewTransaction){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DashboardFragment()).commit();
             navBarView.setSelectedItemId(R.id.menu_dashboard);
-        } else{
+        }
+        else if (!isSnapShotExists){
 
             navBarView.getMenu().getItem(0).setEnabled(false);
             navBarView.getMenu().getItem(1).setEnabled(false);
@@ -100,7 +95,10 @@ public class MainActivity extends AppCompatActivity implements
 
         }
 
-
+        if(isViewTransaction && isSnapShotExists){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new TransactionFragment()).commit();
+            navBarView.setSelectedItemId(R.id.menu_list);
+        }
 
         //navBarView.setSelectedItemId(R.id.menu_dashboard);
 

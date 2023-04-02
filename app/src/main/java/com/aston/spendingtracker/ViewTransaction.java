@@ -5,6 +5,10 @@ import static android.view.View.GONE;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,6 +19,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +30,7 @@ import com.aston.spendingtracker.axisformatters.MoneyValueFormatter;
 import com.aston.spendingtracker.axisformatters.MyXAxisValueFormatter;
 import com.aston.spendingtracker.entity.Transaction;
 import com.aston.spendingtracker.fragments.AddToCategoryFragment;
+import com.aston.spendingtracker.tutorial.TutorialActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -114,6 +122,14 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         deleteCatBtn.setVisibility(GONE);
 
         nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+//
+//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+//                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+//                .build();
+//        NavigationUI.setupWithNavController(binding.myToolbar, navController, appBarConfiguration);
 
         setFields();
 
@@ -877,4 +893,35 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     public void onDialogNegativeClick(DialogFragment dialog) {
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menufile_viewtransaction, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_up:
+
+                Intent i = new Intent(this, MainActivity.class);
+                i.putExtra("ViewTransaction", true);
+                i.putExtra("snapShotExists", true);
+
+                startActivity(i);
+
+//                startActivity(new Intent(ViewTransaction.this, MainActivity.class));
+
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
 }

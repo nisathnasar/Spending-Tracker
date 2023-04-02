@@ -12,9 +12,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
-import com.aston.spendingtracker.TutorialActivity;
+import com.aston.spendingtracker.tutorial.TutorialActivity;
 import com.aston.spendingtracker.entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
