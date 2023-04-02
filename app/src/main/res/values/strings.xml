@@ -2,7 +2,7 @@
     <string name="app_name">Spending Tracker</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="strip_text">Strip Text and Submit File</string>
+    <string name="strip_text">Submit File</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

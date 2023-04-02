@@ -33,14 +33,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="You can upload your bank statement in this page. \nPlease note:\n
-        1. Never upload same statement more than once. \n
-        2. Select only one statement to upload at a time.\n
-        3. The current version only supports HSBC bank statements.
+                    android:text="You can upload your bank statement in this page. \n\nPlease note:\n
+        \n1 App only supports PDF.
+        \n2 Never upload same statement more than once.
+        \n3 The current version only supports HSBC.
         \n\nSteps: \n
-        1. Click 'Browse' \n
-        2. Find your statement in your storage. \n
-        3. Click 'StripText and Submit File'"
+        \n1 Click 'Browse'
+        \n2 Find your statement in your device.
+        \n3 Click 'Submit File'"
                     />
             </com.google.android.material.card.MaterialCardView>
 
