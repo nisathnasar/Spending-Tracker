@@ -8,7 +8,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.aston.spendingtracker.Category;
 import com.aston.spendingtracker.Party;
+import com.aston.spendingtracker.PartyKeywordsToCategory;
 import com.aston.spendingtracker.entity.Transaction;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -467,7 +470,22 @@ public class HSBCPDFProcessor implements PDFProcessor{
                     words[5].trim(),
                     partyUID);
 
-            transaction.setCategory("other");
+            PartyKeywordsToCategory pKC = new PartyKeywordsToCategory();
+
+            HashMap<String, String> keywordsToCategoryMap = pKC.getKeywordsToCategoryMap();
+
+            for(String keyword : keywordsToCategoryMap.keySet()){
+                if(transaction.getPaymentDetails().toLowerCase().contains(keyword)){
+                    transaction.setCategory(keywordsToCategoryMap.get(keyword));
+                    break;
+                }
+            }
+            if(transaction.getCategory().equals("")){
+                transaction.setCategory("other");
+            }
+
+
+
 
             //extract party
             //extractParty(transaction);

@@ -309,8 +309,14 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.hasChild("Categories")){
                     ArrayList<String> categories = new ArrayList<>();
-                    categories.add("entertainment");
-                    categories.add("utility");
+                    categories.add("Grocery");
+                    categories.add("Travel");
+                    categories.add("Online Shopping");
+                    categories.add("Restaurant");
+                    categories.add("ATM");
+                    categories.add("Shopping");
+                    categories.add("Utility Bill");
+                    categories.add("University");
                     categories.add("other");
 
 
