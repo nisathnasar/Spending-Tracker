@@ -35,7 +35,8 @@
                 android:id="@+id/et_other_text_input"
                 android:visibility="gone"
                 android:focusable="true"
-                android:hint="Other "/>
+                android:textSize="14sp"
+                android:hint="Enter custom category"/>
 
         </LinearLayout>
 

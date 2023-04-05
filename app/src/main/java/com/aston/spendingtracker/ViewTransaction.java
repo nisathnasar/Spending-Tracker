@@ -113,13 +113,13 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         catChipGroup = findViewById(R.id.cat_chip_group);
 
         editCatBtn = findViewById(R.id.edit_cat_btn);
-        editCatBtn.setVisibility(GONE);
+        //editCatBtn.setVisibility(GONE);
 
         clearCatBtn = findViewById(R.id.clear_cat_btn);
         clearCatBtn.setVisibility(GONE);
 
         deleteCatBtn = findViewById(R.id.delete_cat_btn);
-        deleteCatBtn.setVisibility(GONE);
+        //deleteCatBtn.setVisibility(GONE);
 
         nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
@@ -348,7 +348,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     editCatBtn.setVisibility(View.VISIBLE);
 
                     if(!partyCategory.equals("other")){
-                        clearCatBtn.setVisibility(View.VISIBLE);
+                        //clearCatBtn.setVisibility(View.VISIBLE);
                         deleteCatBtn.setVisibility(View.VISIBLE);
                     }
 
@@ -356,7 +356,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     editCatBtn.setVisibility(View.GONE);
 
                     //if(!partyCategory.equals("other")){
-                        clearCatBtn.setVisibility(View.GONE);
+                        //clearCatBtn.setVisibility(View.GONE);
                         deleteCatBtn.setVisibility(View.GONE);
                     //}
 
