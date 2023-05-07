@@ -1,5 +1,6 @@
 package com.aston.spendingtracker.tutorial;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -83,6 +91,47 @@ public class Page1Fragment extends Fragment {
             }
         });
 
+
+
+        Button skip = getView().findViewById(R.id.btn_skip);
+
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                DatabaseReference mTransactionRef = mRootRef.child("Transaction");
+
+                mTransactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        boolean snapShotExists = false;
+
+                        if(!snapshot.exists()){
+
+                        }
+                        else{
+                            snapShotExists = true;
+                        }
+
+
+                        Intent i = new Intent((TutorialActivity)getActivity(), MainActivity.class);
+
+                        i.putExtra("snapShotExists", snapShotExists);
+
+                        startActivity(i);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        });
 
 
     }
