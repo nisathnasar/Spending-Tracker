@@ -4,11 +4,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.aston.spendingtracker.Category;
 import com.aston.spendingtracker.Party;
 import com.aston.spendingtracker.PartyKeywordsToCategory;
 import com.aston.spendingtracker.entity.Transaction;
@@ -141,7 +139,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
             System.out.println("-------------------text read on first page--------------------------");
             for (int i = 0; i < rows.size(); i++) {
                 String row = rows.get(i);
-                //System.out.println(row);
+                System.out.println(row);
 
                 //identify when to stop reading
                 if(row.matches(".*BALANCE CARRIED FORWARD\\s[()a-zA-Z0-9_-].*$")){
@@ -179,10 +177,9 @@ public class HSBCPDFProcessor implements PDFProcessor{
             }
             System.out.println("---------------------------------------------");
 
+            //if the page doesn't have any transaction data, break the loop.
             if(lastIndexToKeep == -1){
-                Toast.makeText(thisContext, "page "+ (e+1) + " doesn't have any transaction data.", Toast.LENGTH_SHORT).show();
                 break;
-                //throw new NullPointerException("regex fail");
             }
 
             // Remove the last non transaction lines: removes the first 30 lines by traversing in reverse
@@ -229,7 +226,7 @@ public class HSBCPDFProcessor implements PDFProcessor{
         rowIndexListToMergeWith = new ArrayList<>();
 
         for (int i = 0; i < rows.size(); i++) {
-
+            System.out.println(rows.get(i));
             rows.set(i, rows.get(i).replaceAll(",", "")); //removes the commas in money values
             rows.set(i, rows.get(i).trim()); //removes space on both ends
 
