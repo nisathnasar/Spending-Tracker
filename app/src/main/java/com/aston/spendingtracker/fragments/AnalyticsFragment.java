@@ -95,7 +95,10 @@ public class AnalyticsFragment extends Fragment implements
 
 
     public static final int[] DARK_COLOURS_FOR_WHITE_TEXT = {
-            rgb("#ad3e07"), rgb("#807306"), rgb("#056341"), rgb("#053963"), rgb("#4a0563"), rgb("#630544"), rgb("#23454a")
+            rgb("#ad3e07"), rgb("#243354"),
+            rgb("#056341"), rgb("#053963"),
+            rgb("#4a0563"), rgb("#630544"),
+            rgb("#23454a"), rgb("#9a37c4")
     };
 
 
