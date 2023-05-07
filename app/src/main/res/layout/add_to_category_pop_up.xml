@@ -12,7 +12,7 @@
         style="@style/word_title"
         android:textSize="20sp"
         android:textAlignment="center"
-        android:text="Add the venue to category"
+        android:text="@string/add_the_venue_to_category"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         />
@@ -29,43 +29,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rd_cat_shopping"
-            android:text="Shopping"
+            android:text="@string/shopping"
             />
 
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rd_cat_leisure"
-            android:text="Leisure"
+            android:text="@string/leisure"
             />
 
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rd_cat_food_drink"
-            android:text="Food and Drink"
+            android:text="@string/food_and_drink"
             />
 
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rd_cat_utility"
-            android:text="Utility Bill"
+            android:text="@string/utility_bill"
             />
 
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rd_cat_income"
-            android:text="Income Source"
+            android:text="@string/income_source"
             />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/rd_cat_other"
-            android:text="other:"
-            android:paddingEnd="10dp"/>
+            android:text="@string/other"
+            android:paddingEnd="10dp"
+            android:paddingStart="0dp"/>
 
     </RadioGroup>
 
@@ -73,7 +74,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter new category"
+        android:hint="@string/enter_new_category"
         />
 
 

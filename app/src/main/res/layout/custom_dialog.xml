@@ -36,7 +36,7 @@
                 android:visibility="gone"
                 android:focusable="true"
                 android:textSize="14sp"
-                android:hint="Enter custom category"/>
+                android:hint="@string/enter_custom_category"/>
 
         </LinearLayout>
 

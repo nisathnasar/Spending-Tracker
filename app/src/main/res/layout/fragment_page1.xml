@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Quick Tutorial"
+            android:text="@string/quick_tutorial"
             android:textAlignment="center"
             style="@style/word_title"
             android:layout_weight="0.05"
@@ -26,7 +26,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dashboard Screen"
+            android:text="@string/dashboard_screen"
             android:textAlignment="center"
             android:textSize="20dp"
             android:layout_weight="0.05"/>
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/btn_skip"
                 android:layout_marginStart="20dp"
-                android:text="Skip"
+                android:text="@string/skip"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/btn_next_page"
                 android:layout_marginEnd="20dp"
-                android:text="Next"
+                android:text="@string/next"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

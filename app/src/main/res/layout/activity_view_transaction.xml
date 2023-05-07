@@ -186,7 +186,7 @@
                     style="@style/word_title"
                     android:textSize="20sp"
                     android:id="@+id/history_tv"
-                    android:text="History:">
+                    android:text="@string/history">
 
                 </TextView>
 
