@@ -3,18 +3,22 @@ package com.aston.spendingtracker.authorization;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.aston.spendingtracker.MainActivity;
 import com.aston.spendingtracker.R;
-import com.aston.spendingtracker.TutorialActivity;
+import com.aston.spendingtracker.tutorial.TutorialActivity;
 import com.aston.spendingtracker.entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,7 +26,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class RegisterUser extends AppCompatActivity implements View.OnClickListener{
+public class RegisterUserActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
     private Button registerNewUserButton, loginRedirectButton;
@@ -47,9 +51,49 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
 
         mAuth = FirebaseAuth.getInstance();
 
+        LinearLayout linearLayout = findViewById(R.id.register_linear_layout);
+
+//        getSupportActionBar().hide();
+
+        setupUI(linearLayout);
+
 
 
     }
+
+    public void setupUI(View view) {
+
+        // Set up touch listener for non-text box views to hide keyboard.
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(RegisterUserActivity.this);
+                    return false;
+                }
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
+        }
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -124,18 +168,18 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
-                                                Toast.makeText(RegisterUser.this, "User has been registered successfully!", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(RegisterUserActivity.this, "User has been registered successfully!", Toast.LENGTH_LONG).show();
                                                 progressBar.setVisibility(View.GONE);
-                                                startActivity(new Intent(RegisterUser.this, TutorialActivity.class));
+                                                startActivity(new Intent(RegisterUserActivity.this, TutorialActivity.class));
                                             }
                                             else{
-                                                Toast.makeText(RegisterUser.this, "Failed to register! Try again!", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(RegisterUserActivity.this, "Failed to register! Try again!", Toast.LENGTH_LONG).show();
                                                 progressBar.setVisibility(View.GONE);
                                             }
                                         }
                                     });
                         } else{
-                            Toast.makeText(RegisterUser.this, "Failed to register! Try again!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterUserActivity.this, "Failed to register! Try again!", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                         }
                     }

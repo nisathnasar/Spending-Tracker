@@ -95,7 +95,10 @@ public class AnalyticsFragment extends Fragment implements
 
 
     public static final int[] DARK_COLOURS_FOR_WHITE_TEXT = {
-            rgb("#ad3e07"), rgb("#807306"), rgb("#056341"), rgb("#053963"), rgb("#4a0563"), rgb("#630544"), rgb("#23454a")
+            rgb("#ad3e07"), rgb("#243354"),
+            rgb("#056341"), rgb("#053963"),
+            rgb("#4a0563"), rgb("#630544"),
+            rgb("#23454a"), rgb("#9a37c4")
     };
 
 
@@ -618,7 +621,24 @@ public class AnalyticsFragment extends Fragment implements
                     data.setValueTextSize(10f);
                     //data.setValueTypeface(tfLight);
                     //data.setBarWidth(0.9f);
-                    data.setValueTextColor(Color.WHITE);
+
+
+                    int nightModeFlags = getView().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+                    switch (nightModeFlags) {
+                        case Configuration.UI_MODE_NIGHT_YES:
+                            data.setValueTextColor(Color.WHITE);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_NO:
+                            data.setValueTextColor(Color.BLACK);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                            break;
+                    }
+
+                    //data.setValueTextColor(Color.WHITE);
+
+
                     data.setValueFormatter(new MoneyValueFormatter());
 
 

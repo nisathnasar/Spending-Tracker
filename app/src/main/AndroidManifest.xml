@@ -32,7 +32,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".TutorialActivity"
+            android:name=".tutorial.TutorialActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
@@ -41,13 +41,15 @@
         <activity
             android:name=".ViewTransaction"
             android:exported="false"
-            android:parentActivityName=".MainActivity">
+
+            >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+    <!--            android:parentActivityName=".MainActivity"-->
         <activity
-            android:name=".authorization.RegisterUser"
+            android:name=".authorization.RegisterUserActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

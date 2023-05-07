@@ -1,4 +1,4 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.tutorial;
 
 import android.os.Bundle;
 
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.aston.spendingtracker.R;
 
 /**
  * A simple {@link Fragment} subclass.

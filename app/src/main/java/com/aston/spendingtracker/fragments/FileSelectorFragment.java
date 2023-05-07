@@ -294,6 +294,9 @@ public class FileSelectorFragment extends Fragment implements AdapterView.OnItem
                     navBarView.getMenu().getItem(1).setEnabled(true);
                     navBarView.getMenu().getItem(2).setEnabled(true);
 
+                    navBarView.setSelectedItemId(R.id.menu_dashboard);
+
+
                 }
                 else{
                     Toast.makeText(getActivity(), "Something went wrong, please upload appropriate statements.", Toast.LENGTH_SHORT).show();

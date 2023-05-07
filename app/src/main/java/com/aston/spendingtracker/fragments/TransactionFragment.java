@@ -131,41 +131,26 @@ public class TransactionFragment extends Fragment implements ItemClickListener {
         DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         DatabaseReference mTransactionRef = mRootRef.child("Transaction");
 
-        final float[] finalMaximumBal = new float[1];
-
         mTransactionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 float maximumBal = 0;
-
-                transactionList.clear(); //------------------
+                transactionList.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     for(DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
                         Transaction transaction = dataSnapshot2.getValue(Transaction.class);
-                        //System.out.println(transaction);
                         transaction.parseDBDate();
                         transaction.parseDBMonth();
                         transaction.parseDBYear();
                         transactionList.add(transaction);
-
                         if(maximumBal < Float.valueOf(transaction.getBalance())){
                             maximumBal = Float.valueOf(transaction.getBalance());
                         }
-
-//                        try {
-//                            Transaction.sortTransactionListByDate(transactionList);
-//                        } catch (ParseException e) {
-//                            e.printStackTrace();
-//                        }
                     }
-
                 }
-
-                //finalMaximumBal[0] = maximumBal;
 
                 //update max bal on db:
                 mRootRef.child("MaximumBalance").setValue(maximumBal);
-
 
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -179,10 +164,7 @@ public class TransactionFragment extends Fragment implements ItemClickListener {
                                 getView().findViewById(R.id.welcome_msg_tv).setVisibility(View.VISIBLE);
                             }
                             catch (Exception e){
-
                             }
-
-
 
                         } else{
                             try{

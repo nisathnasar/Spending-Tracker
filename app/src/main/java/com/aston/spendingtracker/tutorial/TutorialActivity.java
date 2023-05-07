@@ -1,12 +1,13 @@
-package com.aston.spendingtracker;
+package com.aston.spendingtracker.tutorial;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.view.View;
 
+import com.aston.spendingtracker.FragmentChangeListener;
+import com.aston.spendingtracker.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -40,19 +41,19 @@ public class TutorialActivity extends AppCompatActivity implements FragmentChang
 
         new TabLayoutMediator(mTabLayout, pager, (tab, position) -> {
             if(position == 0){
-                tab.setText("Page 1");
+                tab.setText("");
                 //tab.setIcon(R.drawable.dashboard_icon);
             } else if (position == 1){
-                tab.setText("Page 2");
+                tab.setText("");
 //                tab.setIcon(R.drawable.reorder_icon);
             } else if (position == 2){
-                tab.setText("Page 3");
+                tab.setText("");
 //                tab.setIcon(R.drawable.bar_chart_icon);
             } else if (position == 3){
-                tab.setText("Page 4");
+                tab.setText("");
 //                tab.setIcon(R.drawable.description_icon);
             } else if (position == 4){
-                tab.setText("Page 5");
+                tab.setText("");
             }
             else{
 //                tab.setText("Tab " + (position+1));

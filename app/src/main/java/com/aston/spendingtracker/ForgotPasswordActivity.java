@@ -14,16 +14,11 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.aston.spendingtracker.authorization.LoginActivity;
-import com.aston.spendingtracker.authorization.RegisterUser;
-import com.aston.spendingtracker.entity.Transaction;
+import com.aston.spendingtracker.authorization.RegisterUserActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
@@ -115,7 +110,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ForgotPasswordActivity.this, RegisterUser.class);
+                Intent intent = new Intent(ForgotPasswordActivity.this, RegisterUserActivity.class);
                 startActivity(intent);
             }
         });

@@ -5,6 +5,10 @@ import static android.view.View.GONE;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,6 +19,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +30,7 @@ import com.aston.spendingtracker.axisformatters.MoneyValueFormatter;
 import com.aston.spendingtracker.axisformatters.MyXAxisValueFormatter;
 import com.aston.spendingtracker.entity.Transaction;
 import com.aston.spendingtracker.fragments.AddToCategoryFragment;
+import com.aston.spendingtracker.tutorial.TutorialActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -105,15 +113,23 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
         catChipGroup = findViewById(R.id.cat_chip_group);
 
         editCatBtn = findViewById(R.id.edit_cat_btn);
-        editCatBtn.setVisibility(GONE);
+        //editCatBtn.setVisibility(GONE);
 
         clearCatBtn = findViewById(R.id.clear_cat_btn);
         clearCatBtn.setVisibility(GONE);
 
         deleteCatBtn = findViewById(R.id.delete_cat_btn);
-        deleteCatBtn.setVisibility(GONE);
+        //deleteCatBtn.setVisibility(GONE);
 
         nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+//
+//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+//                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+//                .build();
+//        NavigationUI.setupWithNavController(binding.myToolbar, navController, appBarConfiguration);
 
         setFields();
 
@@ -158,7 +174,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     transactionTextView.setTextColor(Color.parseColor("#82b889"));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
-                    transactionTextView.setBackgroundColor(Color.parseColor("#53b075"));
+                    transactionTextView.setTextColor(Color.parseColor("#53b075"));
                     break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
@@ -293,8 +309,14 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.hasChild("Categories")){
                     ArrayList<String> categories = new ArrayList<>();
-                    categories.add("entertainment");
-                    categories.add("utility");
+                    categories.add("Grocery");
+                    categories.add("Travel");
+                    categories.add("Online Shopping");
+                    categories.add("Restaurant");
+                    categories.add("ATM");
+                    categories.add("Shopping");
+                    categories.add("Utility Bill");
+                    categories.add("University");
                     categories.add("other");
 
 
@@ -326,7 +348,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     editCatBtn.setVisibility(View.VISIBLE);
 
                     if(!partyCategory.equals("other")){
-                        clearCatBtn.setVisibility(View.VISIBLE);
+                        //clearCatBtn.setVisibility(View.VISIBLE);
                         deleteCatBtn.setVisibility(View.VISIBLE);
                     }
 
@@ -334,7 +356,7 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     editCatBtn.setVisibility(View.GONE);
 
                     //if(!partyCategory.equals("other")){
-                        clearCatBtn.setVisibility(View.GONE);
+                        //clearCatBtn.setVisibility(View.GONE);
                         deleteCatBtn.setVisibility(View.GONE);
                     //}
 
@@ -710,7 +732,21 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
                     data.setValueTextSize(10f);
                     //data.setValueTypeface(tfLight);
                     data.setBarWidth(0.9f);
-                    data.setValueTextColor(Color.WHITE);
+
+                    int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+                    switch (nightModeFlags) {
+                        case Configuration.UI_MODE_NIGHT_YES:
+                            data.setValueTextColor(Color.WHITE);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_NO:
+                            data.setValueTextColor(Color.BLACK);
+                            break;
+                        case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                            break;
+                    }
+
+                    //data.setValueTextColor(Color.WHITE);
                     data.setValueFormatter(new MoneyValueFormatter());
 
                     chart.setData(data);
@@ -863,4 +899,35 @@ public class ViewTransaction extends AppCompatActivity implements OnChartValueSe
     public void onDialogNegativeClick(DialogFragment dialog) {
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menufile_viewtransaction, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_up:
+
+                Intent i = new Intent(this, MainActivity.class);
+                i.putExtra("ViewTransaction", true);
+                i.putExtra("snapShotExists", true);
+
+                startActivity(i);
+
+//                startActivity(new Intent(ViewTransaction.this, MainActivity.class));
+
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
 }
