@@ -47,7 +47,7 @@
             android:inputType="textEmailAddress"
             android:minHeight="48dp"
             android:selectAllOnFocus="true"
-            android:text="test@spending.com"
+
             />
 
 
@@ -74,7 +74,7 @@
             android:inputType="textPassword"
             android:minHeight="48dp"
             android:selectAllOnFocus="true"
-            android:text="somepassword"
+
             />
 
     </com.google.android.material.textfield.TextInputLayout>
