@@ -33,19 +33,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="You can upload your bank statement in this page. Please note:\n
-        \n1 App only supports PDF.
-        \n2 Never upload same statement more than once.
-        \n3 The current version only supports HSBC.
-        \n\nSteps: \n
-        \n1 Click 'Browse'
-        \n2 Find your statement in your device.
-        \n3 Click 'Submit File'"
+                    android:text="@string/upload_instruction"
                     />
             </com.google.android.material.card.MaterialCardView>
-
-
-
 
             <TextView
                 android:id="@+id/editText_path"
@@ -53,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:layout_gravity="center_horizontal"
-                android:text="No File Selected"
+                android:text="@string/no_file_selected"
                 android:inputType="textUri" />
 
             <com.google.android.material.button.MaterialButton
@@ -61,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Browse" />
+                android:text="@string/browse" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -75,7 +65,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Select your bank:"
+                    android:text="@string/select_your_bank"
                     android:layout_weight="0.5"
                     android:textSize="15sp"/>
 

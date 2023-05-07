@@ -88,7 +88,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="15dp"
-        android:text="Sign In"
+        android:text="@string/sign_in"
          />
 
     <com.google.android.material.button.MaterialButton
@@ -103,14 +103,14 @@
 
         style="?attr/materialButtonOutlinedStyle"
 
-        android:text="Register"
+        android:text="@string/register"
         />
 
     <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_forgot_password"
-        android:text="I have forgotten my password"
+        android:text="@string/i_have_forgotten_my_password"
         style="@style/Widget.Material3.Button.TextButton"
         />
 

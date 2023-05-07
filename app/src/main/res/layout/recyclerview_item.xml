@@ -58,7 +58,6 @@
                     android:layout_weight="0.6"
                     android:maxLines="1"
                     android:gravity="start"
-                    android:text="23-rfv-22"
                     android:layout_marginBottom="3dp"
                     />
 
@@ -72,8 +71,7 @@
                     style="@style/word_title"
                     android:textSize="15sp"
                     android:layout_weight="0.6"
-                    android:paddingStart="10dp"
-                    android:text="Amazon"/>
+                    android:paddingStart="10dp" />
 
             </LinearLayout>
             <LinearLayout
@@ -94,7 +92,6 @@
                     android:layout_weight="0.4"
                     android:maxLines="1"
                     android:gravity="end"
-                    android:text="£2454"
                     />
 
                 <TextView
@@ -107,8 +104,7 @@
                     android:paddingStart="15dp"
                     android:paddingEnd="10dp"
                     android:layout_weight="0.4"
-                    android:gravity="end"
-                    android:text="£2454"/>
+                    android:gravity="end" />
 
             </LinearLayout>
 

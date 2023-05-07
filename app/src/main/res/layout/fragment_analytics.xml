@@ -38,7 +38,7 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginStart="30dp"
                         android:layout_marginEnd="30dp"
-                        android:text="Latest Week Spending"
+                        android:text="@string/latest_week_spending"
                         android:layout_gravity="center_horizontal"
                         android:textAlignment="center"
 
@@ -81,7 +81,7 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginStart="30dp"
                         android:layout_marginEnd="30dp"
-                        android:text="Spending by Category"
+                        android:text="@string/spending_by_category"
                         android:layout_gravity="center_horizontal"
                         android:textAlignment="center"
 
@@ -121,7 +121,7 @@
 
                         android:checked="false"
                         android:id="@+id/labels_toggle"
-                        android:text="Show labels on the chart"
+                        android:text="@string/show_labels_on_the_chart"
                         />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -132,7 +132,7 @@
                         android:layout_marginBottom="15dp"
                         android:checked="false"
                         android:id="@+id/percentage_toggle_spending_by_category"
-                        android:text="Show percentage values"
+                        android:text="@string/show_percentage_values"
                         />
 
                 </LinearLayout>
@@ -160,7 +160,7 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginStart="30dp"
                         android:layout_marginEnd="30dp"
-                        android:text="Income by Category"
+                        android:text="@string/income_by_category"
                         android:layout_gravity="center_horizontal"
                         android:textAlignment="center"
 
@@ -200,7 +200,7 @@
 
                         android:checked="false"
                         android:id="@+id/labels_toggle_income_sources"
-                        android:text="Show labels on the chart"
+                        android:text="@string/show_labels_on_the_chart"
                         />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -211,7 +211,7 @@
                         android:layout_marginBottom="15dp"
                         android:checked="false"
                         android:id="@+id/percentage_toggle_income_sources"
-                        android:text="Show percentage values"
+                        android:text="@string/show_percentage_values"
                         />
 
                 </LinearLayout>
@@ -238,7 +238,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="30dp"
-                        android:text="Overview of all your transactions:"
+                        android:text="@string/overview_of_your_balance_throughout_the_years"
                         android:layout_gravity="center"
                         style="@style/word_title"
                         android:textSize="15sp"/>

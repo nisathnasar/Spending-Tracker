@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:inputType="textFilter"
-            android:hint="Search"
+            android:hint="@string/search"
             android:imeOptions="actionSearch"
             android:id="@+id/filter_et"
             />
@@ -38,7 +38,7 @@
         android:visibility="gone"
         android:textAlignment="center"
         android:id="@+id/welcome_msg_tv"
-        android:text="Welcome to Spending Tracker. Please upload your bank statements to start tracking your spending."/>
+        android:text="@string/welcome_to_spending_tracker_please_upload_your_bank_statements_to_start_tracking_your_spending"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
         android:layout_gravity="center_horizontal"
         android:visibility="gone"
         android:id="@+id/welcome_msg_upload_bt"
-        android:text="Upload"/>
+        android:text="@string/upload"/>
 
     <FrameLayout
         android:layout_width="match_parent"
